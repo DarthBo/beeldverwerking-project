@@ -5,7 +5,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-/* Approximations of Hue values for common colours in HSV colour space
+/* Approximations of Hue values for common colours in HSV colour space. S and V values vary and have to be found by experimenting.
 Orange  0-22
 Yellow 22- 38
 Green 38-75
