@@ -4,6 +4,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <sys/stat.h>
 #include "image_utils.h"
+#include "file_utils.h"
+#include "video_utils.h"
 
 using namespace cv;
 
