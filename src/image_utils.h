@@ -27,4 +27,17 @@ void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& ma
     cv::GaussianBlur(out,out,ksize,0);//noise reduction
 }
 
+/* Returns cv::Mat accentuating texture in vertical direction. Values for kernel could need tweaking, current ones are barely more than guess work. */
+void textureFilter(const cv::Mat& in, cv::Mat& out){
+    cv::Size ksize;
+    ksize.height = 3; // precision
+    ksize.width = 3;
+    int sigma= 1;
+    int theta = 180; // orientation, 0 or 180 for vertical textures
+    int lamda = 180;
+    int gamma = 1;
+    cv::Mat kernel = cv::getGaborKernel(ksize,sigma,theta,lamda,gamma);
+    cv::filter2D(in, out, CV_32F, kernel);
+}
+
 #endif
