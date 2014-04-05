@@ -8,6 +8,7 @@
 #include "video_utils.h"
 
 using namespace cv;
+using namespace std;
 
 const std::string videoLocation = "../resources/vid/20140226_h_10fps.avi";
 const std::string windowName1 = "Image stuffs";
