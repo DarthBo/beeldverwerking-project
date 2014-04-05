@@ -35,7 +35,8 @@ double getAverageColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scal
     return s[0];
 }
 
-/* Returns cv::Mat with type CV_32F (= 21, 3 channels) accentuating texture in vertical direction using a Gabor filter. Values for kernel could need tweaking, current ones are barely more than guesswork. */
+/* Returns cv::Mat with type CV_32F (= 21, 3 channels) accentuating texture in vertical direction using a Gabor filter.
+ * Values for kernel could need tweaking, current ones are barely more than guesswork. */
 void textureFilter(const cv::Mat& in, cv::Mat& out){
     cv::Size ksize;
     ksize.height = 3; // precision
