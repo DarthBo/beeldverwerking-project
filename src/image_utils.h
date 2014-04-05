@@ -27,7 +27,7 @@ void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& ma
     cv::GaussianBlur(out,out,ksize,0);//noise reduction
 }
 
-/* Returns cv::Mat accentuating texture in vertical direction. Values for kernel could need tweaking, current ones are barely more than guess work. */
+/* Returns cv::Mat accentuating texture in vertical direction. Values for kernel could need tweaking, current ones are barely more than guesswork. */
 void textureFilter(const cv::Mat& in, cv::Mat& out){
     cv::Size ksize;
     ksize.height = 3; // precision
