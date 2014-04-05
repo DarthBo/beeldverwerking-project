@@ -7,8 +7,11 @@
 #include "file_utils.h"
 #include "video_utils.h"
 
-using namespace cv;
-using namespace std;
+using cv::namedWindow;
+using cv::Mat;
+using cv::imshow;
+using cv::waitKey;
+using cv::destroyWindow;
 
 const std::string videoLocation = "../resources/vid/20140226_h_10fps.avi";
 const std::string windowName1 = "Image stuffs";
