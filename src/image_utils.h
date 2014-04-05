@@ -49,7 +49,7 @@ void textureFilter(const cv::Mat& in, cv::Mat& out){
 }
 
 /* Utility function that calls textureFilter and returns the means of it's output channels. */
-void getAverageTexture(const cv::Mat& in, std::vector<double> means){
+void getAverageTexture(const cv::Mat& in, std::vector<double>& means){
     cv::Mat out;
     textureFilter(in, out);
     cv::Scalar s = cv::mean(out);
