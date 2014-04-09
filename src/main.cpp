@@ -26,7 +26,7 @@ const char* windowName3 = "More Processed image stuffs";
 
 int main(int argc, char **argv)
 {
-    std::cout<<(exists(videoLocation) == true ? "FILE FOUND" : "FILE NOT FOUND")<<std::endl;
+    //std::cout<<(exists(videoLocation) == true ? "FILE FOUND" : "FILE NOT FOUND")<<std::endl;
 
     Mat frame;
     getFrameByNumber(videoLocation,1,frame);
@@ -44,8 +44,8 @@ int main(int argc, char **argv)
             //CALL SVM WITH FEATURES HERE
 
             //print features
-            for(int i = 0; i< features.size();i++){
-                cout<<features[i]<<" ";
+            for(double feature : features){
+                cout<<feature<<" ";
             }
             cout<<endl;
 

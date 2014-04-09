@@ -11,6 +11,7 @@ find_package(OpenCV REQUIRED)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(CMAKE_CXX_FLAGS "-o3 -Wall")
+SET(CMAKE_CXX_FLAGS "-std=c++0x")
 SET(CMAKE_CXX_LINK_FLAGS "-pg")
 SET(OpenCV_LIBRARIES opencv_core opencv_highgui opencv_imgproc)
 
