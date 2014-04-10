@@ -48,7 +48,7 @@ int main(int argc, char **argv)
             //CALL SVM WITH FEATURES HERE
 
             //print features
-            for (int i=1 ; i <= features.size() ; i++)
+            for (size_t i=1 ; i <= features.size() ; i++)
             {
                 cout << i << ':' << features[i] << ' ';
             }
