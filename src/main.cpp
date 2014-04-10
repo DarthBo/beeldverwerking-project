@@ -35,7 +35,9 @@ int main(int argc, char **argv)
 
     Mat frame;
     getFrameByNumber(videoLocation,1,frame);
-    Rect window = Rect(0, 0, 16, 9);
+    ImageGrid(frame,16,9);
+
+    /*Rect window = Rect(0, 0, 16, 9);
     cout << frame.cols << " " << frame.rows << endl;
     for(int row = 0; row< frame.rows; row+= window.height ){
         for(int col = 0; col < frame.cols;col += window.width){
@@ -59,7 +61,7 @@ int main(int argc, char **argv)
         }
         window.x = 0;
         window.y = window.y + window.height;
-    }
+    }*/
     return 0;
 }
 

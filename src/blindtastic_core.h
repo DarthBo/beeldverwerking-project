@@ -1,5 +1,5 @@
-#ifndef IMAGE_UTILS_H
-#define IMAGE_UTILS_H
+#ifndef BLINDTASTIC_CORE_H
+#define BLINDTASTIC_CORE_H
 
 #include "opencv2/opencv.hpp"
 
@@ -10,7 +10,7 @@ protected:
 public:
     Feature(const char* _name,double _value):name(_name),value(_value){}
     const char* getName(){return name;}
-    double getValue(){return value;};
+    double getValue(){return value;}
 };
 
 class Characteristic{
@@ -20,30 +20,88 @@ class Characteristic{
 
 class GridElement{
 protected:
-    int width;
-    int height;
+    cv::Mat element;
     Characteristic characteristic;
 public:
-    GridElement(int _width,int _height):width(_width),height(_height){}
+    GridElement(){}
+    GridElement(cv::Mat _element):element(_element){}
     Characteristic* getCharacteristic(){return &characteristic;}
+};
+
+class Image{
+protected:
+    cv::Mat mat;
+    std::vector<Characteristic> characteristics;
+public:
+    Image(cv::Mat _image):mat(_image){}
+    cv::Mat* getMat(){return &mat;}
 };
 
 class ImageGrid{
 protected:
-    int gridHeight;
-    int gridWidth;
+    Image image;
     int elementHeight;
     int elementWidth;
     std::vector<std::vector<GridElement>> elements;
+    void populate();
 public:
-    ImageGrid(int _gridHeight,int _gridWidth,int _elementHeight,int _elementWidth)
-        :gridHeight(_gridHeight),gridWidth(_gridWidth),elementHeight(_elementHeight),elementWidth(_elementWidth){}
+    ImageGrid(cv::Mat _image,int _elementWidth, int _elementHeight):image(_image),elementHeight(_elementHeight),elementWidth(_elementWidth){
+        populate();
+    }
 };
 
-class Image{
-    cv::Mat image;
-    ImageGrid grid;
-    std::vector<Characteristic> characteristics;
-};
+void ImageGrid::populate(){
+    cv::Mat* mat = image.getMat();
+    int rows = ceil(mat->rows/elementHeight);
+    int cols = ceil(mat->cols/elementWidth);
+    //init vectors
+    elements.resize(rows);
+    for(int row = 0; row<rows; row++){
+        elements[row].resize(cols);
+    }
+    std::cout<<"Populating "<<rows<<"x"<<cols<<" grid..."<<std::endl;
+    int count = 0; //debugging
+    cv::Rect window = cv::Rect(0, 0, elementWidth, elementHeight);
+    for(int row = 0; row<rows-1; row++){
+        for(int col = 0; col<cols-1; col++){
+            cv::Mat ROI(*mat,window);
+            GridElement element(ROI);
+            elements[row][col] = element;
+            window.x = window.x + window.width;
+            count++;
+        }
+        window.x = 0;
+        window.y += window.height;
+    }
+    //final row/column might have different dimensions
+    int remainingX = mat->cols - window.x;
+    int remainingY = mat->rows - window.y;
+
+    //final column except for last element, this we will handle last, can have a different width
+    window.width = remainingX;
+    for(int row = 0; row<rows-1; row++){
+        cv::Mat ROI(*mat,window);
+        GridElement element(ROI);
+        elements[row][cols-1] = element;
+        count++;
+    }
+    //final row except for last element, this we will handle last, can have a different height
+    window.width = elementWidth;
+    window.height = remainingY;
+    for(int col = 0; col<cols-1; col++){
+        cv::Mat ROI(*mat,window);
+        GridElement element(ROI);
+        elements[rows-1][col] = element;
+        count++;
+    }
+    //final element can have a different width and height
+    window.width = remainingX;
+    cv::Mat ROI(*mat,window);
+    GridElement element(ROI);
+    elements[rows-1][cols-1] = element;
+    count++;
+
+    std::cout<<"Done! Number of grid elements:"<<count<<std::endl;
+}
 
 #endif
