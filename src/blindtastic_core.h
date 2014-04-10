@@ -45,6 +45,7 @@ protected:
     std::vector<std::vector<GridElement>> elements;
     void populate();
 public:
+    //Elements of final column and row may not have given dimensions if height and width cannot be properly divided
     ImageGrid(cv::Mat _image,int _elementWidth, int _elementHeight):image(_image),elementHeight(_elementHeight),elementWidth(_elementWidth){
         populate();
     }
