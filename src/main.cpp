@@ -37,6 +37,9 @@ int main(int argc, char **argv)
     getFrameByNumber(videoLocation,1,frame);
     ImageGrid(frame,50,50);
 
+
+    //Code below should be integrated in blindtastic_core.h
+
     /*Rect window = Rect(0, 0, 16, 9);
     cout << frame.cols << " " << frame.rows << endl;
     for(int row = 0; row< frame.rows; row+= window.height ){
