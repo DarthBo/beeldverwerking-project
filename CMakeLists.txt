@@ -18,6 +18,7 @@ SET(SRC src/main.cpp
         src/image_utils.h
         src/file_utils.h
         src/video_utils.h
+        src/blindtastic_core.h
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})
