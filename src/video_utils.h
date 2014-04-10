@@ -1,13 +1,7 @@
 #ifndef VIDEO_UTILS_H
 #define VIDEO_UTILS_H
 
-#include <cstdio>
-#include <sys/stat.h>
 #include "opencv2/opencv.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-
-
 
 // Shows first frame of video in window. Show next frame of video on key pressed.
 int showFramePerFrame(const char* windowName, const char* videoLocation)

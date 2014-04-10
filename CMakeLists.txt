@@ -17,8 +17,8 @@ SET(OpenCV_LIBRARIES opencv_core opencv_highgui opencv_imgproc)
 
 SET(SRC src/main.cpp
         src/image_utils.h
-	   src/file_utils.h
-	   src/video_utils.h
+        src/file_utils.h
+        src/video_utils.h
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})

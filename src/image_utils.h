@@ -1,9 +1,7 @@
 #ifndef IMAGE_UTILS_H
 #define IMAGE_UTILS_H
-#include <cstdio>
+
 #include "opencv2/opencv.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
 
 /* Approximations of Hue values for common colours in HSV colour space. S and V values vary and have to be found by experimenting.
 Orange  0-22

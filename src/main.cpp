@@ -1,11 +1,10 @@
-#include <cstdio>
-#include <sys/stat.h>
 #include "opencv2/opencv.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "image_utils.h"
+//#include "opencv2/core/core.hpp"
+//#include "opencv2/highgui/highgui.hpp"
+
 #include "file_utils.h"
 #include "video_utils.h"
+#include "image_utils.h"
 
 using cv::namedWindow;
 using cv::Mat;
@@ -26,12 +25,17 @@ const char* windowName3 = "More Processed image stuffs";
 
 int main(int argc, char **argv)
 {
-    //std::cout<<(exists(videoLocation) == true ? "FILE FOUND" : "FILE NOT FOUND")<<std::endl;
+    if (!exists(videoLocation))
+    {
+        std::cout << videoLocation << " not found!\nAborting..." << std::endl;
+        return 1;
+    }
+    std::cout << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     Mat frame;
     getFrameByNumber(videoLocation,1,frame);
     Rect window = Rect(0, 0, 16, 9);
-    cout<< frame.cols <<" "<<frame.rows<<endl;
+    cout << frame.cols << " " << frame.rows << endl;
     for(int row = 0; row< frame.rows; row+= window.height ){
         for(int col = 0; col < frame.cols;col += window.width){
             Mat ROI(frame,window); // region of interest
@@ -44,10 +48,11 @@ int main(int argc, char **argv)
             //CALL SVM WITH FEATURES HERE
 
             //print features
-            for(double feature : features){
-                cout<<feature<<" ";
+            for (int i=1 ; i <= features.size() ; i++)
+            {
+                cout << i << ':' << features[i] << ' ';
             }
-            cout<<endl;
+            cout << "# 1[" << col << ',' << row << ']' << endl; // frame[x,y]
 
             window.x = window.x + window.width;
         }
