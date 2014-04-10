@@ -23,6 +23,49 @@ const char* windowName2 = "Processed image stuffs";
 const char* windowName3 = "More Processed image stuffs";
 
 
+class Feature{
+protected:
+    const char* name;
+    double value;
+    Feature(const char* _name):name(_name){}
+public:
+    const char* getName(){return name;}
+    double getValue(){return value;};
+};
+
+class Characteristic{
+    string name;
+    vector<Feature> features;
+};
+
+class GridElement{
+protected:
+    int width;
+    int height;
+    Characteristic characteristic;
+public:
+    GridElement(int _width,int _height):width(_width),height(_height){}
+    Characteristic* getCharacteristic(){return &characteristic;}
+};
+
+class ImageGrid{
+protected:
+    int gridHeight;
+    int gridWidth;
+    int elementHeight;
+    int elementWidth;
+    vector<vector<GridElement>> elements;
+public:
+    ImageGrid(int _gridHeight,int _gridWidth,int _elementHeight,int _elementWidth)
+        :gridHeight(_gridHeight),gridWidth(_gridWidth),elementHeight(_elementHeight),elementWidth(_elementWidth){}
+};
+
+class Image{
+    Mat image;
+    ImageGrid grid;
+    vector<Characteristic> characteristics;
+};
+
 int main(int argc, char **argv)
 {
     if (!exists(videoLocation))
