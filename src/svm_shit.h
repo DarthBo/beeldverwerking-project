@@ -6,9 +6,16 @@
 #include "video_utils.h"
 #include "blindtastic_core.h"
 
-
-#define YES 1048697
-#define NO 1048686
+#ifdef __linux__
+    #define YES 1048697
+    #define NO 1048686
+#elif __APPLE__
+    #define YES 121
+    #define NO 110
+#else
+    #define YES 121
+    #define NO 110
+#endif
 
 //show window, ask question
 bool train_askuser(cv::Mat q)
