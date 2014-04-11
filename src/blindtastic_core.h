@@ -5,16 +5,18 @@
 
 class Feature{
 protected:
-    const char* name;
+    std::string name;
     double value;
 public:
     Feature(const char* _name,double _value):name(_name),value(_value){}
-    const char* getName(){return name;}
+    Feature(std::string& _name,double _value):name(_name),value(_value){}
+    const char* getName(){return name.c_str();}
     double getValue(){return value;}
 };
 
 class Characteristic{
-    const char* name;
+public:
+    std::string name;
     std::vector<Feature> features;
 };
 
@@ -121,9 +123,9 @@ void ImageGrid::test(){
             for(int row = 0; row < (*m).rows;row++){
                 for(int col = 0; col < (*m).cols;col++){
                     cv::Scalar s(1,0,0);
-                    (*m).at<cv::Vec3b>(row,col)[0] = count%255;
-                    (*m).at<cv::Vec3b>(row,col)[1] =(count+125)%255;
-                    (*m).at<cv::Vec3b>(row,col)[2] = (count+250)%255;
+                    m->at<cv::Vec3b>(row,col)[0] =  count     %255;
+                    m->at<cv::Vec3b>(row,col)[1] = (count+125)%255;
+                    m->at<cv::Vec3b>(row,col)[2] = (count+250)%255;
                 }
             count++;
             }

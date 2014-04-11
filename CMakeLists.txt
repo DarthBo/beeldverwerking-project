@@ -10,7 +10,7 @@ find_package(OpenCV REQUIRED)
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-SET(CMAKE_CXX_FLAGS "-o3 -Wall -std=c++11")
+SET(CMAKE_CXX_FLAGS "-o3 -Wall -g -std=c++11")
 SET(CMAKE_CXX_LINK_FLAGS "-pg")
 SET(OpenCV_LIBRARIES opencv_core opencv_highgui opencv_imgproc)
 
@@ -19,6 +19,8 @@ SET(SRC src/main.cpp
         src/file_utils.h
         src/video_utils.h
         src/blindtastic_core.h
+        #tijdelijke shit
+        src/svm_shit.h
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})
