@@ -18,6 +18,13 @@ int showFramePerFrame(const char* windowName, const char* videoLocation)
     return 0;
 }
 
+// Get Framecount
+unsigned int getFrameCount(const char* videoLocation)
+{
+    cv::VideoCapture cap(videoLocation);
+    return (unsigned int) cap.get(CV_CAP_PROP_FRAME_COUNT);
+}
+
 // Return frame at given index
 int getFrameByNumber(const char* videoLocation, const int frameNumber, cv::Mat& frame){
     cv::VideoCapture cap(videoLocation);
