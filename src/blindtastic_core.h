@@ -52,6 +52,10 @@ public:
     ImageGrid(cv::Mat _image,int _elementWidth, int _elementHeight):image(_image),elementHeight(_elementHeight),elementWidth(_elementWidth){
         populate();
     }
+
+    void populateCharacteristics(){
+        //move over grid and call SVM for every element to find the Characteristics
+    }
 };
 
 void ImageGrid::populate(){
