@@ -15,13 +15,14 @@ public:
 
 class Characteristic{
     const char* name;
+    double weight;
     std::vector<Feature> features;
 };
 
 class GridElement{
 protected:
     cv::Mat element;
-    Characteristic characteristic;
+    std::vector<Characteristic> characteristics;
 public:
     GridElement(){}
     GridElement(cv::Mat _element):element(_element){}
