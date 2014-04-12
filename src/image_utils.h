@@ -21,16 +21,23 @@ void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& ma
     ksize.height=3;
     ksize.width=3;
     cv::GaussianBlur(in,out,ksize,0); //noise reduction
-    cv::inRange(in,min,max,out);
+    cv::inRange(out,min,max,out);
     cv::GaussianBlur(out,out,ksize,0);//noise reduction
 }
 
 /* Utility function that calls filterColour and returns the mean of it's output channel. */
-double getAverageColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max){
+double getAverageFilteredColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max){
     cv::Mat out;
     filterColour(in,min,max,out);
     cv::Scalar s = cv::mean(out);
     return s[0];
+}
+
+double getAverageColour(const cv::Mat& in,std::vector<double>& means){
+    cv::Scalar s = cv::mean(in);
+    means.push_back(s[0]);
+    means.push_back(s[1]);
+    means.push_back(s[2]);
 }
 
 /* Returns cv::Mat with type CV_32F (= 21, 3 channels) accentuating texture in vertical direction using a Gabor filter.
