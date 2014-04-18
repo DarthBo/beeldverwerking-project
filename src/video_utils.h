@@ -17,7 +17,7 @@ int thresh = 50, N = 11;
 int LINE_AA=16;
 const char* wndname = "Square Detection Demo";
 
-static double angle( Point pt1, Point pt2, Point pt0 )
+double angle( Point pt1, Point pt2, Point pt0 )
 {
     double dx1 = pt1.x - pt0.x;
     double dy1 = pt1.y - pt0.y;
@@ -28,7 +28,7 @@ static double angle( Point pt1, Point pt2, Point pt0 )
 
 // returns sequence of squares detected on the image.
 // the sequence is stored in the specified memory storage
-static void findSquares( const Mat& image, vector<vector<Point> >& squares )
+void findSquares( const Mat& image, vector<vector<Point> >& squares )
 {
     squares.clear();
 
@@ -110,7 +110,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 
 
 // the function draws all the squares in the image
-static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
+void drawSquares( Mat& image, const vector<vector<Point> >& squares )
 {
     for( size_t i = 0; i < squares.size(); i++ )
     {
