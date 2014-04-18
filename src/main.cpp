@@ -22,25 +22,20 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-const char* videoLocation = "../resources/vid/20140226_h_10fps.avi";
-const char* windowName1 = "Image stuffs";
+const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
+
+const char* win_squares = "Amai al die vakjes :o";
 const char* windowName2 = "Processed image stuffs";
 const char* windowName3 = "More Processed image stuffs";
 
 
-int main(int argc, char **argv)
-{
-    if (!exists(videoLocation))
-    {
-        std::cout << videoLocation << " not found!\nAborting..." << std::endl;
-        return 1;
-    }
-    std::cout << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
+void showSquares(const char* videoLocation)
+{
     //Om filmpje af te spelen en square detection te doen.
     vector<vector<Point> > squares;
 
-    cv::namedWindow(windowName1);
+    cv::namedWindow(win_squares);
 
     char buff[32] = {0};
 
@@ -56,7 +51,7 @@ int main(int argc, char **argv)
             printText(img, string(buff));
         }
 
-        cv::imshow(windowName1,img);
+        cv::imshow(win_squares,img);
         counter++;
 
         if (cv::waitKey(10) >= 0)
@@ -64,6 +59,33 @@ int main(int argc, char **argv)
     }
 
     cv::destroyAllWindows();
+}
+
+void svm_trainGrass(const char* video)
+{
+    man_train_video(video);
+}
+
+
+int main(int argc, char **argv)
+{
+    // find video file
+    const char* videoLocation = defaultVideo;
+    if (argc > 1)
+    {
+        videoLocation = argv[1];
+    }
+    if (!file_exists(videoLocation))
+    {
+        std::cout << videoLocation << " not found!\nAborting..." << std::endl;
+        return 1;
+    }
+    std::cout << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
+
+    // do something
+
+    //testSquares(videoLocation);
+    svm_trainGrass(videoLocation);
 
     return 0;
 }
