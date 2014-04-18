@@ -43,6 +43,8 @@ int main(int argc, char **argv)
 
     cv::namedWindow(windowName1);
 
+    char buff[32] = {0};
+
     cv::VideoCapture cap(videoLocation);
     Mat img;
     int counter = 0;
@@ -51,6 +53,13 @@ int main(int argc, char **argv)
             findSquares(img,squares);
             drawSquares(img,squares);
         }
+
+        //debug text
+        sprintf(buff, "%u kotjes", static_cast<unsigned int>(squares.size()));
+        //print twice (+shift) for shadow effect -> improves readability
+        putText(img, string(buff), Point(50,75), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 50, 0));
+        putText(img, string(buff), Point(48,73), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 255, 0));
+
         cv::imshow(windowName1,img);
         counter++;
 
