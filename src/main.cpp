@@ -22,7 +22,7 @@ using std::endl;
 
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
-const char* win_rects = "Discover ALL the rectangles \o/";
+const char* win_rects = "Discover ALL the rectangles \\o/";
 const char* windowName2 = "Processed image stuffs";
 const char* windowName3 = "More Processed image stuffs";
 
@@ -75,15 +75,17 @@ int main(int argc, char **argv)
     }
     if (!file_exists(videoLocation))
     {
-        std::cout << videoLocation << " not found!\nAborting..." << std::endl;
+        std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
         return 1;
     }
-    std::cout << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
+    std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
 
     //showSquares(videoLocation);
     svm_trainGrass(videoLocation);
 
+
+    std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }
