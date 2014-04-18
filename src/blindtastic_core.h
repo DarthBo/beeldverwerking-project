@@ -126,9 +126,9 @@ void ImageGrid::test(){
             for(int row = 0; row < (*m).rows;row++){
                 for(int col = 0; col < (*m).cols;col++){
                     cv::Scalar s(1,0,0);
-                    (*m).at<cv::Vec3b>(row,col)[0] = count%255;
-                    (*m).at<cv::Vec3b>(row,col)[1] =(count+125)%255;
-                    (*m).at<cv::Vec3b>(row,col)[2] = (count+250)%255;
+                    m->at<cv::Vec3b>(row,col)[0] =  count     %255;
+                    m->at<cv::Vec3b>(row,col)[1] = (count+125)%255;
+                    m->at<cv::Vec3b>(row,col)[2] = (count+250)%255;
                 }
             count++;
             }
