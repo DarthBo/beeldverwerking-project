@@ -108,16 +108,21 @@ void findSquares( const Mat& image, vector<vector<Point> >& squares )
     }
 }
 
+// draws a rectangle on the image
+void drawRect(Mat& img, const vector<Point>& rect, const Scalar& colour = Scalar(0,255,0))
+{
+    const Point* p = &rect[0];
+    int n = static_cast<int>(rect.size());
 
-// the function draws all the squares in the image
-void drawSquares( Mat& image, const vector<vector<Point> >& squares )
+    polylines(img, &p, &n, 1, true, colour, 3, LINE_AA);
+}
+
+// this function draws all the squares in the image
+void drawSquares(Mat& image, const vector<vector<Point> >& squares)
 {
     for( size_t i = 0; i < squares.size(); i++ )
     {
-        const Point* p = &squares[i][0];
-        int n = (int)squares[i].size();
-
-        polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, LINE_AA);
+        drawRect(image, squares[i]);
     }
 }
 
@@ -147,7 +152,7 @@ int showFramePerFrame(const char* windowName, const char* videoLocation)
 unsigned int getFrameCount(const char* videoLocation)
 {
     cv::VideoCapture cap(videoLocation);
-    return (unsigned int) cap.get(CV_CAP_PROP_FRAME_COUNT);
+    return static_cast<unsigned int>(cap.get(CV_CAP_PROP_FRAME_COUNT));
 }
 
 // Get frame count from existing capture
@@ -155,7 +160,7 @@ unsigned int getFrameCount(cv::VideoCapture& video)
 {
     if(!video.isOpened())
         return 0;
-    return (unsigned int) video.get(CV_CAP_PROP_FRAME_COUNT);
+    return static_cast<unsigned int>(video.get(CV_CAP_PROP_FRAME_COUNT));
 }
 
 // Return frame at given index

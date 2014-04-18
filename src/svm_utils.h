@@ -18,15 +18,42 @@
 #endif
 
 //show window, ask question
-bool train_askuser(cv::Mat q)
+bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question)
 {
-    cv::imshow("frame",q);
+    cv::Mat ROI = img.clone();
+
+    std::vector<cv::Point> corners(4);
+    corners[0] = Point(rect.x           , rect.y            );
+    corners[1] = Point(rect.x+rect.width, rect.y            );
+    corners[2] = Point(rect.x+rect.width, rect.y+rect.height);
+    corners[3] = Point(rect.x           , rect.y+rect.height);
+
+    drawRect(ROI, corners, Scalar(255,0,0));
+    printText(ROI, question, rect.x + 50, rect.y+75);
+
+    cv::imshow(question, ROI);
+
     int key = cv::waitKey();
+
+    switch (key)
+    {
+        case YES:
+            drawRect(ROI, corners, Scalar(0,255,0));
+            break;
+        case NO:
+            drawRect(ROI, corners, Scalar(0,0,255));
+            break;
+        default:
+            exit(1);
+    }
+
+    cv::imshow(question, ROI);
+    cv::waitKey(100);
 
     return (key == YES);
 }
 
-void man_train_video(const char* videoLocation)
+void man_train_video(const char* videoLocation, const string& q)
 {
     cv::VideoCapture cap(videoLocation);
     assert(cap.isOpened());
@@ -52,7 +79,7 @@ void man_train_video(const char* videoLocation)
                 features.push_back(greenFeature);
                 features.insert(features.end(),textureFeatures.begin(),textureFeatures.end());
 
-                bool green = train_askuser(ROI);
+                bool green = train_askuser(frame, window, q);
                 std::cout << (green ? "+1 " : "-1 ");
 
                 //print features

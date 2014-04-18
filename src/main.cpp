@@ -9,8 +9,6 @@
 
 #include "blindtastic_core.h"
 
-
-
 using cv::namedWindow;
 using cv::Mat;
 using cv::imshow;
@@ -24,7 +22,7 @@ using std::endl;
 
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
-const char* win_squares = "Amai al die vakjes :o";
+const char* win_rects = "Discover ALL the rectangles \o/";
 const char* windowName2 = "Processed image stuffs";
 const char* windowName3 = "More Processed image stuffs";
 
@@ -35,7 +33,7 @@ void showSquares(const char* videoLocation)
     //Om filmpje af te spelen en square detection te doen.
     vector<vector<Point> > squares;
 
-    cv::namedWindow(win_squares);
+    cv::namedWindow(win_rects);
 
     char buff[32] = {0};
 
@@ -47,11 +45,11 @@ void showSquares(const char* videoLocation)
             findSquares(img,squares);
             drawSquares(img,squares);
             //debug text
-            sprintf(buff, "%u kotjes", static_cast<unsigned int>(squares.size()));
+            sprintf(buff, "%u rectangles", static_cast<unsigned int>(squares.size()));
             printText(img, string(buff));
         }
 
-        cv::imshow(win_squares,img);
+        cv::imshow(win_rects,img);
         counter++;
 
         if (cv::waitKey(10) >= 0)
@@ -63,7 +61,7 @@ void showSquares(const char* videoLocation)
 
 void svm_trainGrass(const char* video)
 {
-    man_train_video(video);
+    man_train_video(video, string("Contains grass? Y/N"));
 }
 
 
@@ -84,7 +82,7 @@ int main(int argc, char **argv)
 
     // do something
 
-    //testSquares(videoLocation);
+    //showSquares(videoLocation);
     svm_trainGrass(videoLocation);
 
     return 0;
