@@ -51,13 +51,10 @@ int main(int argc, char **argv)
         if(counter%100){
             findSquares(img,squares);
             drawSquares(img,squares);
+            //debug text
+            sprintf(buff, "%u kotjes", static_cast<unsigned int>(squares.size()));
+            printText(img, string(buff));
         }
-
-        //debug text
-        sprintf(buff, "%u kotjes", static_cast<unsigned int>(squares.size()));
-        //print twice (+shift) for shadow effect -> improves readability
-        putText(img, string(buff), Point(50,75), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 50, 0));
-        putText(img, string(buff), Point(48,73), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 255, 0));
 
         cv::imshow(windowName1,img);
         counter++;

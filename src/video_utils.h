@@ -112,7 +112,6 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 // the function draws all the squares in the image
 static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
 {
-    cout<<"Aantal vierkantekes in frame: "<<squares.size()<<endl;
     for( size_t i = 0; i < squares.size(); i++ )
     {
         const Point* p = &squares[i][0];
@@ -120,8 +119,13 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
 
         polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, LINE_AA);
     }
+}
 
-    //return image;
+// prints green text (+shadow) onto an image
+void printText(Mat& img, const std::string& text, int x = 50, int y = 75)
+{
+    putText(img, text, Point(x,y), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 50, 0));
+    putText(img, text, Point(x-2,y-2), CV_FONT_HERSHEY_TRIPLEX, 1, CV_RGB(0, 255, 0));
 }
 
 // Shows first frame of video in window. Show next frame of video on key pressed.
