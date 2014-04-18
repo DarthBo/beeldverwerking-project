@@ -5,16 +5,16 @@
 
 class Feature{
 protected:
-    const char* name;
+    std::string name;
     double value;
 public:
     Feature(const char* _name,double _value):name(_name),value(_value){}
-    const char* getName(){return name;}
+    const char* getName(){return name.c_str();}
     double getValue(){return value;}
 };
 
 class Characteristic{
-    const char* name;
+    std::string name;
     double weight;
     std::vector<Feature> features;
 };
@@ -26,7 +26,7 @@ protected:
 public:
     GridElement(){}
     GridElement(cv::Mat _element):element(_element){}
-    Characteristic* getCharacteristic(){return &characteristic;}
+    //Characteristic* getCharacteristic(){return &characteristic;}
     cv::Mat* getMat(){return &element;}
 };
 

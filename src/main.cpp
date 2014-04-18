@@ -18,7 +18,7 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-const char* videoLocation = "../recources/vid/20140226_h_10fps.avi";
+const char* videoLocation = "../resources/vid/20140226_h_10fps.avi";
 const char* windowName1 = "Image stuffs";
 const char* windowName2 = "Processed image stuffs";
 const char* windowName3 = "More Processed image stuffs";
@@ -37,9 +37,11 @@ int main(int argc, char **argv)
     getFrameByNumber(videoLocation,1,frame);
     ImageGrid(frame,50,50);
 
-    /*
-    Om filmpje af te spelen en square detection te doen.
+
+    //Om filmpje af te spelen en square detection te doen.
     vector<vector<Point> > squares;
+
+    cv::namedWindow(windowName1);
 
     cv::VideoCapture cap(videoLocation);
     Mat img;
@@ -49,10 +51,15 @@ int main(int argc, char **argv)
             findSquares(img,squares);
             drawSquares(img,squares);
         }
-        cv::waitKey(10);
+        cv::imshow(windowName1,img);
         counter++;
+
+        if (cv::waitKey(10) >= 0)
+            break;
     }
-    */
+
+    cv::destroyAllWindows();
+
 
 
     //Code below should be integrated in blindtastic_core.h

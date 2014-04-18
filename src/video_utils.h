@@ -121,8 +121,6 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
         polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, LINE_AA);
     }
 
-    imshow(wndname, image);
-
     //return image;
 }
 

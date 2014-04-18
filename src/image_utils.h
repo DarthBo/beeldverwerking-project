@@ -33,7 +33,7 @@ double getAverageFilteredColour(const cv::Mat& in, const cv::Scalar& min, const 
     return s[0];
 }
 
-double getAverageColour(const cv::Mat& in,std::vector<double>& means){
+void getAverageColour(const cv::Mat& in,std::vector<double>& means){
     cv::Scalar s = cv::mean(in);
     means.push_back(s[0]);
     means.push_back(s[1]);
