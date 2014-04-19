@@ -7,7 +7,7 @@
 #include "opencv2/highgui/highgui.hpp"
 
 #include <iostream>
-#include <Math.h>
+#include <math.h>
 #include <string.h>
 
 double angle( cv::Point pt1, cv::Point pt2, cv::Point pt0 )
