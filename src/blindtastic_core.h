@@ -8,7 +8,7 @@ protected:
     std::string name;
     double value;
 public:
-    Feature(std::string _name,double _value):name(_name),value(_value){}
+    Feature(std::string& _name,double _value):name(_name),value(_value){}
     const char* getName(){return name.c_str();}
     double getValue(){return value;}
 };
@@ -21,7 +21,7 @@ private:
 public:
     Characteristic(){}
     Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
-    bool operator==(const Characteristic& characteristic){
+    bool operator==(const Characteristic& characteristic) const{
         if(name != *characteristic.getName())
             return false;
     }
