@@ -36,3 +36,4 @@ resources/
 # qtcreator
 *.json
 .excludes
+*.autosave
