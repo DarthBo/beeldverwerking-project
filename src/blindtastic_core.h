@@ -9,12 +9,20 @@ protected:
     double value;
 public:
     Feature(std::string& _name,double _value):name(_name),value(_value){}
-    const char* getName(){return name.c_str();}
+    bool operator==(const Feature& feature) const
+    {
+        return name == feature.name && value == feature.value;
+    }
+    bool operator!=(const Feature& feature) const
+    {
+        return !((*this).operator==(feature));
+    }
+    const std::string& getName(){return name;}
     double getValue(){return value;}
 };
 
 class Characteristic{
-private:
+protected:
     std::string name;
     double weight;
     std::vector<Feature> features;
@@ -23,13 +31,14 @@ public:
     Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
     bool operator==(const Characteristic& characteristic) const
     {
-        return (name == characteristic.name);
+        return name != characteristic.name && weight != characteristic.weight && features == characteristic.features;
     }
     bool operator!=(const Characteristic& characteristic ) const
     {
         return !((*this).operator==(characteristic));
     }
     const std::string& getName() {return name;}
+    const std::vector<Feature>& getFeatures() {return features;}
 
 };
 
