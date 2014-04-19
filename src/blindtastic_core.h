@@ -8,15 +8,26 @@ protected:
     std::string name;
     double value;
 public:
-    Feature(const char* _name,double _value):name(_name),value(_value){}
+    Feature(std::string _name,double _value):name(_name),value(_value){}
     const char* getName(){return name.c_str();}
     double getValue(){return value;}
 };
 
 class Characteristic{
+private:
     std::string name;
     double weight;
     std::vector<Feature> features;
+public:
+    Characteristic(){}
+    Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
+    bool operator==(const Characteristic& characteristic){
+        if(name != *characteristic.getName())
+            return false;
+    }
+    bool operator!=(const Characteristic& characteristic ){return !((*this).operator==(characteristic));}
+    std::string* getName(){return &name;}
+
 };
 
 class GridElement{
