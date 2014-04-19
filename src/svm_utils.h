@@ -23,12 +23,12 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     cv::Mat ROI = img.clone();
 
     std::vector<cv::Point> corners(4);
-    corners[0] = Point(rect.x           , rect.y            );
-    corners[1] = Point(rect.x+rect.width, rect.y            );
-    corners[2] = Point(rect.x+rect.width, rect.y+rect.height);
-    corners[3] = Point(rect.x           , rect.y+rect.height);
+    corners[0] = cv::Point(rect.x           , rect.y            );
+    corners[1] = cv::Point(rect.x+rect.width, rect.y            );
+    corners[2] = cv::Point(rect.x+rect.width, rect.y+rect.height);
+    corners[3] = cv::Point(rect.x           , rect.y+rect.height);
 
-    drawRect(ROI, corners, Scalar(255,0,0));
+    drawRect(ROI, corners, cv::Scalar(255,0,0));
     printText(ROI, question, rect.x + 50, rect.y+75);
 
     cv::imshow(question, ROI);
@@ -38,10 +38,10 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     switch (key)
     {
         case YES:
-            drawRect(ROI, corners, Scalar(0,255,0));
+            drawRect(ROI, corners, cv::Scalar(0,255,0));
             break;
         case NO:
-            drawRect(ROI, corners, Scalar(0,0,255));
+            drawRect(ROI, corners, cv::Scalar(0,0,255));
             break;
         default:
             exit(1);
@@ -53,7 +53,7 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     return (key == YES);
 }
 
-void man_train_video(const char* videoLocation, const string& q, bool train = true)
+void man_train_video(const char* videoLocation, const std::string& q, bool train = true)
 {
     cv::VideoCapture cap(videoLocation);
     assert(cap.isOpened());
@@ -98,6 +98,11 @@ void man_train_video(const char* videoLocation, const string& q, bool train = tr
             window.y = window.y + window.height;
         }
     }
+}
+
+void svm_trainGrass(const char* video)
+{
+    man_train_video(video, std::string("Contains grass? Y/N"));
 }
 
 void print_characteristics(const char* videoLocation)
