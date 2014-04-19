@@ -21,12 +21,15 @@ private:
 public:
     Characteristic(){}
     Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
-    bool operator==(const Characteristic& characteristic) const{
-        if(name != *characteristic.getName())
-            return false;
+    bool operator==(const Characteristic& characteristic) const
+    {
+        return (name == characteristic.name);
     }
-    bool operator!=(const Characteristic& characteristic ){return !((*this).operator==(characteristic));}
-    std::string* getName(){return &name;}
+    bool operator!=(const Characteristic& characteristic ) const
+    {
+        return !((*this).operator==(characteristic));
+    }
+    const std::string& getName() {return name;}
 
 };
 
