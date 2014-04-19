@@ -22,11 +22,8 @@ using std::endl;
 
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
+
 const char* win_rects = "Discover ALL the rectangles \\o/";
-const char* windowName2 = "Processed image stuffs";
-const char* windowName3 = "More Processed image stuffs";
-
-
 
 void showSquares(const char* videoLocation)
 {
@@ -64,6 +61,31 @@ void svm_trainGrass(const char* video)
     man_train_video(video, string("Contains grass? Y/N"));
 }
 
+const char* win_class = "check classification";
+const char* track_class = "Position:";
+
+void play_video(const char* videoLocation)
+{
+    cv::namedWindow(win_class);
+
+    cv::VideoCapture cap(videoLocation);
+    Mat img;
+    int counter = 0;
+
+    createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation));
+
+    while(getFrameByNumber(cap, counter, img))
+    {
+        cv::imshow(win_class,img);
+        counter++;
+        setTrackbarPos(track_class, win_class, counter);
+
+        if (cv::waitKey(1) >= 0)
+            break;
+    }
+
+    cv::destroyWindow(win_class);
+}
 
 int main(int argc, char **argv)
 {
@@ -83,8 +105,8 @@ int main(int argc, char **argv)
     // do something
 
     //showSquares(videoLocation);
-    svm_trainGrass(videoLocation);
-
+    //svm_trainGrass(videoLocation);
+    play_video(videoLocation);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

@@ -53,7 +53,7 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     return (key == YES);
 }
 
-void man_train_video(const char* videoLocation, const string& q)
+void man_train_video(const char* videoLocation, const string& q, bool train = true)
 {
     cv::VideoCapture cap(videoLocation);
     assert(cap.isOpened());
@@ -79,8 +79,11 @@ void man_train_video(const char* videoLocation, const string& q)
                 features.push_back(greenFeature);
                 features.insert(features.end(),textureFeatures.begin(),textureFeatures.end());
 
-                bool green = train_askuser(frame, window, q);
-                std::cout << (green ? "+1 " : "-1 ");
+                if (train)
+                {
+                    bool green = train_askuser(frame, window, q);
+                    std::cout << (green ? "+1 " : "-1 ");
+                }
 
                 //print features
                 for (size_t i=1 ; i <= features.size() ; i++)
@@ -96,6 +99,13 @@ void man_train_video(const char* videoLocation, const string& q)
         }
     }
 }
+
+void print_characteristics(const char* videoLocation)
+{
+    man_train_video(videoLocation, "", false);
+}
+
+
 
 
 #endif // SVM_SHIT_H
