@@ -110,6 +110,11 @@ void print_characteristics(const char* videoLocation)
     man_train_video(videoLocation, "", false);
 }
 
+void check_classification(const char* videoLocation, const char* classification)
+{
+
+}
+
 
 
 
