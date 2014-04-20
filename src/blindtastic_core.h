@@ -8,6 +8,7 @@ protected:
     std::string name;
     double value;
 public:
+    Feature(){}
     Feature(std::string& _name,double _value):name(_name),value(_value){}
     bool operator==(const Feature& feature) const
     {
@@ -18,7 +19,9 @@ public:
         return !((*this).operator==(feature));
     }
     const std::string& getName(){return name;}
+    void setName(const std::string& name){this->name = name;}
     double getValue(){return value;}
+    void setValue(const double value){this->value = value;}
 };
 
 class Characteristic{
@@ -38,7 +41,9 @@ public:
         return !((*this).operator==(characteristic));
     }
     const std::string& getName() {return name;}
+    void setName(const std::string& name){this->name=name;}
     const std::vector<Feature>& getFeatures() {return features;}
+    void setFeatures(const std::vector<Feature>& features){this->features = features;}
 
 };
 

@@ -23,6 +23,7 @@ const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 int main(int argc, char **argv)
 {
     // find video file
+
     const char* videoLocation = defaultVideo;
     if (argc > 1)
     {
@@ -36,10 +37,14 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-
-    //showSquares(videoLocation);
-    //svm_trainGrass(videoLocation);
-    play_video(videoLocation);
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,2600,src);
+    Mat cdst;
+    lineFilter(src,cdst,85,95);
+    imshow("source", src);
+    imshow("detected lines", cdst);
+    waitKey();
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
