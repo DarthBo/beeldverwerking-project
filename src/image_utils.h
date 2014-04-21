@@ -85,7 +85,7 @@ void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int
     cv::cvtColor(temp, out, CV_GRAY2BGR);
     std::vector<cv::Vec2f> lines;
     // detect lines
-    cv::HoughLines(temp, lines, 1, CV_PI/180, 100, 0, 0 ); // 5th parameter: minimum number of collinear points to be detected as a line
+    cv::HoughLines(temp, lines, 1, CV_PI/180, 200, 0, 0 ); // 5th parameter: minimum number of collinear points to be detected as a line
 
     // draw lines
     for( size_t i = 0; i < lines.size(); i++ )
