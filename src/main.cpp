@@ -17,8 +17,6 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#define RELEASE true
-
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
 enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY };
@@ -38,6 +36,7 @@ void print_help_and_exit (const char* arg0)
 int release (int argc, char **argv)
 {
     train_mode mode = NONE;
+
     const char* videoLocation = defaultVideo;
     const char* extra = "";
 
@@ -144,14 +143,11 @@ int release (int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    if (RELEASE)
+    bool CLI = false;
+    if (CLI)
     {
         return release(argc, argv);
     }
-
-    // set RELEASE to false and put your test code here
-    // when you want to debug in your IDE
-
 
     const char* videoLocation = defaultVideo;
 
@@ -162,7 +158,15 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
-    play_video(videoLocation);
+    // do something
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,2600,src);
+    Mat cdst;
+    lineFilter(src,cdst,85,95);
+    imshow("source", src);
+    imshow("detected lines", cdst);
+    waitKey();
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

@@ -3,6 +3,7 @@
 
 #include "opencv2/opencv.hpp"
 
+#include "image_utils.h"
 #include "video_utils.h"
 #include "blindtastic_core.h"
 
