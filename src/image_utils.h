@@ -15,6 +15,7 @@ Red 160-179
 const cv::Scalar GREEN_MIN(38,80,50);
 const cv::Scalar GREEN_MAX(75,255,255);
 
+
 /* Returns cv::Mat with type CV_8U( = 0, 1 channel ) showing the filtered colour .*/
 void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max, cv::Mat& out){
     cv::Size ksize;
@@ -116,5 +117,14 @@ void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int
         }
     }
 }
+
+// filter to find circles in the image
+void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double dp=2, const double min_dist=20){
+    cv::Mat temp;
+    cv::cvtColor( in, temp, CV_BGR2GRAY );
+    cv::GaussianBlur( temp, temp, cv::Size(5, 5), 2, 2 ); // Reduce the noise so we avoid false circle detection
+    cv::HoughCircles( temp, out, CV_HOUGH_GRADIENT, dp, min_dist);
+}
+
 
 #endif

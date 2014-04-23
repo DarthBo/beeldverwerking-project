@@ -7,6 +7,9 @@
 #include "svm_utils.h"
 #include "blindtastic_core.h"
 
+using namespace std;
+using namespace cv;
+
 using cv::namedWindow;
 using cv::Mat;
 using cv::imshow;
@@ -158,15 +161,43 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
-    // do something
+/*    // do something
     cv::VideoCapture cap(defaultVideo);
     Mat src;
-    getFrameByNumber(cap,2600,src);
+    getFrameByNumber(cap,1,src);
     Mat cdst;
     lineFilter(src,cdst,85,95);
     imshow("source", src);
     imshow("detected lines", cdst);
     waitKey();
+*/
+
+
+//************************
+// test circleFilter
+//************************
+    //   cv::VideoCapture cap(defaultVideo);
+    Mat src;
+//    getFrameByNumber(cap,3500,src);
+    std::vector<cv::Vec3f> circles;
+    src = imread("../resources/img/multicolored-circles.jpg");
+    circleFilter(src,circles);
+    // Draw the circles detected
+    for( size_t i = 0; i < circles.size(); i++ )
+    {
+        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+        int radius = cvRound(circles[i][2]);
+        // circle center
+        circle( src, center, 3, Scalar(0,255,0), -1, 8, 0 );
+        // circle outline
+        circle( src, center, radius, Scalar(0,0,255), 3, 8, 0 );
+     }
+    cout << "Aantal cirkels: " <<  circles.size() <<endl;
+    imshow("source", src);
+    waitKey();
+
+
+
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
