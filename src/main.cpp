@@ -176,11 +176,11 @@ int main(int argc, char **argv)
 //************************
 // test circleFilter
 //************************
-    //   cv::VideoCapture cap(defaultVideo);
+    cv::VideoCapture cap(defaultVideo);
     Mat src;
-//    getFrameByNumber(cap,3500,src);
+    getFrameByNumber(cap,1347,src);
     std::vector<cv::Vec3f> circles;
-    src = imread("../resources/img/multicolored-circles.jpg");
+//    src = imread("../resources/img/multicolored-circles.jpg");
     circleFilter(src,circles);
     // Draw the circles detected
     for( size_t i = 0; i < circles.size(); i++ )

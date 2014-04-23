@@ -122,8 +122,8 @@ void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int
 void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double dp=2, const double min_dist=20){
     cv::Mat temp;
     cv::cvtColor( in, temp, CV_BGR2GRAY );
-    cv::GaussianBlur( temp, temp, cv::Size(5, 5), 2, 2 ); // Reduce the noise so we avoid false circle detection
-    cv::HoughCircles( temp, out, CV_HOUGH_GRADIENT, dp, min_dist);
+    cv::GaussianBlur( temp, temp, cv::Size(15, 15), 2, 2 ); // Reduce the noise so we avoid false circle detection
+    cv::HoughCircles( temp, out, CV_HOUGH_GRADIENT, dp, min_dist,100,100,0,200);
 }
 
 
