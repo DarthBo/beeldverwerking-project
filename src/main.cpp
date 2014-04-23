@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     waitKey();
 */
 
-
+/*
 //************************
 // test circleFilter
 //************************
@@ -195,7 +195,18 @@ int main(int argc, char **argv)
     cout << "Aantal cirkels: " <<  circles.size() <<endl;
     imshow("source", src);
     waitKey();
+*/
 
+//************************
+// test whiteFilter
+//************************
+    cv::VideoCapture cap(defaultVideo);
+    Mat src, dst;
+    getFrameByNumber(cap,100,src);
+    whiteFilter(src, dst);
+    imshow("source", src);
+    imshow("detected white", dst);
+    waitKey();
 
 
 
