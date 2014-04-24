@@ -198,7 +198,6 @@ int main(int argc, char **argv)
     waitKey();
 */
 
-/*
 //************************
 // test whiteFilter
 //************************
@@ -209,24 +208,8 @@ int main(int argc, char **argv)
     imshow("source", src);
     imshow("detected white", dst);
     waitKey();
-*/
 
 
-//************************
-// test cornerFilter
-//************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src;
-    getFrameByNumber(cap,100,src);
-    vector<Point2f> corners;
-    cornerFilter(src, corners);
-    // circle the corners
-    cout<<"** Number of corners detected in image: "<<corners.size()<<endl;
-    for (size_t i=0; i<corners.size(); i++ ){
-        circle(src, corners[i], 1, Scalar(0,0,255),2);
-    }
-    imshow("source", src);
-    waitKey();
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
