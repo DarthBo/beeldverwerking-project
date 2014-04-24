@@ -20,7 +20,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
+const char* defaultVideo = "../../beeldverwerking/resources/vid/20140226_h_10fps.avi";
 
 enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY };
 
@@ -166,7 +166,8 @@ int main(int argc, char **argv)
     Mat src;
     getFrameByNumber(cap,1,src);
     Mat cdst;
-    lineFilter(src,cdst,85,95);
+    //lineFilter(src,cdst,85,95);
+    showSquares(videoLocation);
     imshow("source", src);
     imshow("detected lines", cdst);
     waitKey();

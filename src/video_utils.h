@@ -117,6 +117,7 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
     for( size_t i = 0; i < squares.size(); i++ )
     {
         drawRect(image, squares[i]);
+        std::cout<<fabs(cv::contourArea(cv::Mat(squares[i])))<<std::endl;
     }
 }
 
