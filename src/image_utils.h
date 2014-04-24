@@ -130,8 +130,10 @@ void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double d
 // filter to find the color white
 void whiteFilter(const cv::Mat& in, cv::Mat&out, const double thresh=200){
     cv::Mat temp;
-    cv::cvtColor( in, temp, CV_BGR2GRAY );
-    cv::threshold(temp, out, thresh, 255, cv::THRESH_BINARY);
+    cv::Scalar min(255,255,255);
+    //cv::cvtColor( in, temp, CV_BGR2GRAY );
+    cv::threshold(in, temp, thresh, 255, cv::THRESH_BINARY);
+    cv::inRange(temp,min,min,out);
 }
 
 

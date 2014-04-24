@@ -20,7 +20,7 @@ using std::string;
 using std::cout;
 using std::endl;
 
-const char* defaultVideo = "../../beeldverwerking/resources/vid/20140226_h_10fps.avi";
+const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
 enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY };
 
@@ -214,20 +214,20 @@ int main(int argc, char **argv)
 //************************
 // test whiteFilter
 //************************
-    //cv::VideoCapture cap(defaultVideo);
-    //Mat src, dst;
-    //getFrameByNumber(cap,100,src);
-    //whiteFilter(src, dst);
-    //imshow("source", src);
-    //imshow("detected white", dst);
-    //waitKey();
-
+    cv::VideoCapture cap(defaultVideo);
+    Mat src, dst;
+    getFrameByNumber(cap,100,src);
+    //src = imread("../resources/img/multicolored-circles.jpg");
+    whiteFilter(src, dst);
+    imshow("source", src);
+    imshow("detected white", dst);
+    waitKey();
 
 
     //showSquares(videoLocation);
     //svm_trainGrass(videoLocation);
     //play_video(videoLocation);
-    svm_trainSquares(videoLocation);
+    //svm_trainSquares(videoLocation);
 
 
     std::cerr << "Done. Bye!" << std::endl;
