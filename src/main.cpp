@@ -61,6 +61,10 @@ void svm_trainGrass(const char* video)
     man_train_video(video, string("Contains grass? Y/N"));
 }
 
+void svm_trainSquares(const char* img){
+    man_train_img(img, string("Contains squares? Y/N"));
+}
+
 const char* win_class = "check classification";
 const char* track_class = "Position:";
 
@@ -90,24 +94,24 @@ void play_video(const char* videoLocation)
 int main(int argc, char **argv)
 {
     // find video file
-    const char* videoLocation = defaultVideo;
+    const char* location = defaultVideo;
     if (argc > 1)
     {
-        videoLocation = argv[1];
+        location = argv[1];
     }
-    if (!file_exists(videoLocation))
+    if (!file_exists(location))
     {
-        std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
+        std::cerr << location << " not found!\nAborting..." << std::endl;
         return 1;
     }
-    std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
+    std::cerr << "Found file at " << location << "! \nProcessing..." << std::endl;
 
     // do something
 
     //showSquares(videoLocation);
     //svm_trainGrass(videoLocation);
-    play_video(videoLocation);
-
+    //play_video(videoLocation);
+    svm_trainSquares(location);
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }

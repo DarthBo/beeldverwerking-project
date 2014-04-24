@@ -29,7 +29,7 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     corners[3] = Point(rect.x           , rect.y+rect.height);
 
     drawRect(ROI, corners, Scalar(255,0,0));
-    printText(ROI, question, rect.x + 50, rect.y+75);
+    printText(ROI, question, rect.x + 100, rect.y+100);
 
     cv::imshow(question, ROI);
 
@@ -51,6 +51,31 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     cv::waitKey(100);
 
     return (key == YES);
+}
+
+//atm used for training squares
+void man_train_img(const char* imgLocation, const string& q, bool train = true){
+   Mat image;
+   image = imread(imgLocation, CV_LOAD_IMAGE_COLOR);   // Read the file
+
+   if(! image.data )                              // Check for invalid input
+   {
+       cout <<  "Could not open or find the image" << std::endl ;
+   }
+   char buff[32] = {0};
+   cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
+   vector<vector<Point> > squares;
+   findSquares(image,squares);
+   drawSquares(image,squares);
+   //debug text
+   sprintf(buff, "%u rectangles", static_cast<unsigned int>(squares.size()));
+   printText(image, string(buff));
+   if (train)
+   {
+       bool square = train_askuser(image, window, q);
+       std::cout << (square ? "+1 " : "-1 ");
+   }
+   std::cout <<"1:" << string(buff)<<endl;
 }
 
 void man_train_video(const char* videoLocation, const string& q, bool train = true)
