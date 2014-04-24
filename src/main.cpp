@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
-/*    // do something
+    // do something
     cv::VideoCapture cap(defaultVideo);
     Mat src;
     getFrameByNumber(cap,1,src);
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     imshow("source", src);
     imshow("detected lines", cdst);
     waitKey();
-*/
+
 
 /*
 //************************
@@ -201,14 +201,14 @@ int main(int argc, char **argv)
 //************************
 // test whiteFilter
 //************************
-    cv::VideoCapture cap(defaultVideo);
+   /* cv::VideoCapture cap(defaultVideo);
     Mat src, dst;
     getFrameByNumber(cap,100,src);
     whiteFilter(src, dst);
     imshow("source", src);
     imshow("detected white", dst);
     waitKey();
-
+*/
 
 
     std::cerr << "Done. Bye!" << std::endl;
