@@ -8,15 +8,43 @@ protected:
     std::string name;
     double value;
 public:
-    Feature(const char* _name,double _value):name(_name),value(_value){}
-    const char* getName(){return name.c_str();}
+    Feature(){}
+    Feature(std::string& _name,double _value):name(_name),value(_value){}
+    bool operator==(const Feature& feature) const
+    {
+        return name == feature.name && value == feature.value;
+    }
+    bool operator!=(const Feature& feature) const
+    {
+        return !((*this).operator==(feature));
+    }
+    const std::string& getName(){return name;}
+    void setName(const std::string& name){this->name = name;}
     double getValue(){return value;}
+    void setValue(const double value){this->value = value;}
 };
 
 class Characteristic{
+protected:
     std::string name;
     double weight;
     std::vector<Feature> features;
+public:
+    Characteristic(){}
+    Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
+    bool operator==(const Characteristic& characteristic) const
+    {
+        return name != characteristic.name && weight != characteristic.weight && features == characteristic.features;
+    }
+    bool operator!=(const Characteristic& characteristic ) const
+    {
+        return !((*this).operator==(characteristic));
+    }
+    const std::string& getName() {return name;}
+    void setName(const std::string& name){this->name=name;}
+    const std::vector<Feature>& getFeatures() {return features;}
+    void setFeatures(const std::vector<Feature>& features){this->features = features;}
+
 };
 
 class GridElement{
