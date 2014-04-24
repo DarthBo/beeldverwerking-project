@@ -43,6 +43,10 @@ void svm_trainSquares(const char* img){
     man_train_img(img, string("Contains squares? Y/N"));
 }
 
+void svm_trainRectangles(const char* img){
+    man_train_img(img, string("Contains rectangles? Y/N"));
+}
+
 
 
 int release (int argc, char **argv)
@@ -166,6 +170,9 @@ int main(int argc, char **argv)
 
     const char* videoLocation = defaultVideo;
 
+    if(argc > 1){
+        videoLocation = argv[1];
+    }
     if (!file_exists(videoLocation))
 
     {
@@ -175,15 +182,15 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-    cv::VideoCapture cap(defaultVideo);
-    Mat src;
-    getFrameByNumber(cap,1,src);
-    Mat cdst;
+    //cv::VideoCapture cap(defaultVideo);
+    //Mat src;
+    //getFrameByNumber(cap,1,src);
+    //Mat cdst;
     //lineFilter(src,cdst,85,95);
-    showSquares(videoLocation);
-    imshow("source", src);
-    imshow("detected lines", cdst);
-    waitKey();
+    //showSquares(videoLocation);
+    //imshow("source", src);
+    //imshow("detected lines", cdst);
+    //waitKey();
 
 
 /*
