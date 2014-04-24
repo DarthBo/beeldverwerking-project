@@ -36,12 +36,23 @@ void print_help_and_exit (const char* arg0)
     exit(1);
 }
 
+
+
+
+void svm_trainSquares(const char* img){
+    man_train_img(img, string("Contains squares? Y/N"));
+}
+
+
+
 int release (int argc, char **argv)
 {
     train_mode mode = NONE;
 
+
     const char* videoLocation = defaultVideo;
     const char* extra = "";
+
 
     int it = 1;
     while (it < argc)
@@ -146,6 +157,7 @@ int release (int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+
     bool CLI = false;
     if (CLI)
     {
@@ -155,6 +167,7 @@ int main(int argc, char **argv)
     const char* videoLocation = defaultVideo;
 
     if (!file_exists(videoLocation))
+
     {
         std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
         return 1;
@@ -201,14 +214,21 @@ int main(int argc, char **argv)
 //************************
 // test whiteFilter
 //************************
-   /* cv::VideoCapture cap(defaultVideo);
-    Mat src, dst;
-    getFrameByNumber(cap,100,src);
-    whiteFilter(src, dst);
-    imshow("source", src);
-    imshow("detected white", dst);
-    waitKey();
-*/
+
+    //cv::VideoCapture cap(defaultVideo);
+    //Mat src, dst;
+    //getFrameByNumber(cap,100,src);
+    //whiteFilter(src, dst);
+    //imshow("source", src);
+    //imshow("detected white", dst);
+    //waitKey();
+
+
+
+    //showSquares(videoLocation);
+    //svm_trainGrass(videoLocation);
+    //play_video(videoLocation);
+    svm_trainSquares(videoLocation);
 
 
     std::cerr << "Done. Bye!" << std::endl;
