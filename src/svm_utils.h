@@ -72,15 +72,15 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train = t
    std::vector<std::vector<cv::Point> > squares;
    findSquares(image,squares);
    drawSquares(image,squares);
-   //debug text
-   sprintf(buff, "%u rectangles", static_cast<unsigned int>(squares.size()));
+   double avgRatio=getRatio(squares);
+
    printText(image, std::string(buff));
    if (train)
    {
        bool square = train_askuser(image, window, q);
        std::cout << (square ? "+1 " : "-1 ");
    }
-   std::cout <<"1:" << std::string(buff)<<std::endl;
+   std::cout <<"1:" << static_cast<unsigned int>(squares.size())<<" 2:"<<avgRatio<<std::endl;
 }
 
 
