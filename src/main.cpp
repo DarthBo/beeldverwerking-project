@@ -169,10 +169,10 @@ int main(int argc, char **argv)
     if (!file_exists(videoLocation))
 
     {
-        std::cerr << location << " not found!\nAborting..." << std::endl;
+        std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
         return 1;
     }
-    std::cerr << "Found file at " << location << "! \nProcessing..." << std::endl;
+    std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
 /*    // do something
     cv::VideoCapture cap(defaultVideo);
@@ -214,20 +214,20 @@ int main(int argc, char **argv)
 //************************
 // test whiteFilter
 //************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src, dst;
-    getFrameByNumber(cap,100,src);
-    whiteFilter(src, dst);
-    imshow("source", src);
-    imshow("detected white", dst);
-    waitKey();
+    //cv::VideoCapture cap(defaultVideo);
+    //Mat src, dst;
+    //getFrameByNumber(cap,100,src);
+    //whiteFilter(src, dst);
+    //imshow("source", src);
+    //imshow("detected white", dst);
+    //waitKey();
 
 
 
     //showSquares(videoLocation);
     //svm_trainGrass(videoLocation);
     //play_video(videoLocation);
-   // svm_trainSquares(location);
+    svm_trainSquares(videoLocation);
 
 
     std::cerr << "Done. Bye!" << std::endl;
