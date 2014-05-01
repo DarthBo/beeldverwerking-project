@@ -79,6 +79,7 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
                 // contour orientation
                 if( approx.size() == 4 &&
                     fabs(cv::contourArea(cv::Mat(approx))) > 1000 &&
+                    fabs(cv::contourArea(cv::Mat(approx))) < 100000 &&
                     cv::isContourConvex(cv::Mat(approx)) )
                 {
                     double maxCosine = 0;
@@ -118,6 +119,26 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
     {
         drawRect(image, squares[i]);
     }
+}
+
+double getRatio(const std::vector<std::vector<cv::Point>>& squares){
+    double avgRatio;
+    int counter = 0;
+    for( size_t i = 0; i < squares.size(); i++ )
+    {
+        cv::Point p = squares[i][0];
+        cv::Point p1 = squares[i][1];
+        cv::Point p2 = squares[i][2];
+        double height = p1.y-p.y;
+        double width = p2.x-p.x;
+        double ratio = fabs(width/height);
+
+        if(ratio<10){
+            counter++;
+            avgRatio += ratio;
+        }
+    }
+    return avgRatio/counter;
 }
 
 // prints green text (+shadow) onto an image

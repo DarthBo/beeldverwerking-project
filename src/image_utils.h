@@ -107,7 +107,7 @@ void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int
     cv::cvtColor(temp, out, CV_GRAY2BGR);
     std::vector<cv::Vec2f> lines;
     // detect lines
-    cv::HoughLines(temp, lines, 1, CV_PI/180, 200, 0, 0 ); // 5th parameter: minimum number of collinear points to be detected as a line
+    cv::HoughLines(temp, lines, 1, CV_PI/180, 100, 0, 0 ); // 5th parameter: minimum number of collinear points to be detected as a line
 
     // draw lines
     for( size_t i = 0; i < lines.size(); i++ )
@@ -201,15 +201,10 @@ void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double d
 // filter to find the color white
 void whiteFilter(const cv::Mat& in, cv::Mat&out, const double thresh=200){
     cv::Mat temp;
-    cv::cvtColor( in, temp, CV_BGR2GRAY );
-    cv::threshold(temp, out, thresh, 255, cv::THRESH_BINARY);
-}
-
-// filter to find corners
-void cornerFilter(const cv::Mat& in, std::vector<cv::Point2f>& out, const int maxCorners=2000, const double qualityLevel=0.05, const double minDistance=20 ){
-    cv::Mat temp;
-    cv::cvtColor(in, temp, CV_RGB2GRAY);
-    cv::goodFeaturesToTrack(temp, out, maxCorners, qualityLevel, minDistance);
+    cv::Scalar min(255,255,255);
+    //cv::cvtColor( in, temp, CV_BGR2GRAY );
+    cv::threshold(in, temp, thresh, 255, cv::THRESH_BINARY);
+    cv::inRange(temp,min,min,out);
 }
 
 

@@ -37,12 +37,27 @@ void print_help_and_exit (const char* arg0)
     exit(1);
 }
 
+
+
+
+void svm_trainSquares(const char* img){
+    man_train_img(img, string("Contains squares? Y/N"));
+}
+
+void svm_trainRectangles(const char* img){
+    man_train_img(img, string("Contains rectangles? Y/N"));
+}
+
+
+
 int release (int argc, char **argv)
 {
     train_mode mode = NONE;
 
+
     const char* videoLocation = defaultVideo;
     const char* extra = "";
+
 
     int it = 1;
     while (it < argc)
@@ -147,6 +162,7 @@ int release (int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+
     bool CLI = false;
     if (CLI)
     {
@@ -155,12 +171,17 @@ int main(int argc, char **argv)
 
     const char* videoLocation = defaultVideo;
 
+    if(argc > 1){
+        videoLocation = argv[1];
+    }
     if (!file_exists(videoLocation))
+
     {
         std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
         return 1;
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
+
     // do something
     cv::VideoCapture cap(defaultVideo);
     Mat src;
@@ -192,26 +213,24 @@ int main(int argc, char **argv)
     cout << "Aantal cirkels: " <<  circles.size() <<endl;
     imshow("source", src);
     waitKey();
-*/
 
-/*
+
 //************************
 // test whiteFilter
 //************************
     cv::VideoCapture cap(defaultVideo);
     Mat src, dst;
     getFrameByNumber(cap,100,src);
+    //src = imread("../resources/img/multicolored-circles.jpg");
     whiteFilter(src, dst);
     imshow("source", src);
     imshow("detected white", dst);
     waitKey();
-*/
 
 
 //************************
 // test cornerFilter
 //************************
-    /*
     cv::VideoCapture cap(defaultVideo);
     Mat src;
     getFrameByNumber(cap,100,src);
@@ -224,8 +243,8 @@ int main(int argc, char **argv)
     }
     imshow("source", src);
     waitKey();
+*/
 
     std::cerr << "Done. Bye!" << std::endl;
-    */
     return 0;
 }
