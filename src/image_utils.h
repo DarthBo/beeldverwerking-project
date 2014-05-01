@@ -2,6 +2,7 @@
 #define IMAGE_UTILS_H
 
 #include "opencv2/opencv.hpp"
+#include "opencv2/gpu/gpu.hpp"
 
 /* Approximations of Hue values for common colours in HSV colour space. S and V values vary and have to be found by experimenting.
 Orange  0-22
@@ -41,18 +42,20 @@ void getAverageColour(const cv::Mat& in,std::vector<double>& means){
     means.push_back(s[2]);
 }
 
-/* Returns cv::Mat with type CV_32F (= 21, 3 channels) accentuating texture in vertical direction using a Gabor filter.
- * Values for kernel could need tweaking, current ones are barely more than guesswork. */
-void textureFilter(const cv::Mat& in, cv::Mat& out){
+/* Returns cv::Mat with type CV_32F (= 21, 3 channels) accentuating texture in given direction using a Gabor filter.
+ * Values for kernel could need tweaking. */
+void textureFilter(const cv::Mat& in, cv::Mat& out,int orientation = 180){
     cv::Size ksize;
     ksize.height = 3; // precision
     ksize.width = 3;
     int sigma= 1;
-    int theta = 180; // orientation, 0 or 180 for vertical textures
+    int theta = orientation; // orientation, 0 or 180 for vertical textures
     int lamda = 180;
     int gamma = 1;
     cv::Mat kernel = cv::getGaborKernel(ksize,sigma,theta,lamda,gamma);
-    cv::filter2D(in, out, CV_32F, kernel);
+    cv::gpu::GpuMat temp;
+    cv::gpu::filter2D(cv::gpu::GpuMat(in), temp, CV_32F, kernel);
+    out = cv::Mat(temp);
 }
 
 /* Utility function that calls textureFilter and returns the means of it's output channels. */
@@ -63,6 +66,24 @@ void getAverageTexture(const cv::Mat& in, std::vector<double>& means){
     means.push_back(s[0]);
     means.push_back(s[1]);
     means.push_back(s[2]);
+}
+
+/*Utility function to get all texture features as a std::vector<double>*/
+void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
+    int orientations[] = {0,45,90,135};
+    cv::Mat out;
+    cv::gpu::GpuMat gMat(out);
+    for(int i : orientations){
+        textureFilter(in,out,i);
+        cv::Scalar s = cv::gpu::sqrSum(gMat); // local energy
+        for(int i = 0; i< s.channels ;i++){ // for every channel
+            features.push_back(s[i]);
+        }
+        s = cv::gpu::absSum(gMat);          //Mean Amplitude
+        for(int i = 0; i< s.channels ;i++){ // for every channel
+            features.push_back(s[i]);
+        }
+    }
 }
 
 /* Use Canny to find contours.*/
@@ -117,6 +138,56 @@ void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int
         }
     }
 }
+
+//Draw histogram for given cv::Mat (expects 3 channels) for given grouping (bins)
+cv::Mat drawHistogram(const cv::Mat& in,int bins){
+    /// Separate the image in 3 places ( B, G and R  or H,S,V  )
+    std::vector<cv::Mat> planes;
+    cv::split( in, planes );
+
+    /// Establish the number of bins
+    int histSize = bins;
+
+    /// Set the ranges (  B,G,R or H,S,V )
+    float range[] = { 0, 256 } ;
+    const float* histRange = { range };
+
+    bool uniform = true; bool accumulate = false;
+
+    cv::Mat b_hist, g_hist, r_hist;
+
+    /// Compute the histograms:
+    cv::calcHist( &planes[0], 1, 0, cv::Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+    cv::calcHist( &planes[1], 1, 0, cv::Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
+    cv::calcHist( &planes[2], 1, 0, cv::Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+
+    // Draw the histograms for B, G and R
+    int hist_w = 512; int hist_h = 400;
+    int bin_w = cvRound( (double) hist_w/histSize );
+
+    cv::Mat histImage( hist_h, hist_w, CV_8UC3, cv::Scalar( 0,0,0) );
+
+    /// Normalize the result to [ 0, histImage.rows ]
+    normalize(b_hist, b_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+    normalize(g_hist, g_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+    normalize(r_hist, r_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+
+    /// Draw for each channel
+    for( int i = 1; i < histSize; i++ )
+    {
+        cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
+                  cv::Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
+                  cv::Scalar( 255, 0, 0), 2, 8, 0  );
+        cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
+                  cv::Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
+                  cv::Scalar( 0, 255, 0), 2, 8, 0  );
+        cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
+                  cv::Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
+                  cv::Scalar( 0, 0, 255), 2, 8, 0  );
+    }
+    return histImage;
+}
+
 
 // filter to find circles in the image
 void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double dp=2, const double min_dist=20){

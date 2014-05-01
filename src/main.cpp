@@ -1,6 +1,7 @@
 #include "opencv2/opencv.hpp"
 //#include "opencv2/core/core.hpp"
 //#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/gpu/gpu.hpp>
 #include "file_utils.h"
 #include "video_utils.h"
 #include "image_utils.h"
@@ -160,17 +161,13 @@ int main(int argc, char **argv)
         return 1;
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
-
-/*    // do something
+    // do something
     cv::VideoCapture cap(defaultVideo);
     Mat src;
-    getFrameByNumber(cap,1,src);
-    Mat cdst;
-    lineFilter(src,cdst,85,95);
-    imshow("source", src);
-    imshow("detected lines", cdst);
-    waitKey();
-*/
+    getFrameByNumber(cap,1347,src);
+    vector<double> features;
+    getTextureFeatures(src,features);
+    for_each(features.begin(),features.end(),[](double f){cout<<f<<endl;});
 
 /*
 //************************
@@ -214,6 +211,7 @@ int main(int argc, char **argv)
 //************************
 // test cornerFilter
 //************************
+    /*
     cv::VideoCapture cap(defaultVideo);
     Mat src;
     getFrameByNumber(cap,100,src);
@@ -228,5 +226,6 @@ int main(int argc, char **argv)
     waitKey();
 
     std::cerr << "Done. Bye!" << std::endl;
+    */
     return 0;
 }
