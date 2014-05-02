@@ -2,6 +2,7 @@
 #define BLINDTASTIC_CORE_H
 
 #include "opencv2/opencv.hpp"
+#include <queue>
 
 class Feature{
 protected:
@@ -18,9 +19,9 @@ public:
     {
         return !((*this).operator==(feature));
     }
-    const std::string& getName(){return name;}
+    const std::string& getName() const{return name;}
     void setName(const std::string& name){this->name = name;}
-    double getValue(){return value;}
+    double getValue() const{return value;}
     void setValue(const double value){this->value = value;}
 };
 
@@ -28,22 +29,26 @@ class Characteristic{
 protected:
     std::string name;
     double weight;
+    bool detected;
     std::vector<Feature> features;
 public:
     Characteristic(){}
-    Characteristic(std::string& _name, double _weight):name(_name),weight(_weight){}
+    Characteristic(std::string& _name, double _weight, bool _detected)
+        :name(_name),weight(_weight),detected(_detected){}
     bool operator==(const Characteristic& characteristic) const
     {
-        return name != characteristic.name && weight != characteristic.weight && features == characteristic.features;
+        return name != characteristic.name && weight != characteristic.weight && features == characteristic.features && characteristic.detected == detected;
     }
     bool operator!=(const Characteristic& characteristic ) const
     {
         return !((*this).operator==(characteristic));
     }
-    const std::string& getName() {return name;}
+    const std::string& getName() const{return name;}
     void setName(const std::string& name){this->name=name;}
-    const std::vector<Feature>& getFeatures() {return features;}
+    const std::vector<Feature>& getFeatures() const{return features;}
     void setFeatures(const std::vector<Feature>& features){this->features = features;}
+    bool isDetected(){return detected;}
+    void setDetected(bool detected){this->detected = detected;}
 
 };
 
@@ -54,8 +59,10 @@ protected:
 public:
     GridElement(){}
     GridElement(cv::Mat _element):element(_element){}
-    //Characteristic* getCharacteristic(){return &characteristic;}
-    cv::Mat* getMat(){return &element;}
+    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
+    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
+    const cv::Mat& getMat() const{return element;}
+    void setMat(const cv::Mat& mat){this->element = mat;}
 };
 
 class Image{
@@ -64,7 +71,10 @@ protected:
     std::vector<Characteristic> characteristics;
 public:
     Image(cv::Mat _image):mat(_image){}
-    cv::Mat* getMat(){return &mat;}
+    const cv::Mat& getMat() const{return mat;}
+    void setMat(const cv::Mat& mat){this->mat = mat;}
+    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
+    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
 };
 
 class ImageGrid{
@@ -86,10 +96,124 @@ public:
     }
 };
 
+class Location{
+protected:
+    std::string name;
+    std::vector<Characteristic> characteristics;
+public:
+    Location(){}
+    Location(std::string& _name,std::vector<Characteristic> _characteristics):name(_name),characteristics(_characteristics){}
+    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
+    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
+    const std::string& getName() const{return name;}
+    void setName(const std::string& name){this->name = name;}
+};
+
+class LocationRepository {
+    //TODO, stores all locations
+};
+
+
+
+class CharacteristicTree {
+protected:
+    class CharacteristicNode{
+    protected:
+        Characteristic characteristic;
+        std::vector<Location*> possibleLocations;
+        CharacteristicNode* left = nullptr;
+        CharacteristicNode* right = nullptr;
+    public:
+        CharacteristicNode(const Characteristic& _characteristic,const std::vector<Location*>& _possibleLocations)
+            :characteristic(_characteristic),possibleLocations(_possibleLocations){}
+        CharacteristicNode** getLeftChild(){return &left;}
+        void SetLeftChild(CharacteristicNode * n){this->left = n;}
+        CharacteristicNode** getRightChild(){return &right;}
+        void SetRightChild(CharacteristicNode * n){this->right = n;}
+        const Characteristic& getCharacteristic(){return characteristic;}
+        const std::vector<Location*>& getPossibleLocations() const{return possibleLocations;}
+    };
+    std::list<Characteristic> characteristicPool;
+    CharacteristicNode* root = nullptr;
+    CharacteristicNode* current = nullptr;
+    void traverseWithPool();
+public:
+    void refine(Characteristic& characteristic);
+    void addBreadthFirst(const Characteristic& characteristic, const std::vector<Location*>& possibleLocations);
+    void printBreadthFirst();
+    const std::vector<Location*>* getPossibleLocations() const{return current == nullptr? nullptr : &current->getPossibleLocations();}
+};
+
+/*CHARACTERISTICTREE */
+void CharacteristicTree::refine(Characteristic& characteristic){
+    if(current == nullptr)
+        return;
+    if(current->getCharacteristic() == characteristic){
+        if(characteristic.isDetected()){
+            current = *current->getLeftChild();
+        }else{
+            current = *current->getRightChild();
+        }
+        traverseWithPool();
+    }else{
+        characteristicPool.push_back(characteristic);
+    }
+}
+
+void CharacteristicTree::traverseWithPool(){
+   for_each(characteristicPool.begin(),characteristicPool.end(),[=](Characteristic c){
+       if(current->getCharacteristic() == c){
+           if(c.isDetected()){
+               current = *current->getLeftChild();
+           }else{
+               current = *current->getRightChild();
+           }
+           characteristicPool.remove(c);
+           traverseWithPool();
+       }
+   });
+}
+
+void CharacteristicTree::addBreadthFirst(const Characteristic& characteristic,const std::vector<Location*>& possibleLocations){
+    CharacteristicNode** curr = &root;
+    std::queue<CharacteristicNode**> q;
+    if((*curr) != nullptr){
+        q.push((*curr)->getLeftChild());
+        q.push((*curr)->getRightChild());
+    }
+    while((*curr) != nullptr){
+        curr = q.front();
+        q.pop();
+        if((*curr) != nullptr){
+            q.push((*curr)->getLeftChild());
+            q.push((*curr)->getRightChild());
+        }
+    }
+    *curr = new CharacteristicNode(characteristic,possibleLocations);
+}
+
+void CharacteristicTree::printBreadthFirst(){
+    CharacteristicNode** curr = &root;
+    std::queue<CharacteristicNode**> q;
+    if((*curr) != nullptr){
+        q.push(curr);
+    }
+    while(q.size() != 0){
+        curr = q.front();
+        q.pop();
+        std::cout<<(*curr)->getCharacteristic().getName() <<std::endl;
+        if((*(*curr)->getLeftChild()) != nullptr)
+            q.push((*curr)->getLeftChild());
+        if((*(*curr)->getRightChild()) != nullptr)
+            q.push((*curr)->getRightChild());
+    }
+}
+
+/*IMAGEGRID */
 void ImageGrid::populate(){
-    cv::Mat* mat = image.getMat();
-    int rows = ceil((double)mat->rows/elementHeight);
-    int cols = ceil((double)mat->cols/elementWidth);
+    cv::Mat mat = image.getMat();
+    int rows = ceil((double)mat.rows/elementHeight);
+    int cols = ceil((double)mat.cols/elementWidth);
     //init vectors
     elements.resize(rows);
     for(int row = 0; row<rows; row++){
@@ -100,7 +224,7 @@ void ImageGrid::populate(){
     cv::Rect window = cv::Rect(0, 0, elementWidth, elementHeight);
     for(int row = 0; row<rows-1; row++){
         for(int col = 0; col<cols-1; col++){
-            cv::Mat ROI(*mat,window);
+            cv::Mat ROI(mat,window);
             GridElement element(ROI);
             elements[row][col] = element;
             window.x = window.x + window.width;
@@ -111,14 +235,14 @@ void ImageGrid::populate(){
     }
     window.x = window.width*(cols-1);
     //final row/column might have different dimensions
-    int remainingX = mat->cols - window.x;
-    int remainingY = mat->rows - window.y;
+    int remainingX = mat.cols - window.x;
+    int remainingY = mat.rows - window.y;
 
     //final column except for last element, this we will handle last, can have a different width
     window.width = remainingX;
     window.y = 0;
     for(int row = 0; row<rows-1; row++){
-        cv::Mat ROI(*mat,window);
+        cv::Mat ROI(mat,window);
         GridElement element(ROI);
         elements[row][cols-1] = element;
         window.y += window.height;
@@ -129,7 +253,7 @@ void ImageGrid::populate(){
     window.height = remainingY;
     window.x = 0;
     for(int col = 0; col<cols-1; col++){
-        cv::Mat ROI(*mat,window);
+        cv::Mat ROI(mat,window);
         GridElement element(ROI);
         elements[rows-1][col] = element;
         window.x += window.width;
@@ -137,7 +261,7 @@ void ImageGrid::populate(){
     }
     //final element can have a different width and height
     window.width = remainingX;
-    cv::Mat ROI(*mat,window);
+    cv::Mat ROI(mat,window);
     GridElement element(ROI);
     elements[rows-1][cols-1] = element;
     count++;
@@ -150,13 +274,13 @@ void ImageGrid::test(){
     int count = 0;
     for(unsigned int i = 0; i< elements.size();i++){
         for(unsigned int j = 0; j< elements[i].size();j++){
-            cv::Mat* m = elements[i][j].getMat();
-            for(int row = 0; row < (*m).rows;row++){
-                for(int col = 0; col < (*m).cols;col++){
+            cv::Mat m = elements[i][j].getMat();
+            for(int row = 0; row < (m).rows;row++){
+                for(int col = 0; col < (m).cols;col++){
                     cv::Scalar s(1,0,0);
-                    m->at<cv::Vec3b>(row,col)[0] =  count     %255;
-                    m->at<cv::Vec3b>(row,col)[1] = (count+125)%255;
-                    m->at<cv::Vec3b>(row,col)[2] = (count+250)%255;
+                    m.at<cv::Vec3b>(row,col)[0] =  count     %255;
+                    m.at<cv::Vec3b>(row,col)[1] = (count+125)%255;
+                    m.at<cv::Vec3b>(row,col)[2] = (count+250)%255;
                 }
             count++;
             }
