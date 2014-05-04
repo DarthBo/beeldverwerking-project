@@ -141,6 +141,87 @@ double getRatio(const std::vector<std::vector<cv::Point>>& squares){
     return avgRatio/counter;
 }
 
+double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares){
+    double avgContourArea;
+    int counter = 0;
+
+    for( size_t i = 0; i < squares.size(); i++ )
+    {
+        double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));
+        if(contourArea<10000){
+            counter++;
+            avgContourArea += contourArea;
+        }
+    }
+    return avgContourArea/counter;
+}
+
+void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
+    cv::Point p = square[0];
+    cv::Point p1 = square[1];
+    cv::Point p2 = square[2];
+    double height = p1.y-p.y;
+    double width = p2.x-p.x;
+    cv::Point topleft = square[0];
+    for( size_t i=1;i<square.size();i++){
+        if(topleft.x > square[i].x && topleft.y > square[i].y){
+            topleft = square[i];
+        }
+    }
+    cv::Rect window = cv::Rect(topleft.x, topleft.y, width, height);
+    cv::Mat ROI(in,window);
+    cv::Scalar s = cv::mean(ROI);
+    R.push_back(s[0]);
+    G.push_back(s[1]);
+    B.push_back(s[2]);
+}
+
+void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
+    std::vector<double> R;
+    std::vector<double> G;
+    std::vector<double> B;
+
+    for(size_t i=0; i< squares.size();i++){
+        getAvgColorSingleTile(in,R,G,B,squares[i]);
+    }
+    double r, g, b;
+    for(size_t j=0; j<R.size(); j++){
+        r+=R[j];
+        g+=G[j];
+        b+=B[j];
+    }
+    r=r/(R.size()-1);
+    g=g/(G.size()-1);
+    b=b/(B.size()-1);
+    means.push_back(r);
+    means.push_back(g);
+    means.push_back(b);
+}
+
+std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>& squares){
+    //0 -> width, 1 -> height
+    std::vector<double> avg;
+    double avgWidth;
+    double avgHeight;
+    int counter = 0;
+    for( size_t i=0;i<squares.size();i++){
+        double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));
+        if(contourArea<10000){
+            counter++;
+            cv::Point p = squares[i][0];
+            cv::Point p1 = squares[i][1];
+            cv::Point p2 = squares[i][2];
+            double height = p1.y-p.y;
+            double width = p2.x-p.x;
+            avgWidth += width;
+            avgHeight += height;
+        }
+    }
+    avg.push_back(avgWidth/counter);
+    avg.push_back(avgHeight/counter);
+    return avg;
+}
+
 // prints green text (+shadow) onto an image
 void printText(cv::Mat& img, const std::string& text, int x = 50, int y = 75)
 {
