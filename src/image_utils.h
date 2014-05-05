@@ -69,9 +69,7 @@ void getAverageTexture(const cv::Mat& in, std::vector<double>& means){
     means.push_back(s[2]);
 }
 
-
-
-/* Calculate squared sum (i.e. the local energy) for every channel of the cv::Mat*/
+/* Calculate squared sum (i.e. the local energy) for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
 void squaredSum(const cv::Mat& in,std::vector<double>& out){
     if(in.rows == 0 || in.cols == 0){
         return;
@@ -83,16 +81,15 @@ void squaredSum(const cv::Mat& in,std::vector<double>& out){
     double temp;
     for(int row = 0; row < in.rows; row++){
         for(int col = 0; col < in.cols; col++){
-            cv::Scalar s = in.at<cv::Scalar>(row,col);
             for(int channel = 0; channel < in.channels(); channel++){
-                temp = s[channel];
+                temp = in.at<cv::Vec3b>(row,col)[channel];
                 out[channel] += temp*temp;
             }
         }
     }
 }
 
-/* Calculate sum of absolute values for every channel of the cv::Mat*/
+/* Calculate sum of absolute values for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
 void absoluteSum(const cv::Mat& in,std::vector<double>& out){
     if(in.rows == 0 || in.cols == 0){
         return;
@@ -104,7 +101,7 @@ void absoluteSum(const cv::Mat& in,std::vector<double>& out){
     for(int row = 0; row < in.rows;row++){
         for(int col = 0; col < in.cols;col++){
             for(int channel = 0; channel < in.channels(); channel++){
-                out[channel] += abs(in.at<cv::Scalar>(row,col)[channel]);
+                out[channel] += abs(in.at<cv::Vec3b>(row,col)[channel]);
             }
         }
     }
@@ -121,6 +118,7 @@ void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
         for(size_t i = 0; i< sums.size() ;i++){ // for every channel
             features.push_back(sums[i]);
         }
+        sums.clear();
         absoluteSum(out,sums);                  //Mean Amplitude
         for(size_t i = 0; i< sums.size() ;i++){ // for every channel
             features.push_back(sums[i]);
