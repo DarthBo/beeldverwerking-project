@@ -183,15 +183,15 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-    //test GPU
     cv::VideoCapture cap(defaultVideo);
     Mat src;
     getFrameByNumber(cap,1347,src);
     vector<double> features;
-    //getTextureFeatures(src,features);
+    getTextureFeatures(src,features);
     for_each(features.begin(),features.end(),[](double f){cout<<f<<endl;});
 
     //test tree
+    /*
     CharacteristicTree tree;
     for(int i = 0; i < 10;i++){
         Characteristic c;
@@ -200,6 +200,7 @@ int main(int argc, char **argv)
         tree.addBreadthFirst(c,cL);
     }
     tree.printBreadthFirst();
+    */
 
 /*
 //************************

@@ -53,9 +53,10 @@ void textureFilter(const cv::Mat& in, cv::Mat& out,int orientation = 180){
     int lamda = 180;
     int gamma = 1;
     cv::Mat kernel = cv::getGaborKernel(ksize,sigma,theta,lamda,gamma);
-    cv::gpu::GpuMat temp;
-    cv::gpu::filter2D(cv::gpu::GpuMat(in), temp, CV_32F, kernel);
-    out = cv::Mat(temp);
+    //cv::gpu::GpuMat temp;
+    //cv::gpu::filter2D(cv::gpu::GpuMat(in), temp, CV_32F, kernel);
+    cv::filter2D(in,out,CV_32F,kernel);
+    //out = cv::Mat(temp);
 }
 
 /* Utility function that calls textureFilter and returns the means of it's output channels. */
@@ -68,20 +69,61 @@ void getAverageTexture(const cv::Mat& in, std::vector<double>& means){
     means.push_back(s[2]);
 }
 
+
+
+/* Calculate squared sum (i.e. the local energy) for every channel of the cv::Mat*/
+void squaredSum(const cv::Mat& in,std::vector<double>& out){
+    if(in.rows == 0 || in.cols == 0){
+        return;
+    }
+    //init out with 0's for every channel
+    for(int i = 0; i < in.channels(); i++){
+        out.push_back(0.0);
+    }
+    double temp;
+    for(int row = 0; row < in.rows; row++){
+        for(int col = 0; col < in.cols; col++){
+            cv::Scalar s = in.at<cv::Scalar>(row,col);
+            for(int channel = 0; channel < in.channels(); channel++){
+                temp = s[channel];
+                out[channel] += temp*temp;
+            }
+        }
+    }
+}
+
+/* Calculate sum of absolute values for every channel of the cv::Mat*/
+void absoluteSum(const cv::Mat& in,std::vector<double>& out){
+    if(in.rows == 0 || in.cols == 0){
+        return;
+    }
+    //init out with 0's for every channel
+    for(int i = 0; i < in.channels();i++){
+        out.push_back(0.0);
+    }
+    for(int row = 0; row < in.rows;row++){
+        for(int col = 0; col < in.cols;col++){
+            for(int channel = 0; channel < in.channels(); channel++){
+                out[channel] += abs(in.at<cv::Scalar>(row,col)[channel]);
+            }
+        }
+    }
+}
+
 /*Utility function to get all texture features as a std::vector<double>*/
 void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
     int orientations[] = {0,45,90,135};
     cv::Mat out;
-    cv::gpu::GpuMat gMat(out);
     for(int i : orientations){
         textureFilter(in,out,i);
-        cv::Scalar s = cv::gpu::sqrSum(gMat); // local energy
-        for(int i = 0; i< s.channels ;i++){ // for every channel
-            features.push_back(s[i]);
+        std::vector<double> sums;
+        squaredSum(out,sums);                   // local energy
+        for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+            features.push_back(sums[i]);
         }
-        s = cv::gpu::absSum(gMat);          //Mean Amplitude
-        for(int i = 0; i< s.channels ;i++){ // for every channel
-            features.push_back(s[i]);
+        absoluteSum(out,sums);                  //Mean Amplitude
+        for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+            features.push_back(sums[i]);
         }
     }
 }
