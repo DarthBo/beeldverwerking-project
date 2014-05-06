@@ -57,6 +57,37 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     return (key == YES);
 }
 
+void main_train_square(cv::Mat& image,const std::string& q, bool train){
+    char buff[32] = {0};
+    cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
+    std::vector<std::vector<cv::Point> > squares;
+    findSquares(image,squares);
+    drawSquares(image,squares);
+    //ratio
+    double avgRatio=getRatio(squares);
+
+    printText(image, std::string(buff));
+    //colour
+    std::vector<double> means;
+    double r=means[0];
+    double g=means[1];
+    double b=means[2];
+    getAvgColorTiles(image, squares,means);
+    //width
+    std::vector<double> widthheight;
+    widthheight=getAvgWidthHeight(squares);
+    double avgWidth=widthheight[0];
+    //height
+    double avgHeight=widthheight[1];
+    //svm format print
+    if (train)
+    {
+        bool square = train_askuser(image, window, q);
+        std::cout << (square ? "+1 " : "-1 ");
+    }
+    std::cout <<"1:" << static_cast<unsigned int>(squares.size())<<" 2:"<<avgRatio<<" 3:"<<avgWidth<<" 4:"<<avgHeight<<" 5:"<<r<<" 6:"<<g<<" 7:"<<b<<std::endl;
+
+}
 
 //atm used for training squares
 void man_train_img(const char* imgLocation, const std::string& q, bool train = true){
@@ -67,21 +98,10 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train = t
    {
        std::cout <<  "Could not open or find the image" << std::endl ;
    }
-   char buff[32] = {0};
-   cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
-   std::vector<std::vector<cv::Point> > squares;
-   findSquares(image,squares);
-   drawSquares(image,squares);
-   double avgRatio=getRatio(squares);
 
-   printText(image, std::string(buff));
-   if (train)
-   {
-       bool square = train_askuser(image, window, q);
-       std::cout << (square ? "+1 " : "-1 ");
-   }
-   std::cout <<"1:" << static_cast<unsigned int>(squares.size())<<" 2:"<<avgRatio<<std::endl;
+   main_train_square(image,q,train);
 }
+
 
 
 void man_train_video(const char* videoLocation, const std::string& q, bool train = true)
