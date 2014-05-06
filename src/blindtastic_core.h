@@ -10,7 +10,7 @@ protected:
     double value;
 public:
     Feature(){}
-    Feature(std::string& _name,double _value):name(_name),value(_value){}
+    Feature(const std::string& _name,double _value):name(_name),value(_value){}
     bool operator==(const Feature& feature) const
     {
         return name == feature.name && value == feature.value;
@@ -29,11 +29,12 @@ class Characteristic{
 protected:
     std::string name;
     double weight;
-    bool detected;
+    bool detected = true;
     std::vector<Feature> features;
 public:
     Characteristic(){}
-    Characteristic(std::string& _name, double _weight, bool _detected)
+    Characteristic(const std::string& _name):name(_name){}
+    Characteristic(const std::string& _name, double _weight, bool _detected)
         :name(_name),weight(_weight),detected(_detected){}
     bool operator==(const Characteristic& characteristic) const
     {
@@ -45,6 +46,8 @@ public:
     }
     const std::string& getName() const{return name;}
     void setName(const std::string& name){this->name=name;}
+    double getWeight(){return weight;}
+    void setWeight(double weight){this->weight = weight;}
     const std::vector<Feature>& getFeatures() const{return features;}
     void setFeatures(const std::vector<Feature>& features){this->features = features;}
     bool isDetected(){return detected;}
@@ -102,7 +105,7 @@ protected:
     std::vector<Characteristic> characteristics;
 public:
     Location(){}
-    Location(std::string& _name,std::vector<Characteristic> _characteristics):name(_name),characteristics(_characteristics){}
+    Location(const std::string& _name,std::vector<Characteristic> _characteristics):name(_name),characteristics(_characteristics){}
     const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
     void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
     const std::string& getName() const{return name;}
@@ -111,9 +114,21 @@ public:
 
 class LocationRepository {
     //TODO, stores all locations
+private:
+    std::vector<Location> locations;
+    void init(){
+        Characteristic grass("Grass");
+        std::vector<Characteristic> chars = {grass};
+        Location school("School",chars);
+        locations.push_back(school);
+    }
+
+public:
+    LocationRepository(){init();}
+    std::vector<Location>& getAllLocations(){
+        return locations;
+    }
 };
-
-
 
 class CharacteristicTree {
 protected:

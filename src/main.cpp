@@ -183,12 +183,13 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-    /*cv::VideoCapture cap(defaultVideo);
-    Mat src;
-    getFrameByNumber(cap,1347,src);
-    vector<double> features;
-    getTextureFeatures(src,features);
-    for_each(features.begin(),features.end(),[](double f){cout<<f<<endl;});*/
+
+
+    LocationRepository repo;
+    vector<Location> locations = repo.getAllLocations();
+    for_each(locations.begin(),locations.end(),[](Location& l){
+        cout<< l.getName()<<endl;
+    });
 
     //test tree
     /*
@@ -256,7 +257,7 @@ int main(int argc, char **argv)
     imshow("source", src);
     waitKey();
 */
-    man_train_img(videoLocation,"Squares?");
+    //man_train_img(videoLocation,"Squares?");
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }
