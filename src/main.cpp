@@ -160,6 +160,65 @@ int release (int argc, char **argv)
     return 0;
 }
 
+
+
+
+
+cv::Mat trans()
+{
+    Point2f morph[4];
+    morph[0].x = 514;
+    morph[0].y = 176;
+    morph[1].x = 676;
+    morph[1].y = 175;
+    morph[2].x = 486;
+    morph[2].y = 309;
+    morph[3].x = 687;
+    morph[3].y = 310;
+
+    Point2f goal[4];
+    //ga uit van LB, RB, LO, RO
+    goal[0].x = morph[2].x;
+    goal[0].y = morph[0].y;
+    goal[1].x = morph[3].x;
+    goal[1].y = morph[0].y;
+    goal[2].x = morph[2].x;
+    goal[2].y = morph[2].y;
+    goal[3].x = morph[3].x;
+    goal[3].y = morph[2].y;
+
+    return getPerspectiveTransform(morph, goal);
+}
+
+void play_warped_video(const char* videoLocation)
+{
+    const char* win_class = "check classification";
+    const char* track_class = "Position:";
+    cv::namedWindow(win_class);
+
+    cv::Mat morph = trans();
+
+    cv::VideoCapture cap(videoLocation);
+    cv::Mat img;
+    cv::Mat warp;
+    int counter = 0;
+
+    cv::createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation));
+
+    while(getFrameByNumber(cap, counter, img))
+    {
+        warpPerspective(img, warp, morph, img.size());
+        cv::imshow(win_class,warp);
+        counter++;
+        cv::setTrackbarPos(track_class, win_class, counter);
+
+        if (cv::waitKey(1) >= 0)
+            break;
+    }
+
+    cv::destroyWindow(win_class);
+}
+
 int main(int argc, char **argv)
 {
 
@@ -193,6 +252,7 @@ int main(int argc, char **argv)
             cout << '\t' << c.getName() << endl;
     });
 
+    play_warped_video(videoLocation);
 
     //test tree
     /*
