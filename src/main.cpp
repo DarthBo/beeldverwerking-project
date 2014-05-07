@@ -189,7 +189,10 @@ int main(int argc, char **argv)
     vector<Location> locations = repo.getAllLocations();
     for_each(locations.begin(),locations.end(),[](Location& l){
         cout<< l.getName()<<endl;
+        for (Characteristic c : l.getCharacteristics())
+            cout << '\t' << c.getName() << endl;
     });
+
 
     //test tree
     /*
