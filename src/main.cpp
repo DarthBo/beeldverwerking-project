@@ -4,7 +4,7 @@
 #include <opencv2/gpu/gpu.hpp>
 #include "file_utils.h"
 #include "video_utils.h"
-#include "image_utils.h"
+#include "features.h"
 #include "svm_utils.h"
 #include "blindtastic_core.h"
 
@@ -199,6 +199,9 @@ void play_warped_video(const char* videoLocation)
     const char* track_class = "Position:";
     cv::namedWindow(win_class);
 
+    std::vector<std::vector<cv::Point> > squares;
+
+
     cv::Mat morph = trans();
 
     cv::VideoCapture cap(videoLocation);
@@ -210,8 +213,12 @@ void play_warped_video(const char* videoLocation)
 
     while(getFrameByNumber(cap, counter, img))
     {
-        warpPerspective(img, warp, morph, img.size());
-        cv::imshow(win_class,warp);
+        //warpPerspective(img, warp, morph, img.size());
+
+        findSquares(img,squares);
+        drawSquares(img,squares);
+
+        cv::imshow(win_class,img);
         counter++;
         cv::setTrackbarPos(track_class, win_class, counter);
 
@@ -292,28 +299,31 @@ int main(int argc, char **argv)
     imshow("detected white", dst);
     waitKey();
 
-
+*/
 //************************
 // test cornerFilter
 //************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src;
+    //cv::VideoCapture cap(defaultVideo);
+    //Mat src;
     getFrameByNumber(cap,100,src);
-    vector<Point2f> corners;
+    //vector<Point2f> corners;
+    vector<double> corners;
     cornerFilter(src, corners);
     // circle the corners
-    cout<<"** Number of corners detected in image: "<<corners.size()<<endl;
-    for (size_t i=0; i<corners.size(); i++ ){
-        circle(src, corners[i], 1, Scalar(0,0,255),2);
+    cout<<"** Number of corners detected in image: "<<(corners.size()/2)<<endl;
+    for (size_t i=0; i<(2*corners.size()); i+=2 ){
+        circle(src, Point(corners[i],corners[i+1]), 1, Scalar(0,0,255),2);
     }
     imshow("source", src);
     waitKey();
-*/
-    char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
+
+
+    /*char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
                      ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};
     for(int i=0;i<22;i++){
         man_train_img(names[i],"Is it square?");
-    }
+    }*/
+
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }

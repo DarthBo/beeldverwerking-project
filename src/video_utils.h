@@ -123,7 +123,7 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
 }
 
 double getRatio(const std::vector<std::vector<cv::Point>>& squares){
-    double avgRatio;
+    double avgRatio = 0;
     int counter = 0;
     for( size_t i = 0; i < squares.size(); i++ )
     {
@@ -143,7 +143,7 @@ double getRatio(const std::vector<std::vector<cv::Point>>& squares){
 }
 
 double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares){
-    double avgContourArea;
+    double avgContourArea = 0.0;
     int counter = 0;
 
     for( size_t i = 0; i < squares.size(); i++ )
@@ -185,7 +185,7 @@ void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point
     for(size_t i=0; i< squares.size();i++){
         getAvgColorSingleTile(in,R,G,B,squares[i]);
     }
-    double r, g, b;
+    double r = 0.0, g = 0.0, b = 0.0;
     for(size_t j=0; j<R.size(); j++){
         r+=R[j];
         g+=G[j];
@@ -229,7 +229,7 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
         getAvgTextureTile(in, R, G, B, squares[i]);
     }
 
-    double r, g, b;
+    double r=0.0, g=0.0, b=0.0;
     for(size_t j=0; j<R.size(); j++){
         r+=R[j];
         g+=G[j];
@@ -248,8 +248,8 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
 std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>& squares){
     //0 -> width, 1 -> height
     std::vector<double> avg;
-    double avgWidth;
-    double avgHeight;
+    double avgWidth = 0.0;
+    double avgHeight = 0.0;
     int counter = 0;
     for( size_t i=0;i<squares.size();i++){
         double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));

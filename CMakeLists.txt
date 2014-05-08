@@ -16,6 +16,9 @@ SET(OpenCV_LIBRARIES opencv_core opencv_highgui opencv_imgproc opencv_gpu)
 
 SET(SRC src/main.cpp
         src/image_utils.h
+        src/image_utils.cpp
+        src/features.h
+        src/features.cpp
         src/file_utils.h
         src/video_utils.h
         src/svm_utils.h
