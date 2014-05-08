@@ -1,15 +1,10 @@
 #include "opencv2/opencv.hpp"
-//#include "opencv2/core/core.hpp"
-//#include "opencv2/highgui/highgui.hpp"
-#include <opencv2/gpu/gpu.hpp>
+
 #include "file_utils.h"
 #include "video_utils.h"
-#include "features.h"
+#include "svm_features.h"
 #include "svm_utils.h"
 #include "blindtastic_core.h"
-
-using namespace std;
-using namespace cv;
 
 using cv::namedWindow;
 using cv::Mat;
@@ -169,7 +164,7 @@ int release (int argc, char **argv)
 
 cv::Mat trans()
 {
-    Point2f morph[4];
+    cv::Point2f morph[4];
     morph[0].x = 514;
     morph[0].y = 176;
     morph[1].x = 676;
@@ -179,7 +174,7 @@ cv::Mat trans()
     morph[3].x = 687;
     morph[3].y = 310;
 
-    Point2f goal[4];
+    cv::Point2f goal[4];
     //ga uit van LB, RB, LO, RO
     goal[0].x = morph[2].x;
     goal[0].y = morph[0].y;

@@ -1,5 +1,5 @@
-#ifndef FEATURES_H
-#define FEATURES_H
+#ifndef SVM_FEATURES_H
+#define SVM_FEATURES_H
 
 #include "opencv2/opencv.hpp"
 

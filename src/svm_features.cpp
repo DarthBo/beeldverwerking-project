@@ -1,4 +1,4 @@
-#include "features.h"
+#include "svm_features.h"
 #include "image_utils.h"
 
 void getAverageColour(const cv::Mat& in,std::vector<double>& means){
