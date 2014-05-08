@@ -4,7 +4,7 @@
 #include <opencv2/gpu/gpu.hpp>
 #include "file_utils.h"
 #include "video_utils.h"
-#include "image_utils.h"
+#include "features.h"
 #include "svm_utils.h"
 #include "blindtastic_core.h"
 
@@ -196,6 +196,9 @@ void play_warped_video(const char* videoLocation)
     const char* track_class = "Position:";
     cv::namedWindow(win_class);
 
+    std::vector<std::vector<cv::Point> > squares;
+
+
     cv::Mat morph = trans();
 
     cv::VideoCapture cap(videoLocation);
@@ -207,8 +210,12 @@ void play_warped_video(const char* videoLocation)
 
     while(getFrameByNumber(cap, counter, img))
     {
-        warpPerspective(img, warp, morph, img.size());
-        cv::imshow(win_class,warp);
+        //warpPerspective(img, warp, morph, img.size());
+
+        findSquares(img,squares);
+        drawSquares(img,squares);
+
+        cv::imshow(win_class,img);
         counter++;
         cv::setTrackbarPos(track_class, win_class, counter);
 
