@@ -58,7 +58,7 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
 }
 
 //Method to produce SVM input to train square or rectangle tile
-void main_train_tile(cv::Mat& image,const std::string& q, bool train){
+void man_train_tile(cv::Mat& image,const std::string& q, bool train){
     char buff[32] = {0};
     cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
     std::vector<std::vector<cv::Point> > squares;
@@ -91,10 +91,11 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
     printText(image, std::string(buff));
     //colour
     std::vector<double> means;
+    getAvgColorTiles(image, squares,means);
     double r=means[0];
     double g=means[1];
     double b=means[2];
-    getAvgColorTiles(image, squares,means);
+
     //width
     std::vector<double> widthheight;
     widthheight=getAvgWidthHeight(squares);
@@ -156,7 +157,7 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train = t
        std::cout <<  "Could not open or find the image" << std::endl ;
    }
    //train method:
-   man_train_specific_paver(image,q,train);
+   man_train_tile(image,q,train);
 }
 
 

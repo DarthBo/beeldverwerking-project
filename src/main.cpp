@@ -244,15 +244,15 @@ int main(int argc, char **argv)
     // do something
 
 
-    LocationRepository repo;
+   /* LocationRepository repo;
     vector<Location> locations = repo.getAllLocations();
     for_each(locations.begin(),locations.end(),[](Location& l){
         cout<< l.getName()<<endl;
         for (Characteristic c : l.getCharacteristics())
             cout << '\t' << c.getName() << endl;
-    });
+    });*/
 
-    play_warped_video(videoLocation);
+    //play_warped_video(videoLocation);
 
     //test tree
     /*
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
     imshow("source", src);
     waitKey();
 */
-    //man_train_img(videoLocation,"Squares?");
+    man_train_img(videoLocation,"Squares?");
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }
