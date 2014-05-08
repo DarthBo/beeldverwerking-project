@@ -246,14 +246,14 @@ int main(int argc, char **argv)
 
     // do something
 
-    cv::VideoCapture cap(defaultVideo);
+ /*   cv::VideoCapture cap(defaultVideo);
     Mat src;
     getFrameByNumber(cap,1347,src);
     vector<double> features;
     getContourFeatures(src,features);
     for_each(features.begin(),features.end(),[](double d){
         cout<<d<<endl;
-    });
+    });*/
 
 /*
 //************************
@@ -309,6 +309,11 @@ int main(int argc, char **argv)
     imshow("source", src);
     waitKey();
 */
+    char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
+                     ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};
+    for(int i=0;i<22;i++){
+        man_train_img(names[i],"Is it square?");
+    }
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }
