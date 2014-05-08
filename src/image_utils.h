@@ -38,21 +38,6 @@ void absoluteSum(const cv::Mat& in,std::vector<double>& out);
 /* Use Canny to find contours.*/
 void contourFilter(const cv::Mat& in, cv::Mat&out);
 
-void getContourFeatures(const cv::Mat& in, std::vector<double>& features){
-   cv::Mat out;
-   contourFilter(in,out);
-   std::vector<double> sums;
-   squaredSum(out,sums);                   // local energy
-   for(size_t i = 0; i< sums.size() ;i++){ // for every channel
-       features.push_back(sums[i]);
-   }
-   sums.clear();
-   absoluteSum(out,sums);                  //Mean Amplitude
-   for(size_t i = 0; i< sums.size() ;i++){ // for every channel
-       features.push_back(sums[i]);
-   }
-}
-
 // Draw lines in red, use angle parameters to limit angle of lines ( examples: 85-95 for horizontal lines, 175-5 for vertical lines, etc.).
 void lineFilter(const cv::Mat& in, cv::Mat& out, const int minAngle=0, const int maxAngle=180);
 
