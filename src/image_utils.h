@@ -66,9 +66,6 @@ void circleFilter(const cv::Mat& in, std::vector<cv::Vec3f>& out, const double d
 void whiteFilter(const cv::Mat& in, cv::Mat&out, const double thresh=200);
 
 // filter to find corners
-void cornerFilter(const cv::Mat& in, std::vector<cv::Point2f>& out,
-                  const int maxCorners=2000,
-                  const double qualityLevel=0.05,
-                  const double minDistance=20);
+void cornerFilter(const cv::Mat& in, std::vector<double>& out);
 
 #endif

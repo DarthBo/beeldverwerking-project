@@ -205,9 +205,18 @@ void whiteFilter(const cv::Mat& in, cv::Mat&out, const double thresh){
 }
 
 // filter to find corners
-void cornerFilter(const cv::Mat& in, std::vector<cv::Point2f>& out,
-                  const int maxCorners, const double qualityLevel, const double minDistance){
+void cornerFilter(const cv::Mat& in, std::vector<double>& out){
+    int maxCorners=2000;
+    double qualityLevel=0.05;
+    double minDistance=20;
+    std::vector<cv::Point2f>& corners;
     cv::Mat temp;
+    cv::Point2f pt;
     cv::cvtColor(in, temp, CV_RGB2GRAY);
-    cv::goodFeaturesToTrack(temp, out, maxCorners, qualityLevel, minDistance);
+    cv::goodFeaturesToTrack(temp, corners, maxCorners, qualityLevel, minDistance);
+    for (size_t i=0; i<corners.size(); i++ ){
+        pt = corners[i];
+        out.push_back(static_cast<double>(pt.x));
+        out.push_back(static_cast<double>(pt.y));
+    }
 }
