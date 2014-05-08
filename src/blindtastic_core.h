@@ -194,7 +194,7 @@ protected:
         CharacteristicNode* right;
     public:
         CharacteristicNode(const Characteristic& _characteristic,const std::vector<Location*>& _possibleLocations)
-            :characteristic(_characteristic),possibleLocations(_possibleLocations){}
+            :characteristic(_characteristic),possibleLocations(_possibleLocations),left(nullptr),right(nullptr){}
         CharacteristicNode** getLeftChild(){return &left;}
         void SetLeftChild(CharacteristicNode * n){this->left = n;}
         CharacteristicNode** getRightChild(){return &right;}
@@ -207,6 +207,7 @@ protected:
     CharacteristicNode* current;
     void traverseWithPool();
 public:
+    CharacteristicTree():root(nullptr),current(nullptr){}
     void refine(Characteristic& characteristic);
     void addBreadthFirst(const Characteristic& characteristic, const std::vector<Location*>& possibleLocations);
     void printBreadthFirst();
