@@ -4,7 +4,6 @@
 #include "svm_features.h"
 #include "file_utils.h"
 #include "video_utils.h"
-#include "features.h"
 #include "svm_utils.h"
 #include "blindtastic_core.h"
 
@@ -288,7 +287,7 @@ void testWhiteFilter()
     cv::VideoCapture cap(defaultVideo);
     Mat src, dst;
     getFrameByNumber(cap,100,src);
-    //src = imread("../resources/img/multicolored-circles.jpg");
+    src = cv::imread("../resources/img/multicolored-circles.jpg");
     whiteFilter(src, dst);
     imshow("source", src);
     imshow("detected white", dst);
