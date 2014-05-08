@@ -8,6 +8,7 @@ void getAverageColour(const cv::Mat& in, std::vector<double>& means);
 /*Utility function to get all texture features as a std::vector<double>*/
 void getTextureFeatures(const cv::Mat& in, std::vector<double>& features);
 
+void getContourFeatures(const cv::Mat& in, std::vector<double>& features);
 
 
 #endif

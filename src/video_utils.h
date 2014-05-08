@@ -229,7 +229,7 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
         getAvgTextureTile(in, R, G, B, squares[i]);
     }
 
-    double r, g, b;
+    double r=0.0, g=0.0, b=0.0;
     for(size_t j=0; j<R.size(); j++){
         r+=R[j];
         g+=G[j];
