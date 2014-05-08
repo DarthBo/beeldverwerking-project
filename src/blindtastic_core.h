@@ -29,10 +29,10 @@ class Characteristic{
 protected:
     std::string name;
     double weight;
-    bool detected = true;
+    bool detected;
     std::vector<Feature> features;
 public:
-    Characteristic(){}
+    Characteristic(){detected = true;}
     Characteristic(const std::string& _name):name(_name){}
     Characteristic(const std::string& _name, double _weight, bool _detected)
         :name(_name),weight(_weight),detected(_detected){}
@@ -116,6 +116,7 @@ class LocationRepository {
     //TODO, stores all locations
 private:
     std::vector<Location> locations;
+    //std::unordered_map<std::string,std::vector<Location>> locationIndex;
     void init(){
         Characteristic grass("Grass");
         Characteristic paver_huge("Huge Pavers at P building");
@@ -190,11 +191,11 @@ protected:
     protected:
         Characteristic characteristic;
         std::vector<Location*> possibleLocations;
-        CharacteristicNode* left = nullptr;
-        CharacteristicNode* right = nullptr;
+        CharacteristicNode* left;
+        CharacteristicNode* right;
     public:
         CharacteristicNode(const Characteristic& _characteristic,const std::vector<Location*>& _possibleLocations)
-            :characteristic(_characteristic),possibleLocations(_possibleLocations){}
+            :characteristic(_characteristic),possibleLocations(_possibleLocations),left(nullptr),right(nullptr){}
         CharacteristicNode** getLeftChild(){return &left;}
         void SetLeftChild(CharacteristicNode * n){this->left = n;}
         CharacteristicNode** getRightChild(){return &right;}
@@ -203,10 +204,11 @@ protected:
         const std::vector<Location*>& getPossibleLocations() const{return possibleLocations;}
     };
     std::list<Characteristic> characteristicPool;
-    CharacteristicNode* root = nullptr;
-    CharacteristicNode* current = nullptr;
+    CharacteristicNode* root;
+    CharacteristicNode* current;
     void traverseWithPool();
 public:
+    CharacteristicTree():root(nullptr),current(nullptr){}
     void refine(Characteristic& characteristic);
     void addBreadthFirst(const Characteristic& characteristic, const std::vector<Location*>& possibleLocations);
     void printBreadthFirst();

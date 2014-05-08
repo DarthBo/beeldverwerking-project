@@ -9,6 +9,7 @@
 #include <iostream>
 #include <math.h>
 #include <string.h>
+#include <image_utils.h>
 
 double angle( cv::Point pt1, cv::Point pt2, cv::Point pt0 )
 {
@@ -197,6 +198,52 @@ void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point
     means.push_back(g);
     means.push_back(b);
 }
+
+void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
+    cv::Point p = square[0];
+    cv::Point p1 = square[1];
+    cv::Point p2 = square[2];
+    double height = p1.y-p.y;
+    double width = p2.x-p.x;
+    cv::Point topleft = square[0];
+    for( size_t i=1;i<square.size();i++){
+        if(topleft.x > square[i].x && topleft.y > square[i].y){
+            topleft = square[i];
+        }
+    }
+    cv::Rect window = cv::Rect(topleft.x, topleft.y, width, height);
+    cv::Mat ROI(in,window);
+    std::vector<double> means;
+    getAverageTexture(ROI, means);
+    R.push_back(means[0]);
+    G.push_back(means[1]);
+    B.push_back(means[2]);
+}
+
+void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
+    std::vector<double> R;
+    std::vector<double> G;
+    std::vector<double> B;
+
+    for(size_t i=0; i< squares.size();i++){
+        getAvgTextureTile(in, R, G, B, squares[i]);
+    }
+
+    double r, g, b;
+    for(size_t j=0; j<R.size(); j++){
+        r+=R[j];
+        g+=G[j];
+        b+=B[j];
+    }
+    r=r/(R.size()-1);
+    g=g/(G.size()-1);
+    b=b/(B.size()-1);
+    means.push_back(r);
+    means.push_back(g);
+    means.push_back(b);
+}
+
+
 
 std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>& squares){
     //0 -> width, 1 -> height
