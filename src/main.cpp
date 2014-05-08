@@ -157,6 +157,9 @@ int release (int argc, char **argv)
     }
 
     std::cerr << "Done. Bye!" << std::endl;
+
+
+
     return 0;
 }
 
@@ -244,7 +247,7 @@ int main(int argc, char **argv)
     // do something
 
 
-    LocationRepository repo;
+    /*LocationRepository repo;
     vector<Location> locations = repo.getAllLocations();
     for_each(locations.begin(),locations.end(),[](Location& l){
         cout<< l.getName()<<endl;
@@ -253,7 +256,15 @@ int main(int argc, char **argv)
     });
 
     play_warped_video(videoLocation);
-
+    */
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,1347,src);
+    vector<double> features;
+    getContourFeatures(src,features);
+    for_each(features.begin(),features.end(),[](double d){
+        cout<<d<<endl;
+    });
     //test tree
     /*
     CharacteristicTree tree;

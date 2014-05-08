@@ -116,6 +116,7 @@ class LocationRepository {
     //TODO, stores all locations
 private:
     std::vector<Location> locations;
+    //std::unordered_map<std::string,std::vector<Location>> locationIndex;
     void init(){
         Characteristic grass("Grass");
         Characteristic paver_huge("Huge Pavers at P building");
