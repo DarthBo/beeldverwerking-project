@@ -44,7 +44,7 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
         {
             // hack: use Canny instead of zero threshold level.
             // Canny helps to catch squares with gradient shading
-            if( l == 0 )
+            /*if( l == 0 )
             {
                 // apply Canny. Take the upper threshold from slider
                 // and set the lower to 0 (which forces edges merging)
@@ -54,11 +54,11 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
                 cv::dilate(gray, gray, cv::Mat(), cv::Point(-1,-1));
             }
             else
-            {
+            {*/
                 // apply threshold if l!=0:
                 //     tgray(x,y) = gray(x,y) < (l+1)*255/N ? 255 : 0
                 gray = gray0 >= (l+1)*255/N;
-            }
+            //}
 
             // find contours and store them all as a list
             cv::findContours(gray, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
@@ -83,6 +83,7 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
                     fabs(cv::contourArea(cv::Mat(approx))) < 100000 &&
                     cv::isContourConvex(cv::Mat(approx)) )
                 {
+
                     double maxCosine = 0;
 
                     for( int j = 2; j < 5; j++ )
@@ -95,8 +96,9 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
                     // if cosines of all angles are small
                     // (all angles are ~90 degree) then write quandrange
                     // vertices to resultant sequence
-                    if( maxCosine < 0.3 )
+                    if( maxCosine < 0.5 )
                         squares.push_back(approx);
+
                 }
             }
         }

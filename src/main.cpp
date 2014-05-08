@@ -214,7 +214,6 @@ void play_warped_video(const char* videoLocation)
     while(getFrameByNumber(cap, counter, img))
     {
         //warpPerspective(img, warp, morph, img.size());
-
         findSquares(img,squares);
         drawSquares(img,squares);
 
@@ -260,8 +259,12 @@ int main(int argc, char **argv)
     getContourFeatures(src,features);
     for_each(features.begin(),features.end(),[](double d){
         cout<<d<<endl;
+
     });*/
 
+
+    });
+    play_warped_video(videoLocation);
 /*
 //************************
 // test circleFilter
