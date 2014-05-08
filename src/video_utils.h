@@ -20,7 +20,8 @@ double angle( cv::Point pt1, cv::Point pt2, cv::Point pt0 )
 // the sequence is stored in the specified memory storage
 void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& squares )
 {
-    int thresh = 50, N = 11;
+    //int thresh = 50;
+    int N = 11;
     squares.clear();
 
     cv::Mat pyr, timg, gray0(image.size(), CV_8U), gray;

@@ -1,8 +1,10 @@
-#include "opencv2/opencv.hpp"
+#include <iostream>
+#include <opencv2/opencv.hpp>
 
+#include "svm_features.h"
 #include "file_utils.h"
 #include "video_utils.h"
-#include "svm_features.h"
+#include "features.h"
 #include "svm_utils.h"
 #include "blindtastic_core.h"
 
@@ -18,6 +20,7 @@ using std::endl;
 
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
+
 enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY };
 
 void print_help_and_exit (const char* arg0)
@@ -31,19 +34,6 @@ void print_help_and_exit (const char* arg0)
 
     exit(1);
 }
-
-
-
-
-void svm_trainSquares(const char* img){
-    man_train_img(img, string("Contains squares? Y/N"));
-}
-
-void svm_trainRectangles(const char* img){
-    man_train_img(img, string("Contains rectangles? Y/N"));
-}
-
-
 
 int release (int argc, char **argv)
 {
@@ -159,8 +149,16 @@ int release (int argc, char **argv)
 }
 
 
+/****************  shitty "let me try this real quick" stuff  ****************/
 
 
+void svm_trainSquares(const char* img){
+    man_train_img(img, string("Contains squares? Y/N"));
+}
+
+void svm_trainRectangles(const char* img){
+    man_train_img(img, string("Contains rectangles? Y/N"));
+}
 
 cv::Mat trans()
 {
@@ -209,8 +207,8 @@ void play_warped_video(const char* videoLocation)
     while(getFrameByNumber(cap, counter, img))
     {
         //warpPerspective(img, warp, morph, img.size());
-        findSquares(img,squares);
-        drawSquares(img,squares);
+        //findSquares(img,squares);
+        //drawSquares(img,squares);
 
         cv::imshow(win_class,img);
         counter++;
@@ -222,6 +220,96 @@ void play_warped_video(const char* videoLocation)
 
     cv::destroyWindow(win_class);
 }
+
+//************************
+// test cornerFilter
+//************************
+void testCornerFilter()
+{
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,100,src);
+    //vector<Point2f> corners;
+    std::vector<double> corners;
+    cornerFilter(src, corners);
+    // circle the corners
+    cout<<"** Number of corners detected in image: "<<(corners.size()/2)<<endl;
+    for (size_t i=0; i<(2*corners.size()); i+=2 ){
+        circle(src, cv::Point(corners[i],corners[i+1]), 1, cv::Scalar(0,0,255),2);
+    }
+    imshow("source", src);
+    waitKey();
+}
+
+//************************
+// test squarePics
+//************************
+void testSquarePics()
+{
+    char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
+                     ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};
+    for(int i=0;i<22;i++){
+        man_train_img(names[i],"Is it square?");
+    }
+}
+
+
+//************************
+// test circleFilter
+//************************
+void testCircleFilter()
+{
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,1347,src);
+    std::vector<cv::Vec3f> circles;
+    src = cv::imread("../resources/img/multicolored-circles.jpg");
+    circleFilter(src,circles);
+    // Draw the circles detected
+    for( size_t i = 0; i < circles.size(); i++ )
+    {
+        cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+        int radius = cvRound(circles[i][2]);
+        // circle center
+        cv::circle( src, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
+        // circle outline
+        cv::circle( src, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+     }
+    cout << "Aantal cirkels: " <<  circles.size() <<endl;
+    imshow("source", src);
+    waitKey();
+}
+
+//************************
+// test whiteFilter
+//************************
+void testWhiteFilter()
+{
+    cv::VideoCapture cap(defaultVideo);
+    Mat src, dst;
+    getFrameByNumber(cap,100,src);
+    //src = imread("../resources/img/multicolored-circles.jpg");
+    whiteFilter(src, dst);
+    imshow("source", src);
+    imshow("detected white", dst);
+    waitKey();
+}
+
+void testContourFilter()
+{
+    cv::VideoCapture cap(defaultVideo);
+    Mat src;
+    getFrameByNumber(cap,1347,src);
+    std::vector<double> features;
+    getContourFeatures(src,features);
+    for_each(features.begin(),features.end(),[](double d){
+        cout<<d<<endl;
+
+    });
+}
+
+
+/**********************************  MAIN  **********************************/
 
 int main(int argc, char **argv)
 {
@@ -238,7 +326,6 @@ int main(int argc, char **argv)
         videoLocation = argv[1];
     }
     if (!file_exists(videoLocation))
-
     {
         std::cerr << videoLocation << " not found!\nAborting..." << std::endl;
         return 1;
@@ -247,80 +334,13 @@ int main(int argc, char **argv)
 
     // do something
 
- /*   cv::VideoCapture cap(defaultVideo);
-    Mat src;
-    getFrameByNumber(cap,1347,src);
-    vector<double> features;
-    getContourFeatures(src,features);
-    for_each(features.begin(),features.end(),[](double d){
-        cout<<d<<endl;
-
-    });*/
-
+    //testWhiteFilter();
+    //testCircleFilter();
+    //testCornerFilter();
+    //testSquarePics();
+    //testContourFilter();
 
     play_warped_video(videoLocation);
-/*
-//************************
-// test circleFilter
-//************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src;
-    getFrameByNumber(cap,1347,src);
-    std::vector<cv::Vec3f> circles;
-    src = imread("../resources/img/multicolored-circles.jpg");
-    circleFilter(src,circles);
-    // Draw the circles detected
-    for( size_t i = 0; i < circles.size(); i++ )
-    {
-        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-        int radius = cvRound(circles[i][2]);
-        // circle center
-        circle( src, center, 3, Scalar(0,255,0), -1, 8, 0 );
-        // circle outline
-        circle( src, center, radius, Scalar(0,0,255), 3, 8, 0 );
-     }
-    cout << "Aantal cirkels: " <<  circles.size() <<endl;
-    imshow("source", src);
-    waitKey();
-*/
-/*
-//************************
-// test whiteFilter
-//************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src, dst;
-    getFrameByNumber(cap,100,src);
-    //src = imread("../resources/img/multicolored-circles.jpg");
-    whiteFilter(src, dst);
-    imshow("source", src);
-    imshow("detected white", dst);
-    waitKey();
-
-*/
-    /*
-//************************
-// test cornerFilter
-//************************
-    //cv::VideoCapture cap(defaultVideo);
-    //Mat src;
-    getFrameByNumber(cap,100,src);
-    //vector<Point2f> corners;
-    vector<double> corners;
-    cornerFilter(src, corners);
-    // circle the corners
-    cout<<"** Number of corners detected in image: "<<(corners.size()/2)<<endl;
-    for (size_t i=0; i<(2*corners.size()); i+=2 ){
-        circle(src, Point(corners[i],corners[i+1]), 1, Scalar(0,0,255),2);
-    }
-    imshow("source", src);
-    waitKey();
-*/
-
-    /*char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
-                     ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};
-    for(int i=0;i<22;i++){
-        man_train_img(names[i],"Is it square?");
-    }*/
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
