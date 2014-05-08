@@ -185,6 +185,23 @@ cv::Mat trans()
     return getPerspectiveTransform(morph, goal);
 }
 
+struct trackdata
+{
+    cv::Mat img;
+    cv::VideoCapture cap;
+    int frame = 0;
+};
+
+void trackbar_moved(int frame_pos, void* _data)
+{
+    struct trackdata* data = static_cast<struct trackdata*>(_data);
+    if (frame_pos != data->frame + 1)
+    {
+        getFrameByNumber(data->cap, frame_pos, data->img);
+    }
+    data->frame = frame_pos;
+}
+
 void play_warped_video(const char* videoLocation)
 {
     const char* win_class = "check classification";
@@ -196,24 +213,27 @@ void play_warped_video(const char* videoLocation)
 
     cv::Mat morph = trans();
 
-    cv::VideoCapture cap(videoLocation);
-    cv::Mat img;
+    struct trackdata data;
+    data.cap.open(videoLocation);
+
     cv::Mat warp;
     int counter = 0;
 
-    cv::createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation));
+    cv::createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation),&trackbar_moved, &data);
 
-    while(getFrameByNumber(cap, counter, img))
+    while(data.cap.isOpened())//getFrameByNumber(cap, counter, img))
     {
+        data.cap.read(data.img);
         //warpPerspective(img, warp, morph, img.size());
-        //findSquares(img,squares);
-        //drawSquares(img,squares);
+        findSquares(data.img,squares);
+        drawSquares(data.img,squares);
 
-        cv::imshow(win_class,img);
+        cv::imshow(win_class,data.img);
         counter++;
+
         cv::setTrackbarPos(track_class, win_class, counter);
 
-        if (cv::waitKey(1) >= 0)
+        if (cv::waitKey(100) >= 0)
             break;
     }
 
