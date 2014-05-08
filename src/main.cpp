@@ -263,7 +263,6 @@ int main(int argc, char **argv)
     });*/
 
 
-    });
     play_warped_video(videoLocation);
 /*
 //************************
@@ -273,7 +272,7 @@ int main(int argc, char **argv)
     Mat src;
     getFrameByNumber(cap,1347,src);
     std::vector<cv::Vec3f> circles;
-//    src = imread("../resources/img/multicolored-circles.jpg");
+    src = imread("../resources/img/multicolored-circles.jpg");
     circleFilter(src,circles);
     // Draw the circles detected
     for( size_t i = 0; i < circles.size(); i++ )
@@ -288,8 +287,8 @@ int main(int argc, char **argv)
     cout << "Aantal cirkels: " <<  circles.size() <<endl;
     imshow("source", src);
     waitKey();
-
-
+*/
+/*
 //************************
 // test whiteFilter
 //************************
@@ -303,6 +302,7 @@ int main(int argc, char **argv)
     waitKey();
 
 */
+    /*
 //************************
 // test cornerFilter
 //************************
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
     }
     imshow("source", src);
     waitKey();
-
+*/
 
     /*char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
                      ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};

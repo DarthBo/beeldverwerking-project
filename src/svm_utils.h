@@ -116,10 +116,6 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
         std::cout << (square ? "+1 " : "-1 ");
     }
     //OUTPUT: 1:tile_count 2:average_ratio 3:average_width 4:average_height 5:average_red 6:average:green 7:average_blue 8:average_texture_red 9:average_texture_green 10:average_texture_blue
-<<<<<<< HEAD
-    std::cout <<"1:" << static_cast<unsigned int>(squares.size())<<" 2:"<<avgRatio<<" 3:"<<avgWidth<<" 4:"<<avgHeight<<" 5:"<<r<<" 6:"<<g<<" 7:"<<b<<" 8:"<<textureR<<" 9:"<<textureG<<" 10:"<<textureB<<std::endl;
-
-=======
     std::cout <<  "1:" << squares.size()
               << " 2:" << avgRatio
               << " 3:" << avgWidth
@@ -131,7 +127,7 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
               << " 9:" << textureG
               << " 10:" << textureB
               << std::endl;
->>>>>>> fb2bcae09f42db3aa97b3354e832a13193e4269a
+
 }
 
 //Method for SVM input for grass
