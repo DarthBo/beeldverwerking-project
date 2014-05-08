@@ -303,8 +303,8 @@ int main(int argc, char **argv)
 //************************
 // test cornerFilter
 //************************
-    cv::VideoCapture cap(defaultVideo);
-    Mat src;
+    //cv::VideoCapture cap(defaultVideo);
+    //Mat src;
     getFrameByNumber(cap,100,src);
     //vector<Point2f> corners;
     vector<double> corners;

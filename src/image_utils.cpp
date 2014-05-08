@@ -209,7 +209,7 @@ void cornerFilter(const cv::Mat& in, std::vector<double>& out){
     int maxCorners=2000;
     double qualityLevel=0.05;
     double minDistance=20;
-    std::vector<cv::Point2f>& corners;
+    std::vector<cv::Point2f> corners;
     cv::Mat temp;
     cv::Point2f pt;
     cv::cvtColor(in, temp, CV_RGB2GRAY);
