@@ -4,8 +4,8 @@
 #include "svm_features.h"
 #include "file_utils.h"
 #include "video_utils.h"
+#include "image_utils.h"
 #include "svm_utils.h"
-#include "blindtastic_core.h"
 
 using cv::namedWindow;
 using cv::Mat;
@@ -120,11 +120,13 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        svm_trainGrass(videoLocation);
+        //svm_trainGrass(videoLocation);
+        train_paver_pebble_white(videoLocation, true);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        print_characteristics(videoLocation);
+        //print_characteristics(videoLocation);
+        train_paver_pebble_white(videoLocation, false);
         break;
     case CLASSIFY:
         if (!file_exists(extra))
@@ -133,7 +135,8 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        check_classification(videoLocation, extra);
+        //check_classification(videoLocation, extra);
+        play_predictions(videoLocation, extra);
         break;
     default:
         print_help_and_exit(argv[0]);
@@ -185,60 +188,7 @@ cv::Mat trans()
     return getPerspectiveTransform(morph, goal);
 }
 
-struct trackdata
-{
-    cv::Mat img;
-    cv::VideoCapture cap;
-    int frame = 0;
-};
 
-void trackbar_moved(int frame_pos, void* _data)
-{
-    struct trackdata* data = static_cast<struct trackdata*>(_data);
-    if (frame_pos != data->frame + 1)
-    {
-        getFrameByNumber(data->cap, frame_pos, data->img);
-    }
-    data->frame = frame_pos;
-}
-
-void play_warped_video(const char* videoLocation)
-{
-    const char* win_class = "check classification";
-    const char* track_class = "Position:";
-    cv::namedWindow(win_class);
-
-    std::vector<std::vector<cv::Point> > squares;
-
-
-    cv::Mat morph = trans();
-
-    struct trackdata data;
-    data.cap.open(videoLocation);
-
-    cv::Mat warp;
-    int counter = 0;
-
-    cv::createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation),&trackbar_moved, &data);
-
-    while(data.cap.isOpened())//getFrameByNumber(cap, counter, img))
-    {
-        data.cap.read(data.img);
-        //warpPerspective(img, warp, morph, img.size());
-        findSquares(data.img,squares);
-        drawSquares(data.img,squares);
-
-        cv::imshow(win_class,data.img);
-        counter++;
-
-        cv::setTrackbarPos(track_class, win_class, counter);
-
-        if (cv::waitKey(100) >= 0)
-            break;
-    }
-
-    cv::destroyWindow(win_class);
-}
 
 //************************
 // test cornerFilter
@@ -333,7 +283,7 @@ void testContourFilter()
 int main(int argc, char **argv)
 {
 
-    bool CLI = false;
+    bool CLI = true;
     if (CLI)
     {
         return release(argc, argv);
@@ -359,7 +309,7 @@ int main(int argc, char **argv)
     //testSquarePics();
     //testContourFilter();
 
-    play_warped_video(videoLocation);
+    play_video(videoLocation);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

@@ -21,7 +21,9 @@ SET(SRC src/main.cpp
         src/svm_features.cpp
         src/file_utils.h
         src/video_utils.h
+        src/video_utils.cpp
         src/svm_utils.h
+        src/svm_utils.cpp
         src/blindtastic_core.h
 )
 
