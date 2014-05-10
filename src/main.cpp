@@ -359,8 +359,19 @@ int main(int argc, char **argv)
     //testSquarePics();
     //testContourFilter();
 
-    play_warped_video(videoLocation);
+    //play_warped_video(videoLocation);
 
+    LocationRepository repo;
+    Characteristic grass("Grass");
+    grass.setWeight(3.2);
+    Characteristic zebra_crossing("Zebra crossing");
+    zebra_crossing.setWeight(7.1);
+    repo.refine(grass);
+    repo.refine(zebra_crossing);
+    std::vector<std::pair<Location*,double>> refined = repo.getRefinedLocations();
+    for(auto p : refined){
+        std::cout<<p.first->getName()<<" : "<<p.second<<std::endl;
+    }
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }

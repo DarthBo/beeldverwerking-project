@@ -3,6 +3,7 @@
 
 #include "opencv2/opencv.hpp"
 #include <queue>
+#include <unordered_map>
 
 class Feature{
 protected:
@@ -112,11 +113,175 @@ public:
     void setName(const std::string& name){this->name = name;}
 };
 
+template <typename T>
+class PairingHeap{
+public:
+    class Node{
+    public:
+        T t;
+        Node* previous; // previous* of first in linked list points to the parent
+        Node* next;     //next sibling in linked list
+        Node* child;    //first child
+        Node(const T& _t):t(_t),previous(nullptr),next(nullptr),child(nullptr){}
+        ~Node(){
+            if(next != nullptr)
+                delete next;
+            if(child != nullptr)
+                delete child;
+        }
+    }; // end of Node interface
+    PairingHeap(){_size = 0; root = nullptr; }
+    ~PairingHeap(){
+        delete root;
+    }
+    int size() const{return _size;}
+    bool empty() const {return _size == 0;}
+    Node* push(const T& t);
+    void pop();
+    const T& top() const;
+    void increasePriority(Node* node, const double val);
+private:
+    int _size;
+    Node* root;
+    Node* combineSiblings(Node* first);
+    void combine(Node*&,Node*);
+};
+
+/*PAIRINGHEAP */
+
+template <typename T>
+void PairingHeap<T>::combine(Node*& first,Node* second){
+    if (second == nullptr)
+        return;
+    if (first->t < second->t)
+    {
+        second->previous = first->previous;
+        first->previous = second;
+        first->next = second->child;
+        if (first->next != nullptr)
+            first->next->previous = first;
+        second->child = first;
+        first = second;
+    }
+    else
+    {
+        second->previous = first;
+        first->next = second->next;
+        if (first->next != nullptr)
+            first->next->previous = first;
+        second->next = first->child;
+        if (second->next != nullptr)
+            second->next->previous = second;
+        first->child = second;
+    }
+}
+
+template <typename T>
+typename PairingHeap<T>::Node* PairingHeap<T>::push(const T& t){
+    Node *newNode = new Node(t);
+    if (root == nullptr)
+        root = newNode;
+    else
+        combine(root, newNode);
+    _size++;
+    return newNode;
+}
+
+template <typename T>
+void PairingHeap<T>::increasePriority(Node* node,const double val){
+        node->t = node->t + val;
+        if (node != root)
+        {
+            if (node->next != nullptr)
+                node->next->previous = node->previous;
+            if (node->previous->child == node)
+                node->previous->child = node->next;
+            else
+                node->previous->next = node->next;
+            node->next = nullptr;
+            combine(root, node);
+        }
+}
+
+template <typename T>
+const T& PairingHeap<T>::top() const{
+    return root->t;
+}
+
+template <typename T>
+typename PairingHeap<T>::Node* PairingHeap<T>::combineSiblings(Node* first){
+    if(first == nullptr)
+        return nullptr;
+    if(first->next == nullptr)
+        return first;
+    std::vector<Node*> subheaps;
+    //first pass combines in pairs creating separate heaps
+    Node* second = first->next;
+    while(first != nullptr){
+        Node* nextFirst = nullptr;
+        Node* nextSecond = nullptr;
+        first->next = nullptr; // decouple
+        if(second != nullptr){
+            nextFirst = second->next;
+            if(nextFirst != nullptr)
+                nextSecond = nextFirst->next;
+            second->next = nullptr;
+        }
+        combine(first,second);
+        subheaps.push_back(first);
+        first = nextFirst;
+        second = nextSecond;
+    }
+    //second pass combines in 1 tree
+    second = subheaps.back();
+    if(subheaps.size() > 1){
+        for(int i = subheaps.size()-2; i >= 0; i--){
+            Node* first = subheaps[i];
+            combine(second,first);
+        }
+    }
+    return second;
+}
+
+template <typename T>
+void PairingHeap<T>::pop(){
+    //delete current root and merge siblings
+    if(root == nullptr)
+        return;
+    Node *oldRoot = root;
+    if (root->child == nullptr)
+        root = nullptr;
+    else
+        root = combineSiblings(root->child);
+    if(root != nullptr)
+        root->previous = nullptr; // cleaning up previous links
+    oldRoot->child = nullptr;
+    delete oldRoot;
+    _size--;
+}
+
 class LocationRepository {
     //TODO, stores all locations
 private:
+    class WeightedLocation{
+    private:
+        Location* location;
+        double weight;
+    public:
+        WeightedLocation(){}
+        WeightedLocation(Location* _location,double _weight):location(_location),weight(_weight){}
+        bool operator>(const WeightedLocation& l) const{return weight>l.weight;}
+        bool operator<(const WeightedLocation& l) const{return weight<l.weight;}
+        WeightedLocation& operator+(const double weight){this->weight += weight; return *this;}
+        double getWeight(){return weight;}
+        void setWeight(double weight){this->weight = weight;}
+        Location* getLocation(){return location;}
+        void setLocation(Location* location){this->location = location;}
+    };
     std::vector<Location> locations;
-    //std::unordered_map<std::string,std::vector<Location>> locationIndex;
+    PairingHeap<WeightedLocation> refinedLocations;
+    std::unordered_map<std::string,std::vector<Location*>> locationIndex;
+    std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
         Characteristic grass("Grass");
         Characteristic paver_huge("Huge Pavers at P building");
@@ -176,12 +341,61 @@ private:
         ch11cs = {paver_train_station};
         Location railw_hall("Stationshal",ch11cs);
         locations.push_back(railw_hall);
+
+        resetRefinement();
+        buildIndex();
+    }
+    void buildIndex(){
+        for(Location& l : locations){
+            for(const Characteristic& c : l.getCharacteristics()){
+                locationIndex[c.getName()].push_back(&l);
+            }
+        }
     }
 
 public:
     LocationRepository(){init();}
     std::vector<Location>& getAllLocations(){
         return locations;
+    }
+
+    std::pair<Location*,double> getTopLocation(){
+        WeightedLocation wl = refinedLocations.top();
+        std::pair<Location*,double> p(wl.getLocation(),wl.getWeight());
+        return p;
+    }
+
+    //warning: resets current refinement
+    std::vector<std::pair<Location*,double>> getRefinedLocations(){
+        std::vector<std::pair<Location*,double>> out;
+        while(refinedLocations.size() > 0){
+              WeightedLocation wl= refinedLocations.top();
+              std::pair<Location*,double> p(wl.getLocation(),wl.getWeight());
+              out.push_back(p);
+              refinedLocations.pop();
+        }
+        resetRefinement();
+        return out;
+    }
+
+    void refine(Characteristic& characteristic){
+        if(nodeIndex.find(characteristic.getName()) != nodeIndex.end()){
+            for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.getName()]){
+                refinedLocations.increasePriority(node,characteristic.getWeight());
+            }
+        }
+    }
+
+    void resetRefinement(){
+        refinedLocations = PairingHeap<WeightedLocation>();
+        nodeIndex.clear();
+        for(Location& l : locations){
+            WeightedLocation wl(&l,0.0);
+            typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(wl);
+            for(const Characteristic& c : l.getCharacteristics()){
+                nodeIndex[c.getName()].push_back(n);
+            }
+        }
     }
 };
 
