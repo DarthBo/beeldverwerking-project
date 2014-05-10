@@ -154,19 +154,21 @@ double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares){
     return avgContourArea/counter;
 }
 
+cv::Rect getrect(const std::vector<cv::Point> &square)
+{
+    int maxx = std::max(std::max(square[0].x,square[1].x),std::max(square[2].x,square[3].x));
+    int minx = std::min(std::min(square[0].x,square[1].x),std::min(square[2].x,square[3].x));
+    int maxy = std::max(std::max(square[0].y,square[1].y),std::max(square[2].y,square[3].y));
+    int miny = std::min(std::min(square[0].y,square[1].y),std::min(square[2].y,square[3].y));
+
+    return cv::Rect(minx, miny, maxx-minx, maxy-miny);
+}
+
+///////////!!!!!!!!!!!!!!!!!!!!!!!!!
 void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
-    cv::Point p = square[0];
-    cv::Point p1 = square[1];
-    cv::Point p2 = square[2];
-    double height = p1.y-p.y;
-    double width = p2.x-p.x;
-    cv::Point topleft = square[0];
-    for( size_t i=1;i<square.size();i++){
-        if(topleft.x > square[i].x && topleft.y > square[i].y){
-            topleft = square[i];
-        }
-    }
-    cv::Rect window = cv::Rect(topleft.x, topleft.y, width, height);
+
+    cv::Rect window = getrect(square);
+
     cv::Mat ROI(in,window);
     cv::Scalar s = cv::mean(ROI);
     R.push_back(s[0]);
@@ -196,19 +198,11 @@ void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point
     means.push_back(b);
 }
 
+/////////////!!!!!!!!!!!!!!!!!!!!!!!
 void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
-    cv::Point p = square[0];
-    cv::Point p1 = square[1];
-    cv::Point p2 = square[2];
-    double height = p1.y-p.y;
-    double width = p2.x-p.x;
-    cv::Point topleft = square[0];
-    for( size_t i=1;i<square.size();i++){
-        if(topleft.x > square[i].x && topleft.y > square[i].y){
-            topleft = square[i];
-        }
-    }
-    cv::Rect window = cv::Rect(topleft.x, topleft.y, width, height);
+
+    cv::Rect window = getrect(square);
+
     cv::Mat ROI(in,window);
     std::vector<double> means;
     getAverageTexture(ROI, means);

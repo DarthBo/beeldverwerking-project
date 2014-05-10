@@ -288,6 +288,9 @@ void train_paver_pebble_white(const char* vidloc, bool train)
 
         //colour + texture
         means.clear();
+
+
+
         getAvgColorTiles(img, squares, means);
         getTextureTiles(img, squares, means);
 
@@ -296,7 +299,7 @@ void train_paver_pebble_white(const char* vidloc, bool train)
         {
             std::cout << " " << i << ":" << means[i];
         }
-        std::cout << std::endl;
+        std::cout << " # frame: " << counter << std::endl;
     }
 }
 
