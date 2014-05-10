@@ -120,8 +120,8 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        //svm_trainGrass(videoLocation);
-        train_paver_pebble_white(videoLocation, true);
+        svm_trainGrass(videoLocation);
+        //train_paver_pebble_white(videoLocation, true);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;

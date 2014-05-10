@@ -59,12 +59,15 @@ class GridElement{
 protected:
     cv::Mat element;
     std::vector<Characteristic> characteristics;
+    cv::Rect window;
 public:
     GridElement(){}
-    GridElement(cv::Mat _element):element(_element){}
+    GridElement(cv::Mat _element, cv::Rect _window)
+        : element(_element), window(_window) {}
     const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
     void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
     const cv::Mat& getMat() const{return element;}
+    const cv::Rect& getWindow() const {return window;}
     void setMat(const cv::Mat& mat){this->element = mat;}
 };
 
@@ -85,14 +88,27 @@ protected:
     Image image;
     int elementHeight;
     int elementWidth;
-    std::vector<std::vector<GridElement>> elements;
+    std::vector<std::vector<GridElement>> elements; //[row][column]
     void populate();
     void test();
 public:
+    typedef std::vector<std::vector<GridElement>>::const_iterator const_it_row;
+    typedef std::vector<GridElement>::const_iterator const_it_col;
     //Elements of final column and row may not have given dimensions if height and width cannot be properly divided
     ImageGrid(cv::Mat _image,int _elementWidth, int _elementHeight):image(_image),elementHeight(_elementHeight),elementWidth(_elementWidth){
         populate();
     }
+
+    const_it_row begin() const
+    {
+        return elements.begin();
+    }
+
+    const_it_row end() const
+    {
+        return elements.end();
+    }
+
 
     void populateCharacteristics(){
         //move over grid and call SVM for every element to find the Characteristics
@@ -296,7 +312,7 @@ void ImageGrid::populate(){
     for(int row = 0; row<rows-1; row++){
         for(int col = 0; col<cols-1; col++){
             cv::Mat ROI(mat,window);
-            GridElement element(ROI);
+            GridElement element(ROI, window);
             elements[row][col] = element;
             window.x = window.x + window.width;
             count++;
@@ -314,7 +330,7 @@ void ImageGrid::populate(){
     window.y = 0;
     for(int row = 0; row<rows-1; row++){
         cv::Mat ROI(mat,window);
-        GridElement element(ROI);
+        GridElement element(ROI, window);
         elements[row][cols-1] = element;
         window.y += window.height;
         count++;
@@ -325,7 +341,7 @@ void ImageGrid::populate(){
     window.x = 0;
     for(int col = 0; col<cols-1; col++){
         cv::Mat ROI(mat,window);
-        GridElement element(ROI);
+        GridElement element(ROI, window);
         elements[rows-1][col] = element;
         window.x += window.width;
         count++;
@@ -333,7 +349,7 @@ void ImageGrid::populate(){
     //final element can have a different width and height
     window.width = remainingX;
     cv::Mat ROI(mat,window);
-    GridElement element(ROI);
+    GridElement element(ROI, window);
     elements[rows-1][cols-1] = element;
     count++;
 

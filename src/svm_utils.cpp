@@ -118,7 +118,7 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
 }
 
 //Method for SVM input for grass
-void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
+void man_train_grass_old(cv::Mat& frame,const std::string& q, bool train,int f){
     cv::Rect window = cv::Rect(0, 0, 640, 360); //deel frame in 4
     for(int row = 0; row< frame.rows; row+= window.height )
     {
@@ -149,6 +149,48 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
         }
         window.x = 0;
         window.y = window.y + window.height;
+    }
+}
+
+//Improved training function for SVM input for grass
+void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
+
+    ImageGrid grid(frame, 32, 18);
+
+    ImageGrid::const_it_row row = grid.begin();
+    while (row != grid.end())
+    {
+        ImageGrid::const_it_col col = row->begin();
+        while (col != row->end())
+        {
+            GridElement el = *col;
+
+            cv::Mat ROI = el.getMat();
+            cv::Rect window = el.getWindow();
+
+            double greenFeature = getAverageFilteredColour(ROI,GREEN_MIN,GREEN_MAX);
+            std::vector<double> textureFeatures;
+            getAverageTexture(ROI,textureFeatures);
+            std::vector<double> features;
+            features.push_back(greenFeature);
+            features.insert(features.end(),textureFeatures.begin(),textureFeatures.end());
+
+            if (train)
+            {
+                bool green = train_askuser(frame, window, q);
+                std::cout << (green ? "+1 " : "-1 ");
+            }
+
+            //print features
+            for (size_t i=1 ; i <= features.size() ; i++)
+            {
+                std::cout << i << ':' << features[i] << ' ';
+            }
+            std::cout << std::endl; // frame[x,y]
+
+            col++;
+        }
+        row++;
     }
 }
 
@@ -201,6 +243,7 @@ void check_classification(const char* videoLocation, const char* classification)
 
 }
 
+//train (defaultVid) zones adhv hardgecodeerde grenzen (framenummers)
 void hardTrainSchool2Station()
 {
     /*
@@ -281,25 +324,23 @@ void train_paver_pebble_white(const char* vidloc, bool train)
         squares.clear();
         findSquares(img,squares);
 
+        //colour + texture
+        means.clear();
+
+        getAvgColorTiles(img, squares, means);
+        getTextureTiles(img, squares, means);
+/*
+        //print
         if (train)
             std::cout << (counter < 735 || counter > 1205 ? "-1" : "+1");
         else
             std::cout << "0";
-
-        //colour + texture
-        means.clear();
-
-
-
-        getAvgColorTiles(img, squares, means);
-        getTextureTiles(img, squares, means);
-
-        //print
         for (int i=0 ; i < means.size() ; i++)
         {
             std::cout << " " << i << ":" << means[i];
         }
         std::cout << " # frame: " << counter << std::endl;
+        */
     }
 }
 
