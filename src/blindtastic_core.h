@@ -130,7 +130,7 @@ public:
                 delete child;
         }
     }; // end of Node interface
-    PairingHeap(){_size = 0; root = nullptr; }
+    PairingHeap():_size(0),root(nullptr){}
     ~PairingHeap(){
         delete root;
     }
