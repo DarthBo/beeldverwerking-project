@@ -177,6 +177,9 @@ void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector
 }
 
 void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
+    if (squares.empty())
+        return;
+
     std::vector<double> R;
     std::vector<double> G;
     std::vector<double> B;
@@ -190,9 +193,9 @@ void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point
         g+=G[j];
         b+=B[j];
     }
-    r=r/(R.size()-1);
-    g=g/(G.size()-1);
-    b=b/(B.size()-1);
+    r=r/R.size();
+    g=g/G.size();
+    b=b/B.size();
     means.push_back(r);
     means.push_back(g);
     means.push_back(b);
@@ -212,6 +215,9 @@ void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<dou
 }
 
 void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
+    if (squares.empty())
+        return;
+
     std::vector<double> R;
     std::vector<double> G;
     std::vector<double> B;
@@ -226,9 +232,9 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
         g+=G[j];
         b+=B[j];
     }
-    r=r/(R.size()-1);
-    g=g/(G.size()-1);
-    b=b/(B.size()-1);
+    r=r/R.size();
+    g=g/G.size();
+    b=b/B.size();
     means.push_back(r);
     means.push_back(g);
     means.push_back(b);
