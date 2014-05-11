@@ -10,7 +10,7 @@
 using cv::namedWindow;
 using cv::Mat;
 using cv::imshow;
-using cv::waitKey;
+using td::waitKey;
 using cv::destroyWindow;
 using cv::Rect;
 using std::string;

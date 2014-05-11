@@ -5,8 +5,16 @@
 #include "video_utils.h"
 #include "blindtastic_core.h"
 
+
+inline int td::waitKey(int delay)
+{
+    int k = cv::waitKey(delay);
+    if (k != -1) k &= 0xFF; //workaround for linux bug
+    return k;
+}
+
 //show window, ask question
-bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question)
+int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question)
 {
     cv::Mat ROI = img.clone();
 
@@ -16,32 +24,29 @@ bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& q
     corners[2] = cv::Point(rect.x+rect.width, rect.y+rect.height);
     corners[3] = cv::Point(rect.x           , rect.y+rect.height);
 
-
-
-
     drawRect(ROI, corners, cv::Scalar(255,0,0));
     printText(ROI, question, rect.x + 50, rect.y+75);
 
     cv::imshow(question, ROI);
 
-    int key = cv::waitKey();
+    int key = td::waitKey();
 
     switch (key)
     {
-        case YES:
+        case K_Y:
             drawRect(ROI, corners, cv::Scalar(0,255,0));
             break;
-        case NO:
+        case K_N:
             drawRect(ROI, corners, cv::Scalar(0,0,255));
             break;
         default:
-            exit(1);
+            return -1;
     }
 
     cv::imshow(question, ROI);
-    cv::waitKey(100);
+    td::waitKey(100); //show choice for 100ms
 
-    return (key == YES);
+    return key;
 }
 
 //Method to produce SVM input to train square or rectangle tile
@@ -60,7 +65,7 @@ void man_train_tile(cv::Mat& image,const std::string& q, bool train){
     //svm format print
     if (train)
     {
-        bool square = train_askuser(image, window, q);
+        bool square = (train_askuser(image, window, q) == K_Y);
         std::cout << (square ? "+1 " : "-1 ");
     }
     //OUTPUT: 1:tile_count 2:average_ratio
@@ -117,45 +122,10 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
 
 }
 
-//Method for SVM input for grass
-void man_train_grass_old(cv::Mat& frame,const std::string& q, bool train,int f){
-    cv::Rect window = cv::Rect(0, 0, 640, 360); //deel frame in 4
-    for(int row = 0; row< frame.rows; row+= window.height )
-    {
-        for(int col = 0; col < frame.cols;col += window.width)
-        {
-            cv::Mat ROI(frame,window); // region of interest
-            double greenFeature = getAverageFilteredColour(ROI,GREEN_MIN,GREEN_MAX);
-            std::vector<double> textureFeatures;
-            getAverageTexture(ROI,textureFeatures);
-            std::vector<double> features;
-            features.push_back(greenFeature);
-            features.insert(features.end(),textureFeatures.begin(),textureFeatures.end());
-
-            if (train)
-            {
-                bool green = train_askuser(frame, window, q);
-                std::cout << (green ? "+1 " : "-1 ");
-            }
-
-            //print features
-            for (size_t i=1 ; i <= features.size() ; i++)
-            {
-                std::cout << i << ':' << features[i] << ' ';
-            }
-            std::cout << "# " << f << "[" << col << ',' << row << ']' << std::endl; // frame[x,y]
-
-            window.x = window.x + window.width;
-        }
-        window.x = 0;
-        window.y = window.y + window.height;
-    }
-}
-
 //Improved training function for SVM input for grass
 void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
 
-    ImageGrid grid(frame, 3, 3); //3x3
+    ImageGrid grid(frame, 9, 9);
 
     ImageGrid::const_it_row row = grid.begin();
     while (row != grid.end())
@@ -177,8 +147,9 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
 
             if (train)
             {
-                bool green = train_askuser(frame, window, q);
-                std::cout << (green ? "+1 " : "-1 ");
+                int green = train_askuser(frame, window, q);
+                if (green < 0) return;
+                std::cout << ((green == K_Y) ? "+1 " : "-1 ");
             }
 
             //print features
@@ -207,24 +178,36 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train){
    man_train_tile(image,q,train);
 }
 
-
 //method that calls a SVM input method used on an image
 void man_train_video(const char* videoLocation, const std::string& q, bool train)
 
 {
     cv::VideoCapture cap(videoLocation);
-    assert(cap.isOpened());
-
-    unsigned int frames = getFrameCount(cap);
-    unsigned int step = (30 * 10); //elke 30s aan 10fps
-
     cv::Mat frame;
-    for (unsigned int f=1 ; f < frames ; f+=step)
-    {
-        getFrameByNumber(cap,f,frame);
-        //train method:
-        man_train_grass(frame,q, train,f);
+    unsigned int f = 0;
 
+    while (cap.isOpened())
+    {
+        cap.read(frame);
+        ++f;
+
+        cv::imshow(q,frame);
+        int key = td::waitKey(100);
+
+        if (key >= 0)
+        {
+            switch (key) {
+            case K_Q:
+                return;
+            case K_ESC:
+                return;
+            case K_SPC:
+                man_train_grass(frame,q,train,f);
+                break;
+            default:
+                break;
+            }
+        }
     }
 }
 
@@ -361,7 +344,7 @@ void play_predictions(const char* fvid, const char* fpred)
 
         cv::imshow(winp, img);
 
-        if (cv::waitKey(25) >= 0) //play at 4x speed
+        if (td::waitKey(25) >= 0) //play at 4x speed
             break;
     }
 

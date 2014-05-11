@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include <math.h>
-#include <image_utils.h>
+#include "image_utils.h"
+#include "svm_utils.h"
 
 
 double angle( cv::Point pt1, cv::Point pt2, cv::Point pt0 )
@@ -298,7 +299,7 @@ void showSquares(const char* videoLocation)
         cv::imshow(win_rects,img);
         counter++;
 
-        if (cv::waitKey(10) >= 0)
+        if (td::waitKey(10) >= 0)
             break;
     }
     cv::destroyAllWindows();
@@ -314,7 +315,7 @@ int showFramePerFrame(const char* windowName, const char* videoLocation)
     cv::Mat frame;
     while(cap.read(frame)){
         imshow(windowName, frame);
-        cv::waitKey();
+        td::waitKey();
     }
     return 0;
 }
@@ -388,7 +389,7 @@ void play_video(const char* videoLocation)
 
         cv::setTrackbarPos(track_class, win_class, counter);
 
-        if (cv::waitKey(100) >= 0)
+        if (td::waitKey(100) >= 0)
             break;
     }
 

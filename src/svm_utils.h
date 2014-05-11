@@ -3,19 +3,18 @@
 
 #include "opencv2/opencv.hpp"
 
-#ifdef __linux__
-    #define YES 1048697
-    #define NO 1048686
-#elif __APPLE__
-    #define YES 121
-    #define NO 110
-#else
-    #define YES 121
-    #define NO 110
-#endif
+#define K_ESC 27
+#define K_SPC 32
+#define K_Q (int)'q'
+#define K_Y (int)'y'
+#define K_N (int)'n'
+
+namespace td {
+    int waitKey(int delay = 0);
+}
 
 //show window, ask question
-bool train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question);
+int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question);
 
 //Method to produce SVM input to train square or rectangle tile
 void man_train_tile(cv::Mat& image,const std::string& q, bool train);
@@ -28,7 +27,6 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f=0);
 
 //method that calls a SVM input method used on an image
 void man_train_img(const char* imgLocation, const std::string& q, bool train = true);
-
 
 //method that calls a SVM input method used on an image
 void man_train_video(const char* videoLocation, const std::string& q, bool train = true);

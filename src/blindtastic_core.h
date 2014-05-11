@@ -86,8 +86,8 @@ public:
 class ImageGrid{
 protected:
     Image image;
-    int cols;
     int rows;
+    int cols;
     std::vector<std::vector<GridElement>> elements; //[row][column]
     void populate();
     void test();
@@ -320,8 +320,6 @@ void ImageGrid::populate(){
     int elementWidth = static_cast<int>(ceil((double)mat.cols/cols));
     int elementHeight = static_cast<int>(ceil((double)mat.rows/rows));
 
-    std::cout<<"Populating "<<rows<<"x"<<cols<<" grid..."<<std::endl;
-
     int count = 0; //debugging
     cv::Rect window = cv::Rect(0, 0, elementWidth, elementHeight);
     for(int row = 0; row<rows-1; row++){
@@ -367,8 +365,6 @@ void ImageGrid::populate(){
     GridElement element(ROI, window);
     elements[rows-1][cols-1] = element;
     count++;
-
-    std::cout<<"Done! Number of grid elements:"<<count<<std::endl;
 }
 
 //shows how to access and change pixels
