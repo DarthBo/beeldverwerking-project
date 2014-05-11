@@ -125,8 +125,8 @@ int release (int argc, char **argv)
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        //print_characteristics(videoLocation);
-        train_paver_pebble_white(videoLocation, false);
+        print_characteristics(videoLocation);
+        //train_paver_pebble_white(videoLocation, false);
         break;
     case CLASSIFY:
         if (!file_exists(extra))
@@ -135,8 +135,8 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        //check_classification(videoLocation, extra);
-        play_predictions(videoLocation, extra);
+        //play_predictions(videoLocation, extra);
+        play_grasspredictions(videoLocation, extra);
         break;
     default:
         print_help_and_exit(argv[0]);

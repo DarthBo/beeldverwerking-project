@@ -51,6 +51,8 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
         case K_N:
             drawRect(ROI, corners, cv::Scalar(0,0,255));
             break;
+        case (int)'h':
+            return -2;
         default:
             return -1;
     }
@@ -160,8 +162,18 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
             if (train)
             {
                 int green = train_askuser(frame, window, q);
-                if (green < 0) return;
+                if (green < 0)
+                {
+                    if (green == -1)
+                        return;
+                    col++;
+                    continue;
+                }
                 std::cout << ((green == K_Y) ? "+1 " : "-1 ");
+            }
+            else
+            {
+                std::cout << "0 ";
             }
 
             //print features
@@ -169,7 +181,7 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
             {
                 std::cout << i << ':' << features[i] << ' ';
             }
-            std::cout << std::endl; // frame[x,y]
+            std::cout << "# frame " << f << std::endl; // frame[x,y]
 
             col++;
         }
@@ -227,11 +239,11 @@ void print_characteristics(const char* videoLocation)
     cv::Mat frame;
     unsigned int f = 0;
 
-    while (cap.isOpened())
+    while (cap.isOpened() && cap.read(frame))
     {
-        cap.read(frame);
         ++f;
-        man_train_grass(frame, "", false, f);
+        if (f%100 == 0)
+            man_train_grass(frame, "", false, f);
     }
 }
 
@@ -337,7 +349,7 @@ void train_paver_pebble_white(const char* vidloc, bool train)
 void play_predictions(const char* fvid, const char* fpred)
 {
     const char* winp = "predictions";
-    std::ifstream pred(fvid);
+    std::ifstream pred(fpred);
     cv::VideoCapture cap(fvid);
 
     std::string certainty;
@@ -353,6 +365,57 @@ void play_predictions(const char* fvid, const char* fpred)
 
         if (td::waitKey(25) >= 0) //play at 4x speed
             break;
+    }
+
+    if (pred.is_open())
+    {
+        std::cout << "not all predictions shown" << std::endl;
+        pred.close();
+    }
+    if (cap.isOpened())
+    {
+        std::cout << "not all frames shown" << std::endl;
+        cap.release();
+    }
+}
+
+void play_grasspredictions(const char* fvid, const char* fpred)
+{
+    const char* winp = "predictions";
+    std::ifstream pred(fpred);
+    cv::VideoCapture cap(fvid);
+
+    std::string certainty;
+    cv::Mat img;
+
+    int f = 0;
+
+    while(cap.isOpened() && cap.read(img) && pred.is_open())
+    {
+        ++f;
+
+        if (f%100 == 0)
+        {
+            double d;
+            int pos = 0;
+            for (int i=0 ; i<81 ; i++)
+            {
+                pred >> d;
+                if (d > 0) pos++;
+            }
+            char buf[100] = {0};
+            sprintf(buf, "%d/81", pos);
+            certainty = buf;
+
+            printText(img, certainty);
+            cv::imshow(winp, img);
+            td::waitKey();
+        }
+
+
+        //if (td::waitKey(25) >= 0) //play at 4x speed
+        //    break;
+
     }
 
     if (pred.is_open())
