@@ -1,9 +1,9 @@
 #include <svm_utils.h>
 
 #include <fstream>
-#include "image_utils.h"
 #include "video_utils.h"
 #include "blindtastic_core.h"
+#include "svm_features.h"
 
 
 inline int td::waitKey(int delay)
@@ -152,12 +152,10 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
             cv::Mat ROI = el.getMat();
             cv::Rect window = el.getWindow();
 
-            double greenFeature = getAverageFilteredColour(ROI,GREEN_MIN,GREEN_MAX);
-            std::vector<double> textureFeatures;
-            getAverageTexture(ROI,textureFeatures);
             std::vector<double> features;
-            features.push_back(greenFeature);
-            features.insert(features.end(),textureFeatures.begin(),textureFeatures.end());
+
+            getAverageColour(ROI, features);
+            getTextureFeatures(ROI,features);
 
             if (train)
             {
