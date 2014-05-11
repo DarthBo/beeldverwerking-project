@@ -155,7 +155,7 @@ void man_train_grass_old(cv::Mat& frame,const std::string& q, bool train,int f){
 //Improved training function for SVM input for grass
 void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
 
-    ImageGrid grid(frame, 32, 18);
+    ImageGrid grid(frame, 3, 3); //3x3
 
     ImageGrid::const_it_row row = grid.begin();
     while (row != grid.end())
@@ -329,7 +329,7 @@ void train_paver_pebble_white(const char* vidloc, bool train)
 
         getAvgColorTiles(img, squares, means);
         getTextureTiles(img, squares, means);
-/*
+
         //print
         if (train)
             std::cout << (counter < 735 || counter > 1205 ? "-1" : "+1");
@@ -340,7 +340,6 @@ void train_paver_pebble_white(const char* vidloc, bool train)
             std::cout << " " << i << ":" << means[i];
         }
         std::cout << " # frame: " << counter << std::endl;
-        */
     }
 }
 

@@ -86,16 +86,26 @@ public:
 class ImageGrid{
 protected:
     Image image;
-    int elementHeight;
-    int elementWidth;
+    int cols;
+    int rows;
     std::vector<std::vector<GridElement>> elements; //[row][column]
     void populate();
     void test();
 public:
     typedef std::vector<std::vector<GridElement>>::const_iterator const_it_row;
     typedef std::vector<GridElement>::const_iterator const_it_col;
+
     //Elements of final column and row may not have given dimensions if height and width cannot be properly divided
-    ImageGrid(cv::Mat _image,int _elementWidth, int _elementHeight):image(_image),elementHeight(_elementHeight),elementWidth(_elementWidth){
+    ImageGrid(cv::Mat _image, cv::Rect celSize) : image(_image)
+    {
+        rows = ceil((double)image.getMat().rows/celSize.height);
+        cols = ceil((double)image.getMat().cols/celSize.width);
+
+        populate();
+    }
+
+    ImageGrid(cv::Mat _image, int _rows, int _cols) : image(_image), rows(_rows), cols(_cols)
+    {
         populate();
     }
 
@@ -298,15 +308,20 @@ void CharacteristicTree::printBreadthFirst(){
 
 /*IMAGEGRID */
 void ImageGrid::populate(){
-    cv::Mat mat = image.getMat();
-    int rows = ceil((double)mat.rows/elementHeight);
-    int cols = ceil((double)mat.cols/elementWidth);
+
     //init vectors
     elements.resize(rows);
     for(int row = 0; row<rows; row++){
         elements[row].resize(cols);
     }
+
+    cv::Mat mat = image.getMat();
+
+    int elementWidth = static_cast<int>(ceil((double)mat.cols/cols));
+    int elementHeight = static_cast<int>(ceil((double)mat.rows/rows));
+
     std::cout<<"Populating "<<rows<<"x"<<cols<<" grid..."<<std::endl;
+
     int count = 0; //debugging
     cv::Rect window = cv::Rect(0, 0, elementWidth, elementHeight);
     for(int row = 0; row<rows-1; row++){
