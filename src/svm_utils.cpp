@@ -14,6 +14,18 @@ inline int td::waitKey(int delay)
 }
 
 //show window, ask question
+int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question);
+
+//Method to produce SVM input to train specific pavement
+void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train);
+
+//Method for SVM input for grass
+void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f=0);
+
+/*****************************************************************************/
+
+
+//show window, ask question
 int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question)
 {
     cv::Mat ROI = img.clone();
@@ -25,7 +37,7 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
     corners[3] = cv::Point(rect.x           , rect.y+rect.height);
 
     drawRect(ROI, corners, cv::Scalar(255,0,0));
-    printText(ROI, question, rect.x + 50, rect.y+75);
+    printText(ROI, question);
 
     cv::imshow(question, ROI);
 
@@ -123,7 +135,7 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
 }
 
 //Improved training function for SVM input for grass
-void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f){
+void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
 
     ImageGrid grid(frame, 9, 9);
 
@@ -179,7 +191,7 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train){
 }
 
 //method that calls a SVM input method used on an image
-void man_train_video(const char* videoLocation, const std::string& q, bool train)
+void man_train_video(const char* videoLocation, const std::string& q)
 
 {
     cv::VideoCapture cap(videoLocation);
@@ -202,7 +214,7 @@ void man_train_video(const char* videoLocation, const std::string& q, bool train
             case K_ESC:
                 return;
             case K_SPC:
-                man_train_grass(frame,q,train,f);
+                man_train_grass(frame,q,true,f);
                 break;
             default:
                 break;
@@ -211,19 +223,18 @@ void man_train_video(const char* videoLocation, const std::string& q, bool train
     }
 }
 
-void svm_trainGrass(const char* video)
-{
-    man_train_video(video, std::string("Contains grass? Y/N"));
-}
-
 void print_characteristics(const char* videoLocation)
 {
-    man_train_video(videoLocation, "", false);
-}
+    cv::VideoCapture cap(videoLocation);
+    cv::Mat frame;
+    unsigned int f = 0;
 
-void check_classification(const char* videoLocation, const char* classification)
-{
-
+    while (cap.isOpened())
+    {
+        cap.read(frame);
+        ++f;
+        man_train_grass(frame, "", false, f);
+    }
 }
 
 //train (defaultVid) zones adhv hardgecodeerde grenzen (framenummers)
