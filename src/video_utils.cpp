@@ -380,10 +380,8 @@ void play_video(const char* videoLocation)
 
     cv::createTrackbar(track_class, win_class, &counter, getFrameCount(videoLocation),&trackbar_moved, &data);
 
-    while(data.cap.isOpened())
+    while(data.cap.isOpened() && data.cap.read(data.img))
     {
-        data.cap.read(data.img);
-
         cv::imshow(win_class,data.img);
         counter++;
 

@@ -192,15 +192,13 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train){
 
 //method that calls a SVM input method used on an image
 void man_train_video(const char* videoLocation, const std::string& q)
-
 {
     cv::VideoCapture cap(videoLocation);
     cv::Mat frame;
     unsigned int f = 0;
 
-    while (cap.isOpened())
+    while (cap.isOpened() && cap.read(frame))
     {
-        cap.read(frame);
         ++f;
 
         cv::imshow(q,frame);
@@ -310,9 +308,8 @@ void train_paver_pebble_white(const char* vidloc, bool train)
     std::vector<double> means;
     int counter = 0;
 
-    while(cap.isOpened())//getFrameByNumber(cap, counter, img))
+    while(cap.read(img))
     {
-        cap.read(img);
         ++counter;
 
         squares.clear();
@@ -346,10 +343,9 @@ void play_predictions(const char* fvid, const char* fpred)
     std::string certainty;
     cv::Mat img;
 
-    while(cap.isOpened() && pred.is_open())
+    while(cap.isOpened() && cap.read(img) && pred.is_open())
     {
         pred >> certainty;
-        cap.read(img);
 
         printText(img, certainty);
 
