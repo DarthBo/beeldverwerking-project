@@ -175,9 +175,9 @@ void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
             }
 
             //print features
-            for (size_t i=1 ; i <= features.size() ; i++)
+            for (size_t i=0 ; i < features.size() ; i++)
             {
-                std::cout << i << ':' << features[i] << ' ';
+                std::cout << i+1 << ':' << features[i] << ' ';
             }
             std::cout << "# frame " << f << std::endl; // frame[x,y]
 
