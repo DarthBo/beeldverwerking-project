@@ -396,10 +396,32 @@ void play_grasspredictions(const char* fvid, const char* fpred)
         {
             double d;
             int pos = 0;
+
+            ImageGrid g(img, 9, 9);
+            typename std::vector<std::vector<GridElement>>::const_iterator row = g.begin();
+            typename std::vector<GridElement>::const_iterator col = row->begin();
+
             for (int i=0 ; i<81 ; i++)
             {
                 pred >> d;
-                if (d > 0) pos++;
+                cv::Rect win = (*col).getWindow();
+                if (d > 0)
+                {
+                    pos++;
+                    drawRect(img, win);
+                }
+                else
+                {
+                    drawRect(img, win, cv::Scalar(0,0,255));
+                }
+
+                col++;
+                if (col == row->end())
+                {
+                    row++;
+                    if (row != g.end())
+                        col = row->begin();
+                }
             }
             char buf[100] = {0};
             sprintf(buf, "%d/81", pos);

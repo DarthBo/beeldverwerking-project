@@ -111,6 +111,19 @@ void drawRect(cv::Mat& img, const std::vector<cv::Point>& rect, const cv::Scalar
     cv::polylines(img, &p, &n, 1, true, colour, 3, LINE_AA);
 }
 
+// draws a rectangle on the image
+void drawRect(cv::Mat& img, const cv::Rect& rect, const cv::Scalar& colour)
+{
+    std::vector<cv::Point> pts;
+
+    pts.push_back(cv::Point(rect.x,rect.y));
+    pts.push_back(cv::Point(rect.x+rect.width,rect.y));
+    pts.push_back(cv::Point(rect.x+rect.width,rect.y+rect.height));
+    pts.push_back(cv::Point(rect.x,rect.y+rect.height));
+
+    drawRect(img, pts, colour);
+}
+
 // this function draws all the squares in the image
 void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squares)
 {

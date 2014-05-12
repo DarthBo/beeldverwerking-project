@@ -12,6 +12,7 @@ void findSquares( const cv::Mat& image, std::vector<std::vector<cv::Point> >& sq
 // draws a rectangle on the image
 void drawRect(cv::Mat& img, const std::vector<cv::Point>& rect,
               const cv::Scalar& colour = cv::Scalar(0,255,0));
+void drawRect(cv::Mat& img, const cv::Rect& rect, const cv::Scalar& colour = cv::Scalar(0,255,0));
 
 // this function draws all the squares in the image
 void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squares);
