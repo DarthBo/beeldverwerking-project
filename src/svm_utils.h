@@ -24,6 +24,8 @@ void man_train_video(const char* videoLocation, const std::string& q);
 
 //method that prints all ch11cs in a video (per frame) to stdout
 void print_characteristics(const char* videoLocation);
+
+//shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
 void play_grasspredictions(const char* fvid, const char* fpred);
 
 ////////////////// pruts /////////////////////

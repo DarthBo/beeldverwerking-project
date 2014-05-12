@@ -377,6 +377,7 @@ void play_predictions(const char* fvid, const char* fpred)
     }
 }
 
+//this code is awful, save your soul by not reading it
 void play_grasspredictions(const char* fvid, const char* fpred)
 {
     const char* winp = "predictions";
@@ -398,8 +399,8 @@ void play_grasspredictions(const char* fvid, const char* fpred)
             int pos = 0;
 
             ImageGrid g(img, 9, 9);
-            typename std::vector<std::vector<GridElement>>::const_iterator row = g.begin();
-            typename std::vector<GridElement>::const_iterator col = row->begin();
+            ImageGrid::const_it_row row = g.begin();
+            ImageGrid::const_it_col col = row->begin();
 
             for (int i=0 ; i<81 ; i++)
             {
