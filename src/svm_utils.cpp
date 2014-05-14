@@ -390,7 +390,7 @@ void play_predictions(const char* fvid, const char* fpred)
 }
 
 //this code is awful, save your soul by not reading it
-void play_grasspredictions(const char* fvid, const char* fpred)
+void play_grid_predictions(const char* fvid, const char* fpred, int rows, int columns, int once_every_x_frames)
 {
     const char* winp = "predictions";
     std::ifstream pred(fpred);
@@ -405,16 +405,16 @@ void play_grasspredictions(const char* fvid, const char* fpred)
     {
         ++f;
 
-        if (f%100 == 0)
+        if (f%once_every_x_frames == 0)
         {
             double d;
             int pos = 0;
 
-            ImageGrid g(img, 9, 9);
+            ImageGrid g(img, rows, columns);
             ImageGrid::const_it_row row = g.begin();
             ImageGrid::const_it_col col = row->begin();
 
-            for (int i=0 ; i<81 ; i++)
+            for (int i=0 ; i<rows*columns ; i++)
             {
                 pred >> d;
                 cv::Rect win = (*col).getWindow();
@@ -437,7 +437,7 @@ void play_grasspredictions(const char* fvid, const char* fpred)
                 }
             }
             char buf[100] = {0};
-            sprintf(buf, "%d/81", pos);
+            sprintf(buf, "%d/%d", pos,rows*columns);
             certainty = buf;
 
             printText(img, certainty);

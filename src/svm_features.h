@@ -18,7 +18,6 @@ void getAvgColorTiles(const cv::Mat& in,
                       const std::vector<std::vector<cv::Point>>& squares,
                       std::vector<double>& means);
 
-
 void getTextureTiles(const cv::Mat& in,
                      const std::vector<std::vector<cv::Point>>& squares,
                      std::vector<double>& means);

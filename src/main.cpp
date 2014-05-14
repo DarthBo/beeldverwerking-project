@@ -126,7 +126,7 @@ int release (int argc, char **argv)
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        print_imagegrid_features(videoLocation, &getTextnColour, 50);
+        print_imagegrid_features(videoLocation, &getTextnColour);
         //train_paver_pebble_white(videoLocation, false);
         break;
     case CLASSIFY:
@@ -137,7 +137,7 @@ int release (int argc, char **argv)
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
         //play_predictions(videoLocation, extra);
-        play_grasspredictions(videoLocation, extra);
+        play_grid_predictions(videoLocation, extra);
         break;
     default:
         print_help_and_exit(argv[0]);

@@ -19,12 +19,12 @@ void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
         std::vector<double> sums;
         squaredSum(out,sums);                   // local energy
         for(size_t i = 0; i< sums.size() ;i++){ // for every channel
-            features.push_back(sums[i]);
+            features.push_back(sums[i]/1000000);//normalise for SVM
         }
         sums.clear();
         absoluteSum(out,sums);                  //Mean Amplitude
         for(size_t i = 0; i< sums.size() ;i++){ // for every channel
-            features.push_back(sums[i]);
+            features.push_back(sums[i]/10000);  //normalise for SVM
         }
     }
 }
