@@ -16,14 +16,105 @@ inline int td::waitKey(int delay)
 //show window, ask question
 int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question);
 
-//Method to produce SVM input to train specific pavement
-void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train);
-
-//Method for SVM input for grass
-void man_train_grass(cv::Mat& frame,const std::string& q, bool train,int f=0);
 
 /*****************************************************************************/
 
+//Improved training function for SVM input for grass
+void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q, featureCallback genFeatures, bool train, int f)
+{
+    ImageGrid grid(frame, 9, 9);
+
+    ImageGrid::const_it_row row = grid.begin();
+    while (row != grid.end())
+    {
+        ImageGrid::const_it_col col = row->begin();
+        while (col != row->end())
+        {
+            GridElement el = *col;
+
+            cv::Mat ROI = el.getMat();
+            cv::Rect window = el.getWindow();
+
+            std::vector<double> features;
+
+            genFeatures(ROI, features);
+
+            if (train)
+            {
+                int hasCharacteristic = train_askuser(frame, window, q);
+                if (hasCharacteristic < 0)
+                {
+                    if (hasCharacteristic == -1)
+                        return;
+                    col++;
+                    continue;
+                }
+                std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+            }
+            else
+            {
+                std::cout << "0 ";
+            }
+
+            //print features
+            for (size_t i=0 ; i < features.size() ; i++)
+            {
+                std::cout << i+1 << ':' << features[i] << ' ';
+            }
+            std::cout << "# frame " << f << std::endl; // frame[x,y]
+
+            col++;
+        }
+        row++;
+    }
+}
+
+//method that calls a SVM input method used on an image
+void start_manual_training_video(const char* videoLocation,
+                                 const std::string& q,
+                                 featureCallback genFeatures)
+{
+    cv::VideoCapture cap(videoLocation);
+    cv::Mat frame;
+    unsigned int f = 0;
+
+    while (cap.isOpened() && cap.read(frame))
+    {
+        ++f;
+
+        cv::imshow(q,frame);
+        int key = td::waitKey(100);
+
+        if (key >= 0)
+        {
+            switch (key) {
+            case K_Q:
+                return;
+            case K_ESC:
+                return;
+            case K_SPC:
+                manual_train_with_imagegrid(frame,q,genFeatures,true,f);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+void print_imagegrid_features(const char* videoLocation, featureCallback genFeatures, int once_every_x_frames)
+{
+    cv::VideoCapture cap(videoLocation);
+    cv::Mat frame;
+    unsigned int f = 0;
+
+    while (cap.isOpened() && cap.read(frame))
+    {
+        ++f;
+        if (f%once_every_x_frames == 0)
+            manual_train_with_imagegrid(frame, "", genFeatures, false, f);
+    }
+}
 
 //show window, ask question
 int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& question)
@@ -62,6 +153,51 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
 
     return key;
 }
+
+void auto_train_video (const char* vidloc,
+                       featureCallback genFeatures,
+                       int from_frame,
+                       int to_frame,
+                       int once_every_x_frames,
+                       bool train)
+{
+    cv::VideoCapture cap(vidloc);
+    assert(cap.isOpened());
+
+    cv::Mat img;
+
+    int counter = 0;
+
+    while(cap.read(img))
+    {
+        ++counter;
+
+        if (counter % once_every_x_frames == 0)
+        {
+            std::vector<double> features;
+
+            genFeatures(img, features);
+
+            //print
+            if (train)
+                std::cout << (counter < from_frame || counter > to_frame ? "-1" : "+1");
+            else
+                std::cout << "0";
+
+            for (int i=0 ; i < features.size() ; i++)
+            {
+                std::cout << " " << i+1 << ":" << features[i];
+            }
+            std::cout << " # frame: " << counter << std::endl;
+        }
+    }
+}
+
+
+/************************************************************************************/
+
+
+
 
 //Method to produce SVM input to train square or rectangle tile
 void man_train_tile(cv::Mat& image,const std::string& q, bool train){
@@ -136,59 +272,10 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
 
 }
 
-//Improved training function for SVM input for grass
-void man_train_grass(cv::Mat& frame,const std::string& q, bool train, int f){
 
-    ImageGrid grid(frame, 9, 9);
-
-    ImageGrid::const_it_row row = grid.begin();
-    while (row != grid.end())
-    {
-        ImageGrid::const_it_col col = row->begin();
-        while (col != row->end())
-        {
-            GridElement el = *col;
-
-            cv::Mat ROI = el.getMat();
-            cv::Rect window = el.getWindow();
-
-            std::vector<double> features;
-
-            getAverageColour(ROI, features);
-            getTextureFeatures(ROI,features);
-
-            if (train)
-            {
-                int green = train_askuser(frame, window, q);
-                if (green < 0)
-                {
-                    if (green == -1)
-                        return;
-                    col++;
-                    continue;
-                }
-                std::cout << ((green == K_Y) ? "+1 " : "-1 ");
-            }
-            else
-            {
-                std::cout << "0 ";
-            }
-
-            //print features
-            for (size_t i=0 ; i < features.size() ; i++)
-            {
-                std::cout << i+1 << ':' << features[i] << ' ';
-            }
-            std::cout << "# frame " << f << std::endl; // frame[x,y]
-
-            col++;
-        }
-        row++;
-    }
-}
 
 //method that calls a SVM input method used on an image
-void man_train_img(const char* imgLocation, const std::string& q, bool train){
+void start_manual_training_image(const char* imgLocation, const std::string& q, bool train){
    cv::Mat image;
    image = cv::imread(imgLocation, CV_LOAD_IMAGE_COLOR);   // Read the file
 
@@ -200,50 +287,6 @@ void man_train_img(const char* imgLocation, const std::string& q, bool train){
    man_train_tile(image,q,train);
 }
 
-//method that calls a SVM input method used on an image
-void man_train_video(const char* videoLocation, const std::string& q)
-{
-    cv::VideoCapture cap(videoLocation);
-    cv::Mat frame;
-    unsigned int f = 0;
-
-    while (cap.isOpened() && cap.read(frame))
-    {
-        ++f;
-
-        cv::imshow(q,frame);
-        int key = td::waitKey(100);
-
-        if (key >= 0)
-        {
-            switch (key) {
-            case K_Q:
-                return;
-            case K_ESC:
-                return;
-            case K_SPC:
-                man_train_grass(frame,q,true,f);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-}
-
-void print_characteristics(const char* videoLocation)
-{
-    cv::VideoCapture cap(videoLocation);
-    cv::Mat frame;
-    unsigned int f = 0;
-
-    while (cap.isOpened() && cap.read(frame))
-    {
-        ++f;
-        if (f%100 == 0)
-            man_train_grass(frame, "", false, f);
-    }
-}
 
 //train (defaultVid) zones adhv hardgecodeerde grenzen (framenummers)
 void hardTrainSchool2Station()
@@ -307,43 +350,6 @@ void hardTrainSchool2Station()
     Location stdenijs("St Denijs",ch11cs);
 }
 
-void train_paver_pebble_white(const char* vidloc, bool train)
-{
-    cv::VideoCapture cap(vidloc);
-    assert(cap.isOpened());
-
-    cv::Mat img;
-
-    std::vector<std::vector<cv::Point>> squares;
-    std::vector<double> means;
-    int counter = 0;
-
-    while(cap.read(img))
-    {
-        ++counter;
-
-        squares.clear();
-        findSquares(img,squares);
-
-        //colour + texture
-        means.clear();
-
-        getAvgColorTiles(img, squares, means);
-        getTextureTiles(img, squares, means);
-
-        //print
-        if (train)
-            std::cout << (counter < 735 || counter > 1205 ? "-1" : "+1");
-        else
-            std::cout << "0";
-        for (int i=0 ; i < means.size() ; i++)
-        {
-            std::cout << " " << i << ":" << means[i];
-        }
-        std::cout << " # frame: " << counter << std::endl;
-    }
-}
-
 void play_predictions(const char* fvid, const char* fpred)
 {
     const char* winp = "predictions";
@@ -353,16 +359,22 @@ void play_predictions(const char* fvid, const char* fpred)
     std::string certainty;
     cv::Mat img;
 
+    int count = 0;
     while(cap.isOpened() && cap.read(img) && pred.is_open())
     {
-        pred >> certainty;
+        ++count;
 
-        printText(img, certainty);
+        if (count % 50 == 0)
+        {
+            pred >> certainty;
 
-        cv::imshow(winp, img);
+            printText(img, certainty);
 
-        if (td::waitKey(25) >= 0) //play at 4x speed
-            break;
+            cv::imshow(winp, img);
+
+            if (td::waitKey(25) >= 0) //play at 4x speed
+                break;
+        }
     }
 
     if (pred.is_open())
@@ -449,4 +461,9 @@ void play_grasspredictions(const char* fvid, const char* fpred)
         std::cout << "not all frames shown" << std::endl;
         cap.release();
     }
+}
+
+void train_paver_pebble_white(const char* vidloc, bool train)
+{
+    auto_train_video(vidloc, &getRectFeatures, 735, 1205, 50, train);
 }

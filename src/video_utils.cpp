@@ -178,7 +178,6 @@ cv::Rect getrect(const std::vector<cv::Point> &square)
     return cv::Rect(minx, miny, maxx-minx, maxy-miny);
 }
 
-///////////!!!!!!!!!!!!!!!!!!!!!!!!!
 void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
 
     cv::Rect window = getrect(square);
@@ -190,32 +189,6 @@ void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector
     B.push_back(s[2]);
 }
 
-void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
-    if (squares.empty())
-        return;
-
-    std::vector<double> R;
-    std::vector<double> G;
-    std::vector<double> B;
-
-    for(size_t i=0; i< squares.size();i++){
-        getAvgColorSingleTile(in,R,G,B,squares[i]);
-    }
-    double r = 0.0, g = 0.0, b = 0.0;
-    for(size_t j=0; j<R.size(); j++){
-        r+=R[j];
-        g+=G[j];
-        b+=B[j];
-    }
-    r=r/R.size();
-    g=g/G.size();
-    b=b/B.size();
-    means.push_back(r);
-    means.push_back(g);
-    means.push_back(b);
-}
-
-/////////////!!!!!!!!!!!!!!!!!!!!!!!
 void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
 
     cv::Rect window = getrect(square);
@@ -227,34 +200,6 @@ void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<dou
     G.push_back(means[1]);
     B.push_back(means[2]);
 }
-
-void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
-    if (squares.empty())
-        return;
-
-    std::vector<double> R;
-    std::vector<double> G;
-    std::vector<double> B;
-
-    for(size_t i=0; i< squares.size();i++){
-        getAvgTextureTile(in, R, G, B, squares[i]);
-    }
-
-    double r=0.0, g=0.0, b=0.0;
-    for(size_t j=0; j<R.size(); j++){
-        r+=R[j];
-        g+=G[j];
-        b+=B[j];
-    }
-    r=r/R.size();
-    g=g/G.size();
-    b=b/B.size();
-    means.push_back(r);
-    means.push_back(g);
-    means.push_back(b);
-}
-
-
 
 std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>& squares){
     //0 -> width, 1 -> height

@@ -27,19 +27,11 @@ void getAvgColorSingleTile(const cv::Mat& in,
                            std::vector<double>& B,
                            const std::vector<cv::Point> &square);
 
-void getAvgColorTiles(const cv::Mat& in,
-                      const std::vector<std::vector<cv::Point>>& squares,
-                      std::vector<double>& means);
-
 void getAvgTextureTile(const cv::Mat& in,
                        std::vector<double>& R,
                        std::vector<double>& G,
                        std::vector<double>& B,
                        const std::vector<cv::Point> &square);
-
-void getTextureTiles(const cv::Mat& in,
-                     const std::vector<std::vector<cv::Point>>& squares,
-                     std::vector<double>& means);
 
 std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>& squares);
 

@@ -121,12 +121,12 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        man_train_video(videoLocation,std::string("Contains grass? Y/N"));
+        start_manual_training_video(videoLocation,std::string("Contains grass? Y/N"), &getTextnColour);
         //train_paver_pebble_white(videoLocation, true);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        print_characteristics(videoLocation);
+        print_imagegrid_features(videoLocation, &getTextnColour, 50);
         //train_paver_pebble_white(videoLocation, false);
         break;
     case CLASSIFY:
@@ -154,14 +154,6 @@ int release (int argc, char **argv)
 
 /****************  shitty "let me try this real quick" stuff  ****************/
 
-
-void svm_trainSquares(const char* img){
-    man_train_img(img, string("Contains squares? Y/N"));
-}
-
-void svm_trainRectangles(const char* img){
-    man_train_img(img, string("Contains rectangles? Y/N"));
-}
 
 cv::Mat trans()
 {
@@ -219,7 +211,7 @@ void testSquarePics()
     char names[][15]={{"rect1.jpg"},{"rect2.jpg"},{"rect3.jpg"},{"rect4.jpg"},{"rect5.jpg"},{"rect6.jpg"},{"rect7.jpg"},{"rect8.jpg"},{"squares1.jpg"},{"squares2.jpg"},{"squares3.jpg"},{"squares4.jpg"},{"squares5.jpg"},{"squares6.jpg"}
                      ,{"squares7.jpg"},{"squares8.jpg"},{"squares9.jpg"},{"squares10.jpg"},{"squares11.jpg"},{"squares12.jpg"},{"squares13.jpg"},{"squares14.jpg"}};
     for(int i=0;i<22;i++){
-        man_train_img(names[i],"Is it square?");
+        start_manual_training_image(names[i],"Is it square?");
     }
 }
 
@@ -326,9 +318,9 @@ int main(int argc, char **argv)
     //testContourFilter();
 
     //play_warped_video(videoLocation);
-    //test_locatiedinges();
+    test_locatiedinges();
 
-    play_video(videoLocation);
+    //play_video(videoLocation);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
