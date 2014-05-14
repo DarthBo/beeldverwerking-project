@@ -37,6 +37,8 @@ void auto_train_video(const char* vidloc,
 
 //shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
 void play_grid_predictions(const char* fvid, const char* fpred, int rows=9, int colums=9, int once_every_x_frames = 100);
+//shows predictions for full frame
+void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames = 100);
 
 ////////////////// pruts /////////////////////
 
@@ -46,8 +48,6 @@ void start_manual_training_image(const char* imgLocation, const std::string& q, 
 void hardTrainSchool2Station();
 
 void train_paver_pebble_white(const char* vidloc, bool train=true);
-
-void play_predictions(const char* fvid, const char* fpred);
 
 
 #endif // SVM_SHIT_H

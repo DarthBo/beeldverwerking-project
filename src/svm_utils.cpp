@@ -193,10 +193,78 @@ void auto_train_video (const char* vidloc,
     }
 }
 
+//this code is awful, save your soul by not reading it
+void play_grid_predictions(const char* fvid, const char* fpred, int rows, int columns, int once_every_x_frames)
+{
+    const char* winp = "predictions";
+    std::ifstream pred(fpred);
+    cv::VideoCapture cap(fvid);
+
+    std::string certainty;
+    cv::Mat img;
+
+    int f = 0;
+
+    while(cap.isOpened() && cap.read(img) && pred.is_open())
+    {
+        ++f;
+
+        if (f%once_every_x_frames == 0)
+        {
+            double d;
+            int pos = 0;
+
+            ImageGrid g(img, rows, columns);
+            ImageGrid::const_it_row row = g.begin();
+            ImageGrid::const_it_col col = row->begin();
+
+            for (int i=0 ; i<rows*columns ; i++)
+            {
+                pred >> d;
+                cv::Rect win = (*col).getWindow();
+                if (d > 0)
+                {
+                    pos++;
+                    drawRect(img, win);
+                }
+                else
+                {
+                    drawRect(img, win, cv::Scalar(0,0,255));
+                }
+
+                col++;
+                if (col == row->end())
+                {
+                    row++;
+                    if (row != g.end())
+                        col = row->begin();
+                }
+            }
+            char buf[100] = {0};
+            sprintf(buf, "%d/%d", pos,rows*columns);
+            certainty = buf;
+
+            printText(img, certainty);
+            cv::imshow(winp, img);
+            int k = td::waitKey();
+            if (k == K_ESC || k == K_Q)
+                cap.release();
+        }
+    }
+
+    if (pred.is_open())
+    {
+        std::cout << "not all predictions shown" << std::endl;
+        pred.close();
+    }
+    if (cap.isOpened())
+    {
+        std::cout << "not all frames shown" << std::endl;
+        cap.release();
+    }
+}
 
 /************************************************************************************/
-
-
 
 
 //Method to produce SVM input to train square or rectangle tile
@@ -350,102 +418,50 @@ void hardTrainSchool2Station()
     Location stdenijs("St Denijs",ch11cs);
 }
 
-void play_predictions(const char* fvid, const char* fpred)
+void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames)
 {
     const char* winp = "predictions";
     std::ifstream pred(fpred);
     cv::VideoCapture cap(fvid);
 
-    std::string certainty;
+    double certainty = 0;
     cv::Mat img;
 
-    int count = 0;
+    int frame = 0;
+    int diff = 0;
+    std::string out;
+
     while(cap.isOpened() && cap.read(img) && pred.is_open())
     {
-        ++count;
+        ++frame;
 
-        if (count % 50 == 0)
+        if (frame % once_every_x_frames == 0)
         {
             pred >> certainty;
-
-            printText(img, certainty);
-
-            cv::imshow(winp, img);
-
-            if (td::waitKey(25) >= 0) //play at 4x speed
-                break;
+            diff = 0;
         }
-    }
-
-    if (pred.is_open())
-    {
-        std::cout << "not all predictions shown" << std::endl;
-        pred.close();
-    }
-    if (cap.isOpened())
-    {
-        std::cout << "not all frames shown" << std::endl;
-        cap.release();
-    }
-}
-
-//this code is awful, save your soul by not reading it
-void play_grid_predictions(const char* fvid, const char* fpred, int rows, int columns, int once_every_x_frames)
-{
-    const char* winp = "predictions";
-    std::ifstream pred(fpred);
-    cv::VideoCapture cap(fvid);
-
-    std::string certainty;
-    cv::Mat img;
-
-    int f = 0;
-
-    while(cap.isOpened() && cap.read(img) && pred.is_open())
-    {
-        ++f;
-
-        if (f%once_every_x_frames == 0)
+        else
         {
-            double d;
-            int pos = 0;
-
-            ImageGrid g(img, rows, columns);
-            ImageGrid::const_it_row row = g.begin();
-            ImageGrid::const_it_col col = row->begin();
-
-            for (int i=0 ; i<rows*columns ; i++)
-            {
-                pred >> d;
-                cv::Rect win = (*col).getWindow();
-                if (d > 0)
-                {
-                    pos++;
-                    drawRect(img, win);
-                }
-                else
-                {
-                    drawRect(img, win, cv::Scalar(0,0,255));
-                }
-
-                col++;
-                if (col == row->end())
-                {
-                    row++;
-                    if (row != g.end())
-                        col = row->begin();
-                }
-            }
-            char buf[100] = {0};
-            sprintf(buf, "%d/%d", pos,rows*columns);
-            certainty = buf;
-
-            printText(img, certainty);
-            cv::imshow(winp, img);
-            int k = td::waitKey();
-            if (k == K_ESC || k == K_Q)
-                cap.release();
+            diff++;
         }
+
+        if (certainty != 0)
+        {
+            if (certainty > 0)
+                out = "Match! (";
+            else
+                out = "Nope!  (";
+
+            out += certainty;
+            out += " frames ago)";
+
+            printText(img, out);
+        }
+
+        cv::imshow(winp, img);
+
+        if (td::waitKey(25) >= 0) //play at 4x speed
+            break;
     }
 
     if (pred.is_open())
