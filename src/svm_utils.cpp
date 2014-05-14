@@ -442,13 +442,10 @@ void play_grid_predictions(const char* fvid, const char* fpred, int rows, int co
 
             printText(img, certainty);
             cv::imshow(winp, img);
-            td::waitKey();
+            int k = td::waitKey();
+            if (k == K_ESC || k == K_Q)
+                cap.release();
         }
-
-
-        //if (td::waitKey(25) >= 0) //play at 4x speed
-        //    break;
-
     }
 
     if (pred.is_open())
