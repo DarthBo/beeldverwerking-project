@@ -10,6 +10,8 @@
 #define K_Y (int)'y'
 #define K_N (int)'n'
 
+#define DEFAULT_FRAMESKIP 100
+
 namespace td {
     int waitKey(int delay = 0);
 }
@@ -26,19 +28,19 @@ void start_manual_training_video(const char* videoLocation,
 //method that prints all ch11cs in a video (per frame) to stdout
 void print_imagegrid_features(const char* videoLocation,
                            featureCallback genFeatures,
-                           int once_every_x_frames = 100);
+                           int once_every_x_frames = DEFAULT_FRAMESKIP);
 
 void auto_train_video(const char* vidloc,
                       featureCallback genFeatures,
                       int from_frame,
                       int to_frame,
-                      int once_every_x_frames = 100,
+                      int once_every_x_frames = DEFAULT_FRAMESKIP,
                       bool train=true);
 
 //shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
-void play_grid_predictions(const char* fvid, const char* fpred, int rows=9, int colums=9, int once_every_x_frames = 100);
+void play_grid_predictions(const char* fvid, const char* fpred, int rows=9, int colums=9, int once_every_x_frames = DEFAULT_FRAMESKIP);
 //shows predictions for full frame
-void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames = 100);
+void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames = DEFAULT_FRAMESKIP);
 
 ////////////////// pruts /////////////////////
 
