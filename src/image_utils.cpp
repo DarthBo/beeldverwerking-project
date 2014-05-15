@@ -72,7 +72,7 @@ void squaredSum(const cv::Mat& in,std::vector<double>& out){
     }
 }
 
-/* Calculate sum of absolute values for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
+/* Calculate sum of absolute values (i.e. mean amplitude) for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
 void absoluteSum(const cv::Mat& in,std::vector<double>& out){
     if(in.rows == 0 || in.cols == 0){
         return;
