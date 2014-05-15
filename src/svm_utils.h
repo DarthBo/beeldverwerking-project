@@ -21,14 +21,16 @@ void manual_train_with_imagegrid(cv::Mat& frame,
                                  const std::string& q,
                                  featureCallback genFeatures,
                                  bool train,
+                                 int f=0,
                                  int rows=9,
-                                 int columns=9,
-                                 int f=0);
+                                 int columns=9);
 
 //method that calls a SVM input method used on an image
 void start_manual_training_video(const char* videoLocation,
                                  const std::string& q,
-                                 featureCallback genFeatures);
+                                 featureCallback genFeatures,
+                                 int rows=9,
+                                 int columns=9);
 
 //method that prints all ch11cs in a video (per frame) to stdout
 void print_imagegrid_features(const char* videoLocation,

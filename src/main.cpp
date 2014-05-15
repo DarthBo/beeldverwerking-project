@@ -285,12 +285,10 @@ void test_locatiedinges()
     }
 }
 
-
 /**********************************  MAIN  **********************************/
 
 int main(int argc, char **argv)
 {
-
     bool CLI = true;
     if (CLI)
     {

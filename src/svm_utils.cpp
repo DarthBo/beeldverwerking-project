@@ -23,9 +23,9 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
 void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                                  featureCallback genFeatures,
                                  bool train,
+                                 int f,
                                  int rows,
-                                 int columns,
-                                 int f)
+                                 int columns)
 {
     ImageGrid grid(frame, rows, columns);
 
@@ -77,7 +77,9 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
 //method that calls a SVM input method used on an image
 void start_manual_training_video(const char* videoLocation,
                                  const std::string& q,
-                                 featureCallback genFeatures)
+                                 featureCallback genFeatures,
+                                 int rows,
+                                 int columns)
 {
     cv::VideoCapture cap(videoLocation);
     cv::Mat frame;
@@ -98,7 +100,7 @@ void start_manual_training_video(const char* videoLocation,
             case K_ESC:
                 return;
             case K_SPC:
-                manual_train_with_imagegrid(frame,q,genFeatures,true,f);
+                manual_train_with_imagegrid(frame,q,genFeatures,true,f,rows,columns);
                 break;
             default:
                 break;
