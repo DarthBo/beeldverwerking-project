@@ -17,8 +17,13 @@ namespace td {
 }
 
 //Method for training a frame with grid
-void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q, featureCallback genFeatures, bool train, int f=0);
-
+void manual_train_with_imagegrid(cv::Mat& frame,
+                                 const std::string& q,
+                                 featureCallback genFeatures,
+                                 bool train,
+                                 int rows=9,
+                                 int columns=9,
+                                 int f=0);
 
 //method that calls a SVM input method used on an image
 void start_manual_training_video(const char* videoLocation,
@@ -38,9 +43,16 @@ void auto_train_video(const char* vidloc,
                       bool train=true);
 
 //shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
-void play_grid_predictions(const char* fvid, const char* fpred, int rows=9, int colums=9, int once_every_x_frames = DEFAULT_FRAMESKIP);
+void play_grid_predictions(const char* fvid,
+                           const char* fpred,
+                           int rows=9,
+                           int colums=9,
+                           int once_every_x_frames = DEFAULT_FRAMESKIP);
+
 //shows predictions for full frame
-void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames = DEFAULT_FRAMESKIP);
+void play_frame_predictions(const char* fvid,
+                            const char* fpred,
+                            int once_every_x_frames = DEFAULT_FRAMESKIP);
 
 ////////////////// pruts /////////////////////
 

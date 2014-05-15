@@ -20,9 +20,14 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
 /*****************************************************************************/
 
 //Improved training function for SVM input for grass
-void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q, featureCallback genFeatures, bool train, int f)
+void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
+                                 featureCallback genFeatures,
+                                 bool train,
+                                 int rows,
+                                 int columns,
+                                 int f)
 {
-    ImageGrid grid(frame, 9, 9);
+    ImageGrid grid(frame, rows, columns);
 
     ImageGrid::const_it_row row = grid.begin();
     while (row != grid.end())
