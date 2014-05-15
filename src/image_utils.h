@@ -15,6 +15,8 @@ Red 160-179
 const cv::Scalar GREEN_MIN(38,80,50);
 const cv::Scalar GREEN_MAX(75,255,255);
 
+/* Utility function that calls cv::means on given cv::Mat and returns values as an std::vector, assumes 3 channels.*/
+void getAverageColour(const cv::Mat& in,std::vector<double>& means);
 
 /* Returns cv::Mat with type CV_8U( = 0, 1 channel ) showing the filtered colour .*/
 void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max, cv::Mat& out);

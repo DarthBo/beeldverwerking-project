@@ -2,13 +2,19 @@
 #include "image_utils.h"
 #include "video_utils.h"
 
-void getAverageColour(const cv::Mat& in,std::vector<double>& means){
-    cv::Scalar s = cv::mean(in);
-    means.push_back(s[0]);
-    means.push_back(s[1]);
-    means.push_back(s[2]);
+/*Utility function to get all colour features as a std::vector<double>*/
+void getColourFeatures(const cv::Mat& in, std::vector<double>& features){
+    std::vector<double> sums;
+    squaredSum(in,sums);                   // local energy
+    for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+        features.push_back(sums[i]/1000000);//normalise for SVM
+    }
+    sums.clear();
+    absoluteSum(in,sums);                  //Mean Amplitude
+    for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+        features.push_back(sums[i]/10000);  //normalise for SVM
+    }
 }
-
 
 /*Utility function to get all texture features as a std::vector<double>*/
 void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){

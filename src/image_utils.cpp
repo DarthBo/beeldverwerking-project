@@ -1,5 +1,12 @@
 #include "image_utils.h"
 
+void getAverageColour(const cv::Mat& in,std::vector<double>& means){
+    cv::Scalar s = cv::mean(in);
+    means.push_back(s[0]);
+    means.push_back(s[1]);
+    means.push_back(s[2]);
+}
+
 /* Returns cv::Mat with type CV_8U( = 0, 1 channel ) showing the filtered colour .*/
 void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max, cv::Mat& out){
     cv::Size ksize;
