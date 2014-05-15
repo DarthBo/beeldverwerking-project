@@ -17,7 +17,7 @@ void drawRect(cv::Mat& img, const cv::Rect& rect, const cv::Scalar& colour = cv:
 // this function draws all the squares in the image
 void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squares);
 
-double getRatio(const std::vector<std::vector<cv::Point>>& squares);
+void getRatio(const std::vector<std::vector<cv::Point>>& squares, double &ratio);
 
 double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares);
 

@@ -93,14 +93,19 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
         g+=G[j];
         b+=B[j];
     }
-    r=r/R.size();
-    g=g/G.size();
-    b=b/B.size();
+    r=(r/R.size())*1000;
+    g=(g/G.size())*1000;
+    b=(b/B.size())*1000;
     means.push_back(r);
     means.push_back(g);
     means.push_back(b);
 }
 
+void getRatioTiles(const std::vector<std::vector<cv::Point>>& squares, std::vector<double> & features){
+    double ratio;
+    getRatio(squares, ratio);
+    features.push_back(ratio);
+}
 
 /***** co-co-combos *****/
 
@@ -116,6 +121,7 @@ void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
     findSquares(img,squares);
 
     features.push_back(squares.size());
-    getAvgColorTiles(img, squares, features);
-    getTextureTiles(img, squares, features);
+    //getAvgColorTiles(img, squares, features);
+    //getTextureTiles(img, squares, features);
+    getRatioTiles(squares, features);
 }
