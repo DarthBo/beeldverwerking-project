@@ -3,13 +3,6 @@
 BLINDTASTIC=./blindtastic
 SVM_CLASS=./svm_perf_classify
 
-if [[ ! OS ]]
-then
-echo "Oh boy, detected Windows, let's hope this works..."
-BLINDTASTIC=blindtastic.exe
-SVM_CLASS=svm_perf_classify.exe
-fi
-
 if (( $# < 1 ))
 then
 echo "usage: $0 <name>"

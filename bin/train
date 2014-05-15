@@ -3,13 +3,6 @@
 BLINDTASTIC=./blindtastic
 SVM_TRAIN=./svm_perf_learn
 
-if [[ ! OS ]]
-then
-echo "Oh boy, detected Windows, let's hope this works..."
-BLINDTASTIC=blindtastic.exe
-SVM_TRAIN=svm_perf_learn.exe
-fi
-
 MODE=REPLACE
 
 if (( $# < 1 ))
