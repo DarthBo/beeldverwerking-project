@@ -1,5 +1,15 @@
 #!/bin/bash
 
+BLINDTASTIC=./blindtastic
+SVM_CLASS=./svm_perf_classify
+
+if [[ ! OS ]]
+then
+echo "Oh boy, detected Windows, let's hope this works..."
+BLINDTASTIC=blindtastic.exe
+SVM_CLASS=svm_perf_classify.exe
+fi
+
 if (( $# < 1 ))
 then
 echo "usage: $0 <name>"
@@ -11,10 +21,10 @@ echo "looking for test.data ..."
 if [[ ! -f "test.data" ]]
 then
 echo "generating testdata..."
-./blindtastic -o > test.data
+$BLINDTASTIC -o > test.data
 fi
 
-./svm_perf_classify test.data $1.model $1.predn
-./blindtastic -c $1.predn
+$SVM_CLASS test.data $1.model $1.predn
+$BLINDTASTIC -c $1.predn
 
 fi

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+BLINDTASTIC=./blindtastic
+SVM_TRAIN=./svm_perf_learn
+
+if [[ ! OS ]]
+then
+echo "Oh boy, detected Windows, let's hope this works..."
+BLINDTASTIC=blindtastic.exe
+SVM_TRAIN=svm_perf_learn.exe
+fi
+
 MODE=REPLACE
 
 if (( $# < 1 ))
@@ -30,9 +40,9 @@ MODEL=$1.model
 if [[ $MODE == APPEND ]]
 then
 echo append
-./blindtastic -t >> $TRAIN
+$BLINDTASTIC -t >> $TRAIN
 else
 echo replace
-./blindtastic -t > $TRAIN
+$BLINDTASTIC -t > $TRAIN
 fi
-./svm_perf_learn -c 0.01 $TRAIN $MODEL
+$SVM_TRAIN -c 0.01 $TRAIN $MODEL
