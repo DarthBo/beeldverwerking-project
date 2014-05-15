@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if (( $# < 1 ))
+then
+echo "usage: $0 <name>"
+exit 1
+elif [[ -f $1.model ]]
+then
+echo "model loaded"
+echo "looking for test.data ..."
+if [[ ! -f "test.data" ]]
+then
+echo "generating testdata..."
+./blindtastic -o > test.data
+fi
+
+./svm_perf_classify test.data $1.model $1.predn
+./blindtastic -c $1.predn
+
+fi

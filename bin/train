@@ -1,0 +1,38 @@
+#!/bin/bash
+
+MODE=REPLACE
+
+if (( $# < 1 ))
+then
+echo "usage: $0 <name>"
+exit 1
+elif [[ -f $1.train ]]
+then
+echo "warning: existing traindata found"
+echo -n "Replace or append? (R/a): "
+read -n 1 in; echo
+case $in in
+q|Q) echo "giving up..."
+    exit 1
+    ;;
+a|A) MODE=APPEND
+    echo "[appending]"
+    ;;
+*)  MODE=REPLACE
+    echo "[replacing]"
+    ;;
+esac
+fi
+
+TRAIN=$1.train
+MODEL=$1.model
+
+if [[ $MODE == APPEND ]]
+then
+echo append
+./blindtastic -t >> $TRAIN
+else
+echo replace
+./blindtastic -t > $TRAIN
+fi
+./svm_perf_learn -c 0.01 $TRAIN $MODEL
