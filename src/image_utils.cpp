@@ -1,5 +1,12 @@
 #include "image_utils.h"
 
+void getAverageColour(const cv::Mat& in,std::vector<double>& means){
+    cv::Scalar s = cv::mean(in);
+    means.push_back(s[0]);
+    means.push_back(s[1]);
+    means.push_back(s[2]);
+}
+
 /* Returns cv::Mat with type CV_8U( = 0, 1 channel ) showing the filtered colour .*/
 void filterColour(const cv::Mat& in, const cv::Scalar& min, const cv::Scalar& max, cv::Mat& out){
     cv::Size ksize;
@@ -65,7 +72,7 @@ void squaredSum(const cv::Mat& in,std::vector<double>& out){
     }
 }
 
-/* Calculate sum of absolute values for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
+/* Calculate sum of absolute values (i.e. mean amplitude) for every channel of the cv::Mat, assumes cv::Vec3b as a matrix element*/
 void absoluteSum(const cv::Mat& in,std::vector<double>& out){
     if(in.rows == 0 || in.cols == 0){
         return;

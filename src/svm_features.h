@@ -9,6 +9,8 @@ typedef void (*featureCallback)(const cv::Mat& in_img, std::vector<double>& out_
 
 /******* features *******/
 
+/*Utility function to get all colour features as a std::vector<double>*/
+void getColourFeatures(const cv::Mat& in, std::vector<double>& features);
 /*Utility function to get all texture features as a std::vector<double>*/
 void getTextureFeatures(const cv::Mat& in, std::vector<double>& features);
 void getAverageColour(const cv::Mat& in, std::vector<double>& means);
