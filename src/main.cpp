@@ -121,12 +121,12 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
+        start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getNewt);
         //train_paver_pebble_white(videoLocation, true);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        print_imagegrid_features(videoLocation, &getTextnColour);
+        print_imagegrid_features(videoLocation, &getNewt);
         //train_paver_pebble_white(videoLocation, false);
         break;
     case CLASSIFY:

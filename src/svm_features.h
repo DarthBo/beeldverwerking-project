@@ -30,4 +30,6 @@ void getTextnColour(const cv::Mat& in, std::vector<double>& features);
 
 void getRectFeatures(const cv::Mat& img, std::vector<double>& features);
 
+void getNewt(const cv::Mat& in, std::vector<double>& features);
+
 #endif
