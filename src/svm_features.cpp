@@ -107,6 +107,12 @@ void getRatioTiles(const std::vector<std::vector<cv::Point>>& squares, std::vect
     features.push_back(ratio);
 }
 
+void getContourArea(const std::vector<std::vector<cv::Point>>& squares, std::vector<double>& features){
+    double avgcontour;
+    getAvgContourArea(squares,avgcontour);
+    features.push_back(avgcontour);
+}
+
 /***** co-co-combos *****/
 
 void getTextnColour(const cv::Mat& in, std::vector<double>& features)
@@ -124,4 +130,5 @@ void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
     //getAvgColorTiles(img, squares, features);
     //getTextureTiles(img, squares, features);
     getRatioTiles(squares, features);
+    getContourArea(squares,features);
 }

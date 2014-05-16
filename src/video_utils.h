@@ -19,7 +19,7 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
 
 void getRatio(const std::vector<std::vector<cv::Point>>& squares, double &ratio);
 
-double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares);
+void getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares, double &avgcontour);
 
 void getAvgColorSingleTile(const cv::Mat& in,
                            std::vector<double>& R,

@@ -133,19 +133,18 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
     }
 }
 
-double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares){
+void getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares, double &avgcontour){
     double avgContourArea = 0.0;
-    int counter = 0;
-
     for( size_t i = 0; i < squares.size(); i++ )
     {
         double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));
-        if(contourArea<10000){
-            counter++;
-            avgContourArea += contourArea;
-        }
+        avgContourArea += contourArea;
     }
-    return avgContourArea/counter;
+    if(squares.size() == 0){
+        avgcontour = 0;
+    } else{
+       avgcontour = avgContourArea/squares.size();
+    }
 }
 
 cv::Rect getrect(const std::vector<cv::Point> &square)
