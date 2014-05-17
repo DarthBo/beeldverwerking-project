@@ -266,7 +266,6 @@ void testContourFilter()
     getContourFeatures(src,features);
     for_each(features.begin(),features.end(),[](double d){
         cout<<d<<endl;
-
     });
 }
 
