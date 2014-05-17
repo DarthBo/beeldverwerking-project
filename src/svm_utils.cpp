@@ -109,7 +109,7 @@ void start_manual_training_video(const char* videoLocation,
     }
 }
 
-void print_imagegrid_features(const char* videoLocation, featureCallback genFeatures, int once_every_x_frames)
+void print_imagegrid_features(const char* videoLocation, featureCallback genFeatures, int rows, int columns, int once_every_x_frames)
 {
     cv::VideoCapture cap(videoLocation);
     cv::Mat frame;
@@ -119,7 +119,7 @@ void print_imagegrid_features(const char* videoLocation, featureCallback genFeat
     {
         ++f;
         if (f%once_every_x_frames == 0)
-            manual_train_with_imagegrid(frame, "", genFeatures, false, f);
+            manual_train_with_imagegrid(frame, "", genFeatures, false, f, rows, columns);
     }
 }
 

@@ -34,8 +34,10 @@ void start_manual_training_video(const char* videoLocation,
 
 //method that prints all ch11cs in a video (per frame) to stdout
 void print_imagegrid_features(const char* videoLocation,
-                           featureCallback genFeatures,
-                           int once_every_x_frames = DEFAULT_FRAMESKIP);
+                              featureCallback genFeatures,
+                              int rows=9,
+                              int columns=9,
+                              int once_every_x_frames = DEFAULT_FRAMESKIP);
 
 void auto_train_video(const char* vidloc,
                       featureCallback genFeatures,
