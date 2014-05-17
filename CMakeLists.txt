@@ -19,7 +19,7 @@ SET(SRC src/main.cpp
         src/image_utils.cpp
         src/svm_features.h
         src/svm_features.cpp
-        src/file_utils.h
+        src/io_utils.h
         src/video_utils.h
         src/video_utils.cpp
         src/svm_utils.h
