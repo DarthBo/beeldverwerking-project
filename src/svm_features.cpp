@@ -104,14 +104,14 @@ void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>
 
 /***** co-co-combos *****/
 
-void getNewt(const cv::Mat& in, std::vector<double>& features)
+void getTextnColour(const cv::Mat& in, std::vector<double>& features)
 {
     getColourFeatures(in, features);
     getTextureFeatures(in, features);
 }
 
 
-void getTextnColour(const cv::Mat& in, std::vector<double>& features)
+void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features)
 {
     getAverageColour(in, features);
     getTextureFeatures(in, features);

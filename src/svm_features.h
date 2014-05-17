@@ -26,10 +26,11 @@ void getTextureTiles(const cv::Mat& in,
 
 /***** co-co-combos *****/
 
+void getRectFeatures(const cv::Mat& img, std::vector<double>& features);
 void getTextnColour(const cv::Mat& in, std::vector<double>& features);
 
-void getRectFeatures(const cv::Mat& img, std::vector<double>& features);
 
-void getNewt(const cv::Mat& in, std::vector<double>& features);
+//old ones
+void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features);
 
 #endif
