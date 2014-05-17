@@ -3,7 +3,7 @@
 
 #include "blindtastic_core.h"
 #include "svm_features.h"
-#include "file_utils.h"
+#include "io_utils.h"
 #include "video_utils.h"
 #include "image_utils.h"
 #include "svm_utils.h"
@@ -270,7 +270,7 @@ void testContourFilter()
     });
 }
 
-void test_locatiedinges()
+void testLocationRepository()
 {
     LocationRepository repo;
     Characteristic grass("Grass");
@@ -295,6 +295,8 @@ int main(int argc, char **argv)
         return release(argc, argv);
     }
 
+    //test code (when CLI == false)
+
     const char* videoLocation = defaultVideo;
 
     if(argc > 1){
@@ -308,17 +310,6 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-
-    //testWhiteFilter();
-    //testCircleFilter();
-    //testCornerFilter();
-    //testSquarePics();
-    //testContourFilter();
-
-    //play_warped_video(videoLocation);
-    test_locatiedinges();
-
-    //play_video(videoLocation);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

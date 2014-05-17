@@ -133,49 +133,46 @@ void drawSquares(cv::Mat& image, const std::vector<std::vector<cv::Point> >& squ
     }
 }
 
-double getRatio(const std::vector<std::vector<cv::Point>>& squares){
-    double avgRatio = 0;
-    int counter = 0;
-    for( size_t i = 0; i < squares.size(); i++ )
-    {
-        cv::Point p = squares[i][0];
-        cv::Point p1 = squares[i][1];
-        cv::Point p2 = squares[i][2];
-        double height = p1.y-p.y;
-        double width = p2.x-p.x;
-        double ratio = fabs(width/height);
-
-        if(ratio<10){
-            counter++;
-            avgRatio += ratio;
-        }
-    }
-    return avgRatio/counter;
-}
-
-double getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares){
+void getAvgContourArea(const std::vector<std::vector<cv::Point>>& squares, double &avgcontour){
     double avgContourArea = 0.0;
-    int counter = 0;
-
     for( size_t i = 0; i < squares.size(); i++ )
     {
         double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));
-        if(contourArea<10000){
-            counter++;
-            avgContourArea += contourArea;
-        }
+        avgContourArea += contourArea;
     }
-    return avgContourArea/counter;
+    if(squares.size() == 0){
+        avgcontour = 0;
+    } else{
+       avgcontour = avgContourArea/squares.size();
+    }
 }
 
 cv::Rect getrect(const std::vector<cv::Point> &square)
 {
-    int maxx = std::max(std::max(square[0].x,square[1].x),std::max(square[2].x,square[3].x));
-    int minx = std::min(std::min(square[0].x,square[1].x),std::min(square[2].x,square[3].x));
-    int maxy = std::max(std::max(square[0].y,square[1].y),std::max(square[2].y,square[3].y));
-    int miny = std::min(std::min(square[0].y,square[1].y),std::min(square[2].y,square[3].y));
+    double maxx = std::max(std::max(square[0].x,square[1].x),std::max(square[2].x,square[3].x));
+    double minx = std::min(std::min(square[0].x,square[1].x),std::min(square[2].x,square[3].x));
+    double maxy = std::max(std::max(square[0].y,square[1].y),std::max(square[2].y,square[3].y));
+    double miny = std::min(std::min(square[0].y,square[1].y),std::min(square[2].y,square[3].y));
+    //Met top left corner
+    return cv::Rect_<double>(minx, maxy, maxx-minx, maxy-miny);
+}
 
-    return cv::Rect(minx, miny, maxx-minx, maxy-miny);
+void getRatio(const std::vector<std::vector<cv::Point>>& squares, double& ratio){
+    double avgRatio = 0;
+    for( size_t i = 0; i < squares.size(); i++ )
+    {
+        cv::Rect_<double> rect = getrect(squares[i]);
+        double height = rect.height;
+        double width = rect.width;
+        double ratio = width/height;
+
+        avgRatio += ratio;
+    }
+    if(squares.size()==0){
+        ratio = 0;
+    } else {
+        ratio = avgRatio/squares.size();
+    }
 }
 
 void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
@@ -211,11 +208,10 @@ std::vector<double> getAvgWidthHeight(const std::vector<std::vector<cv::Point>>&
         double contourArea = fabs(cv::contourArea(cv::Mat(squares[i])));
         if(contourArea<10000){
             counter++;
-            cv::Point p = squares[i][0];
-            cv::Point p1 = squares[i][1];
-            cv::Point p2 = squares[i][2];
-            double height = p1.y-p.y;
-            double width = p2.x-p.x;
+            cv::Rect rect = getrect(squares[i]);
+
+            double height = rect.height;
+            double width = rect.width;
             avgWidth += width;
             avgHeight += height;
         }

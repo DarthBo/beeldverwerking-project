@@ -185,17 +185,19 @@ void auto_train_video (const char* vidloc,
 
             genFeatures(img, features);
 
-            //print
-            if (train)
-                std::cout << (counter < from_frame || counter > to_frame ? "-1" : "+1");
-            else
-                std::cout << "0";
+            if(features.size()>1){
+                //print
+                if (train)
+                    std::cout << (counter < from_frame || counter > to_frame ? "-1" : "+1");
+                else
+                    std::cout << "0";
 
-            for (int i=0 ; i < features.size() ; i++)
-            {
-                std::cout << " " << i+1 << ":" << features[i];
+                for (int i=0 ; i < features.size() ; i++)
+                {
+                    std::cout << " " << i+1 << ":" << features[i];
+                }
+                std::cout << " # frame: " << counter << std::endl;
             }
-            std::cout << " # frame: " << counter << std::endl;
         }
     }
 }
@@ -280,11 +282,12 @@ void man_train_tile(cv::Mat& image,const std::string& q, bool train){
     char buff[32] = {0};
     cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
     std::vector<std::vector<cv::Point> > squares;
+    double avgRatio;
     //cv::GaussianBlur(image,image,cv::Size(3,3),0);
     findSquares(image,squares);
     drawSquares(image,squares);
     //ratio
-    double avgRatio=getRatio(squares);
+    getRatio(squares, avgRatio);
 
     printText(image, std::string(buff));
 
@@ -303,10 +306,11 @@ void man_train_specific_paver(cv::Mat& image,const std::string& q, bool train){
     char buff[32] = {0};
     cv::Rect window = cv::Rect(0, 0, image.cols, image.rows);
     std::vector<std::vector<cv::Point> > squares;
+    double avgRatio;
     findSquares(image,squares);
     drawSquares(image,squares);
     //ratio
-    double avgRatio=getRatio(squares);
+    getRatio(squares,avgRatio);
 
     printText(image, std::string(buff));
     //colour
