@@ -121,8 +121,7 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        //start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
-        train_paver_pebble_white(videoLocation, true);
+        start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
