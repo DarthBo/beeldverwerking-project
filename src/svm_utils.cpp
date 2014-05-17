@@ -234,10 +234,11 @@ void play_grid_predictions(const char* fvid, const char* fpred, int rows, int co
                     pos++;
                     drawRect(img, win);
                 }
+                /*
                 else
                 {
                     drawRect(img, win, cv::Scalar(0,0,255));
-                }
+                }*/
 
                 col++;
                 if (col == row->end())
