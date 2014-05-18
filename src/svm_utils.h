@@ -65,7 +65,4 @@ void start_manual_training_image(const char* imgLocation, const std::string& q, 
 
 void hardTrainSchool2Station();
 
-void train_paver_pebble_white(const char* vidloc, bool train=true);
-
-
 #endif // SVM_SHIT_H

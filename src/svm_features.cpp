@@ -110,7 +110,7 @@ void getRatioTiles(const std::vector<std::vector<cv::Point>>& squares, std::vect
 void getContourArea(const std::vector<std::vector<cv::Point>>& squares, std::vector<double>& features){
     double avgcontour;
     getAvgContourArea(squares,avgcontour);
-    features.push_back(avgcontour);
+    features.push_back(avgcontour/10000); //normalise
 }
 
 /***** co-co-combos *****/

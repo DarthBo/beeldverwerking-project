@@ -162,9 +162,7 @@ void getRatio(const std::vector<std::vector<cv::Point>>& squares, double& ratio)
     for( size_t i = 0; i < squares.size(); i++ )
     {
         cv::Rect_<double> rect = getrect(squares[i]);
-        double height = rect.height;
-        double width = rect.width;
-        double ratio = width/height;
+        double ratio = rect.width/rect.height;
 
         avgRatio += ratio;
     }
@@ -175,8 +173,10 @@ void getRatio(const std::vector<std::vector<cv::Point>>& squares, double& ratio)
     }
 }
 
-void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
-
+void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R,
+                           std::vector<double>& G,std::vector<double>& B,
+                           const std::vector<cv::Point> &square)
+{
     cv::Rect window = getrect(square);
 
     cv::Mat ROI(in,window);
@@ -186,8 +186,10 @@ void getAvgColorSingleTile(const cv::Mat& in,std::vector<double>& R, std::vector
     B.push_back(s[2]);
 }
 
-void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R, std::vector<double>& G,std::vector<double>& B, const std::vector<cv::Point> &square){
-
+void getAvgTextureTile(const cv::Mat& in,std::vector<double>& R,
+                       std::vector<double>& G,std::vector<double>& B,
+                       const std::vector<cv::Point> &square)
+{
     cv::Rect window = getrect(square);
 
     cv::Mat ROI(in,window);

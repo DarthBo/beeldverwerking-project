@@ -6,7 +6,7 @@
 #include "svm_features.h"
 
 
-inline int td::waitKey(int delay)
+int td::waitKey(int delay)
 {
     int k = cv::waitKey(delay);
     if (k != -1) k &= 0xFF; //workaround for linux bug
@@ -179,7 +179,7 @@ void auto_train_video (const char* vidloc,
     {
         ++counter;
 
-        if (counter % once_every_x_frames == 0)
+        if (counter % once_every_x_frames == 1 || ( counter > from_frame && counter < to_frame && counter % 10 == 0))
         {
             std::vector<double> features;
 
@@ -273,6 +273,61 @@ void play_grid_predictions(const char* fvid, const char* fpred, int rows, int co
         cap.release();
     }
 }
+
+
+void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames)
+{
+    const char* winp = "predictions";
+    std::ifstream pred(fpred);
+    cv::VideoCapture cap(fvid);
+
+    double certainty = 0;
+    cv::Mat img;
+
+    int frame = 0;
+    int diff = 0;
+    char buff[64] = {0};
+
+    while(cap.isOpened() && cap.read(img) && pred.is_open())
+    {
+        ++frame;
+
+        if (frame % once_every_x_frames == 1)
+        {
+            pred >> certainty;
+            diff = 0;
+        }
+        else
+        {
+            diff++;
+        }
+
+        if (certainty != 0)
+        {
+            sprintf(buff, "%s! (%d frames ago)",(certainty > 0 ? "Match" : "Nope"), diff);
+
+            printText(img, std::string(buff));
+        }
+
+        cv::imshow(winp, img);
+
+        if (td::waitKey(25) >= 0) //play at 4x speed
+            break;
+    }
+
+    if (pred.is_open())
+    {
+        std::cout << "not all predictions shown" << std::endl;
+        pred.close();
+    }
+    if (cap.isOpened())
+    {
+        std::cout << "not all frames shown" << std::endl;
+        cap.release();
+    }
+}
+
+
 
 /************************************************************************************/
 
@@ -430,65 +485,4 @@ void hardTrainSchool2Station()
     Location stdenijs("St Denijs",ch11cs);
 }
 
-void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames)
-{
-    const char* winp = "predictions";
-    std::ifstream pred(fpred);
-    cv::VideoCapture cap(fvid);
 
-    double certainty = 0;
-    cv::Mat img;
-
-    int frame = 0;
-    int diff = 0;
-    std::string out;
-
-    while(cap.isOpened() && cap.read(img) && pred.is_open())
-    {
-        ++frame;
-
-        if (frame % once_every_x_frames == 0)
-        {
-            pred >> certainty;
-            diff = 0;
-        }
-        else
-        {
-            diff++;
-        }
-
-        if (certainty != 0)
-        {
-            if (certainty > 0)
-                out = "Match! (";
-            else
-                out = "Nope!  (";
-
-            out += certainty;
-            out += " frames ago)";
-
-            printText(img, out);
-        }
-
-        cv::imshow(winp, img);
-
-        if (td::waitKey(25) >= 0) //play at 4x speed
-            break;
-    }
-
-    if (pred.is_open())
-    {
-        std::cout << "not all predictions shown" << std::endl;
-        pred.close();
-    }
-    if (cap.isOpened())
-    {
-        std::cout << "not all frames shown" << std::endl;
-        cap.release();
-    }
-}
-
-void train_paver_pebble_white(const char* vidloc, bool train)
-{
-    auto_train_video(vidloc, &getRectFeatures, 735, 1205, 50, train);
-}
