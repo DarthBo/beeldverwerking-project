@@ -16,7 +16,7 @@ namespace td {
     int waitKey(int delay = 0);
 }
 
-//Method for training a frame with grid
+//Fucntion for training a frame (a single image) with grid
 void manual_train_with_imagegrid(cv::Mat& frame,
                                  const std::string& q,
                                  featureCallback genFeatures,
@@ -25,24 +25,26 @@ void manual_train_with_imagegrid(cv::Mat& frame,
                                  int rows=9,
                                  int columns=9);
 
-//method that calls a SVM input method used on an image
+//Function that starts playing the supplied video for manual training with a grid
 void start_manual_train_with_imagegrid_video(const char* videoLocation,
-                                 const std::string& q,
-                                 featureCallback genFeatures,
-                                 int rows=9,
-                                 int columns=9);
+                                             const std::string& q,
+                                             featureCallback genFeatures,
+                                             int rows=9,
+                                             int columns=9);
 
+//Function that starts playing the supplied video for manual training
 void start_manual_train_frame_video(const char* videoLocation,
                                     const std::string& q,
                                     featureCallback genFeatures);
 
-//method that prints all ch11cs in a video (per frame) to stdout
+//Function that prints all ch11cs in a video (per frame, with grid) to stdout
 void print_imagegrid_features(const char* videoLocation,
                               featureCallback genFeatures,
                               int rows=9,
                               int columns=9,
                               int once_every_x_frames = DEFAULT_FRAMESKIP);
 
+//Function that prints characteristics, adds +/-1 based on framerange
 void auto_train_video(const char* vidloc,
                       featureCallback genFeatures,
                       int from_frame,
@@ -50,14 +52,14 @@ void auto_train_video(const char* vidloc,
                       int once_every_x_frames = DEFAULT_FRAMESKIP,
                       bool train=true);
 
-//shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
+//Reads and shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
 void play_grid_predictions(const char* fvid,
                            const char* fpred,
                            int rows=9,
                            int colums=9,
                            int once_every_x_frames = DEFAULT_FRAMESKIP);
 
-//shows predictions for full frame
+//Reads and shows predictions for full frame
 void play_frame_predictions(const char* fvid,
                             const char* fpred,
                             int once_every_x_frames = DEFAULT_FRAMESKIP);

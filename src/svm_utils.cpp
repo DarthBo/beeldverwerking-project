@@ -19,7 +19,7 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
 
 /*****************************************************************************/
 
-//Improved training function for SVM input for grass
+//Fucntion for training a frame (a single image) with grid
 void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                                  featureCallback genFeatures,
                                  bool train,
@@ -74,7 +74,7 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
     }
 }
 
-//method that calls a SVM input method used on an image
+//Function that starts playing the supplied video for manual training with a grid
 void start_manual_train_with_imagegrid_video(const char* videoLocation,
                                              const std::string& q,
                                              featureCallback genFeatures,
@@ -149,7 +149,7 @@ void manual_train_full_frame(cv::Mat& frame,
     std::cout << "# frame " << f << std::endl; // frame[x,y]
 }
 
-//method that calls a SVM input method used on an image
+//Function that starts playing the supplied video for manual training
 void start_manual_train_frame_video(const char* videoLocation,
                                     const std::string& q,
                                     featureCallback genFeatures)
@@ -182,6 +182,7 @@ void start_manual_train_frame_video(const char* videoLocation,
     }
 }
 
+//Function that prints all ch11cs in a video (per frame, with grid) to stdout
 void print_imagegrid_features(const char* videoLocation, featureCallback genFeatures, int rows, int columns, int once_every_x_frames)
 {
     cv::VideoCapture cap(videoLocation);
@@ -234,6 +235,7 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
     return key;
 }
 
+//Function that prints characteristics, adds +/-1 based on framerange
 void auto_train_video (const char* vidloc,
                        featureCallback genFeatures,
                        int from_frame,
@@ -275,6 +277,7 @@ void auto_train_video (const char* vidloc,
     }
 }
 
+//Reads and shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
 //this code is awful, save your soul by not reading it
 void play_grid_predictions(const char* fvid, const char* fpred, int rows, int columns, int once_every_x_frames)
 {
@@ -347,7 +350,7 @@ void play_grid_predictions(const char* fvid, const char* fpred, int rows, int co
     }
 }
 
-
+//Reads and shows predictions for full frame
 void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames)
 {
     const char* winp = "predictions";
