@@ -122,7 +122,8 @@ int release (int argc, char **argv)
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
         //start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
-        auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
+        //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
+        start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
@@ -136,7 +137,7 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        play_frame_predictions(videoLocation, extra);
+        play_frame_predictions(videoLocation, extra, 53);
         //play_grid_predictions(videoLocation, extra);
         break;
     default:

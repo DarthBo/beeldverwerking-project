@@ -75,11 +75,11 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
 }
 
 //method that calls a SVM input method used on an image
-void start_manual_training_video(const char* videoLocation,
-                                 const std::string& q,
-                                 featureCallback genFeatures,
-                                 int rows,
-                                 int columns)
+void start_manual_train_with_imagegrid_video(const char* videoLocation,
+                                             const std::string& q,
+                                             featureCallback genFeatures,
+                                             int rows,
+                                             int columns)
 {
     cv::VideoCapture cap(videoLocation);
     cv::Mat frame;
@@ -101,6 +101,79 @@ void start_manual_training_video(const char* videoLocation,
                 return;
             case K_SPC:
                 manual_train_with_imagegrid(frame,q,genFeatures,true,f,rows,columns);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+
+void manual_train_full_frame(cv::Mat& frame,
+                             const std::string& q,
+                             featureCallback genFeatures,
+                             bool train,
+                             int f)
+{
+    std::vector<double> features;
+
+    genFeatures(frame, features);
+
+    /* remove me */
+    std::vector<std::vector<cv::Point>> squares;
+    findSquares(frame,squares);
+    drawSquares(frame,squares);
+    /*************/
+
+    if (train)
+    {
+        int hasCharacteristic = train_askuser(frame, cv::Rect(0,0,frame.cols,frame.rows), q);
+        if (hasCharacteristic < 0)
+        {
+            if (hasCharacteristic == -1)
+                return;
+        }
+        std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+    }
+    else
+    {
+        std::cout << "0 ";
+    }
+
+    //print features
+    for (size_t i=0 ; i < features.size() ; i++)
+    {
+        std::cout << i+1 << ':' << features[i] << ' ';
+    }
+    std::cout << "# frame " << f << std::endl; // frame[x,y]
+}
+
+//method that calls a SVM input method used on an image
+void start_manual_train_frame_video(const char* videoLocation,
+                                    const std::string& q,
+                                    featureCallback genFeatures)
+{
+    cv::VideoCapture cap(videoLocation);
+    cv::Mat frame;
+    unsigned int f = 0;
+
+    while (cap.isOpened() && cap.read(frame))
+    {
+        ++f;
+
+        cv::imshow(q,frame);
+        int key = td::waitKey(100);
+
+        if (key >= 0)
+        {
+            switch (key) {
+            case K_Q:
+                return;
+            case K_ESC:
+                return;
+            case K_SPC:
+                manual_train_full_frame(frame,q,genFeatures,true,f);
                 break;
             default:
                 break;

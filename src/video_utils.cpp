@@ -153,8 +153,8 @@ cv::Rect getrect(const std::vector<cv::Point> &square)
     double minx = std::min(std::min(square[0].x,square[1].x),std::min(square[2].x,square[3].x));
     double maxy = std::max(std::max(square[0].y,square[1].y),std::max(square[2].y,square[3].y));
     double miny = std::min(std::min(square[0].y,square[1].y),std::min(square[2].y,square[3].y));
-    //Met top left corner
-    return cv::Rect_<double>(minx, maxy, maxx-minx, maxy-miny);
+    //top left corner
+    return cv::Rect_<double>(minx, miny, maxx-minx, maxy-miny);
 }
 
 void getRatio(const std::vector<std::vector<cv::Point>>& squares, double& ratio){
