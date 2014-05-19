@@ -50,55 +50,59 @@ void getContourFeatures(const cv::Mat& in, std::vector<double>& features){
    }
 }
 
+extern cv::Rect getrect(const std::vector<cv::Point> &square);
+
 void getAvgColorTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
     if (squares.empty())
         return;
 
-    std::vector<double> R;
-    std::vector<double> G;
-    std::vector<double> B;
+    std::vector<double> tmpA;
+    std::vector<double> tmpB;
+    int nrsqr = squares.size();
 
-    for(size_t i=0; i< squares.size();i++){
-        getAvgColorSingleTile(in,R,G,B,squares[i]);
+    for(size_t i=0; i< nrsqr;i++){
+        tmpA.clear();
+        cv::Mat ROI(in, getrect(squares[i]));
+        getColourFeatures(ROI, tmpA);
+        if (i == 0)
+            tmpB = tmpA;
+        else
+            for (size_t j=0 ; j<tmpA.size() ;j++)
+            {
+                tmpB[j] += tmpA[j];
+            }
     }
-    double r = 0.0, g = 0.0, b = 0.0;
-    for(size_t j=0; j<R.size(); j++){
-        r+=R[j];
-        g+=G[j];
-        b+=B[j];
+    for (size_t j=0 ; j<tmpB.size() ;j++)
+    {
+        means.push_back(tmpB[j]/nrsqr);
     }
-    r=r/R.size();
-    g=g/G.size();
-    b=b/B.size();
-    means.push_back(r);
-    means.push_back(g);
-    means.push_back(b);
+
 }
 
 void getTextureTiles(const cv::Mat& in, const std::vector<std::vector<cv::Point>>& squares,std::vector<double>& means){
     if (squares.empty())
         return;
 
-    std::vector<double> R;
-    std::vector<double> G;
-    std::vector<double> B;
+    std::vector<double> tmpA;
+    std::vector<double> tmpB;
+    int nrsqr = squares.size();
 
-    for(size_t i=0; i< squares.size();i++){
-        getAvgTextureTile(in, R, G, B, squares[i]);
+    for(size_t i=0; i< nrsqr;i++){
+        tmpA.clear();
+        cv::Mat ROI(in, getrect(squares[i]));
+        getTextureFeatures(ROI, tmpA);
+        if (i == 0)
+            tmpB = tmpA;
+        else
+            for (size_t j=0 ; j<tmpA.size() ;j++)
+            {
+                tmpB[j] += tmpA[j];
+            }
     }
-
-    double r=0.0, g=0.0, b=0.0;
-    for(size_t j=0; j<R.size(); j++){
-        r+=R[j];
-        g+=G[j];
-        b+=B[j];
+    for (size_t j=0 ; j<tmpB.size() ;j++)
+    {
+        means.push_back(tmpB[j]/nrsqr);
     }
-    r=(r/R.size())*1000;
-    g=(g/G.size())*1000;
-    b=(b/B.size())*1000;
-    means.push_back(r);
-    means.push_back(g);
-    means.push_back(b);
 }
 
 void getRatioTiles(const std::vector<std::vector<cv::Point>>& squares, std::vector<double> & features){
@@ -134,8 +138,8 @@ void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
     findSquares(img,squares);
 
     features.push_back(squares.size());
-    //getAvgColorTiles(img, squares, features);
-    //getTextureTiles(img, squares, features);
+    getAvgColorTiles(img, squares, features);
+    getTextureTiles(img, squares, features);
     getRatioTiles(squares, features);
     getContourArea(squares,features);
 }
