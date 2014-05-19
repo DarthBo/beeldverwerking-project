@@ -38,11 +38,10 @@ void print_help_and_exit (const char* arg0)
 int release (int argc, char **argv)
 {
     train_mode mode = NONE;
-
+    bool grid = false;
 
     const char* videoLocation = defaultVideo;
     const char* extra = "";
-
 
     int it = 1;
     while (it < argc)
@@ -84,6 +83,9 @@ int release (int argc, char **argv)
                     print_help_and_exit(argv[0]);
                 }
                 break;
+            case 'g':
+                grid = true;
+                break;
             case 'f':
                 it++;
                 if (it < argc)
@@ -121,14 +123,18 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        //start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
+        if (grid)
+            start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
+        else
+           start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
-        start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        //print_imagegrid_features(videoLocation, &getTextnColour);
-        auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
+        if (grid)
+            print_imagegrid_features(videoLocation, &getTextnColour);
+        else
+            auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
         break;
     case CLASSIFY:
         if (!file_exists(extra))
@@ -137,8 +143,10 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        play_frame_predictions(videoLocation, extra, 53);
-        //play_grid_predictions(videoLocation, extra);
+        if (grid)
+            play_grid_predictions(videoLocation, extra);
+        else
+            play_frame_predictions(videoLocation, extra, 53);
         break;
     default:
         print_help_and_exit(argv[0]);

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-BLINDTASTIC=./blindtastic
+#comment this line to use full frame
+USEGRID=-g
+
+BLINDTASTIC="./blindtastic $USEGRID"
 SVM_TRAIN=./svm_perf_learn
 
 MODE=REPLACE
