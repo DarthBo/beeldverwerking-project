@@ -1142,7 +1142,7 @@ MATRIX *transpose_matrix(MATRIX *matrix)
 
 
 MATRIX *cholesky_matrix(MATRIX *A)
-/* Given a positive-definite symmetric matrix A[0..n-1][0..n-1], this routine constructs its Cholesky decomposition, A = L · LT . On input, only the upper triangle of A need be given; A is not modified. The Cholesky factor L is returned in the lower triangle. */ 
+/* Given a positive-definite symmetric matrix A[0..n-1][0..n-1], this routine constructs its Cholesky decomposition, A = L Â· LT . On input, only the upper triangle of A need be given; A is not modified. The Cholesky factor L is returned in the lower triangle. */ 
 {
   int i,j,k,n;
   double sum;
@@ -1207,7 +1207,7 @@ The Cholesky factor L is returned in the lower triangle. The L that is given to 
 }
 
 double *find_indep_subset_of_matrix(MATRIX *A, double epsilon)
-/* Given a positive-semidefinite symmetric matrix A[0..n-1][0..n-1], this routine finds a subset of rows and colums that is linear independent. To do this, it constructs the Cholesky decomposition, A = L · LT. On input, only the upper triangle of A need be given; A is not modified. The routine returns a vector in which non-zero elements indicate the linear independent subset. epsilon is the amount by which the diagonal entry of L has to be greater than zero. */ 
+/* Given a positive-semidefinite symmetric matrix A[0..n-1][0..n-1], this routine finds a subset of rows and colums that is linear independent. To do this, it constructs the Cholesky decomposition, A = L Â· LT. On input, only the upper triangle of A need be given; A is not modified. The routine returns a vector in which non-zero elements indicate the linear independent subset. epsilon is the amount by which the diagonal entry of L has to be greater than zero. */ 
 {
   int i,j,k,n;
   double sum,*indep;
