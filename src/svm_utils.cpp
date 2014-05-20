@@ -1,6 +1,7 @@
 #include <svm_utils.h>
 
 #include <fstream>
+#include <iomanip>
 #include "video_utils.h"
 #include "blindtastic_core.h"
 #include "svm_features.h"
@@ -66,7 +67,7 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
             {
                 std::cout << i+1 << ':' << features[i] << ' ';
             }
-            std::cout << "# frame " << f << std::endl; // frame[x,y]
+            std::cout << std::setprecision(10) << "# frame " << f << std::endl; // frame[x,y]
 
             col++;
         }

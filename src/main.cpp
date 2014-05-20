@@ -121,14 +121,14 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        //start_manual_training_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
+        start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
         //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
-        start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
+        //start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        //print_imagegrid_features(videoLocation, &getTextnColour);
-        auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
+        print_imagegrid_features(videoLocation, &getTextnColour);
+        //auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
         break;
     case CLASSIFY:
         if (!file_exists(extra))
@@ -137,8 +137,8 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        play_frame_predictions(videoLocation, extra, 53);
-        //play_grid_predictions(videoLocation, extra);
+        //play_frame_predictions(videoLocation, extra, 53);
+        play_grid_predictions(videoLocation, extra);
         break;
     default:
         print_help_and_exit(argv[0]);

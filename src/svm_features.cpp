@@ -125,6 +125,10 @@ void getTextnColour(const cv::Mat& in, std::vector<double>& features)
     getTextureFeatures(in, features);
 }
 
+void getColourAndContourFeatures(const cv::Mat& in, std::vector<double>& features){
+    getColourFeatures(in, features);
+    getContourFeatures(in,features);
+}
 
 void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features)
 {
