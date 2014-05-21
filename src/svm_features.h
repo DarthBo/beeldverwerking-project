@@ -28,7 +28,7 @@ void getTextureTiles(const cv::Mat& in,
 
 void getRectFeatures(const cv::Mat& img, std::vector<double>& features);
 void getTextnColour(const cv::Mat& in, std::vector<double>& features);
-
+void getColourAndContourFeatures(const cv::Mat& in, std::vector<double>& features);
 
 //old ones
 void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features);
