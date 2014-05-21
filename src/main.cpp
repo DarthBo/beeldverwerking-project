@@ -126,7 +126,7 @@ int release (int argc, char **argv)
         if (grid)
             start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
         else
-           start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
+            start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
         break;
     case PRINT:

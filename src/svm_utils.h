@@ -10,7 +10,7 @@
 #define K_Y (int)'y'
 #define K_N (int)'n'
 
-#define DEFAULT_FRAMESKIP 100
+#define DEFAULT_FRAMESKIP 50
 
 namespace td {
     int waitKey(int delay = 0);
