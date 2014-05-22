@@ -82,15 +82,22 @@ void start_manual_train_with_imagegrid_video(const char* videoLocation,
                                              int rows,
                                              int columns)
 {
-    cv::VideoCapture cap(videoLocation);
-    cv::Mat frame;
-    unsigned int f = 0;
+    struct trackdata data;
+    data.cap.open(videoLocation);
+    cv::namedWindow(q);
+    const char* track_class = "frame:";
 
-    while (cap.isOpened() && cap.read(frame))
+    //cv::Mat frame;
+    int f = 0;
+
+    cv::createTrackbar(track_class, q, &f, getFrameCount(videoLocation),&trackbar_moved, &data);
+
+    while (data.cap.isOpened() && data.cap.read(data.img))
     {
         ++f;
 
-        cv::imshow(q,frame);
+        cv::imshow(q,data.img);
+        cv::setTrackbarPos(track_class, q, f);
         int key = td::waitKey(100);
 
         if (key >= 0)
@@ -101,13 +108,14 @@ void start_manual_train_with_imagegrid_video(const char* videoLocation,
             case K_ESC:
                 return;
             case K_SPC:
-                manual_train_with_imagegrid(frame,q,genFeatures,true,f,rows,columns);
+                manual_train_with_imagegrid(data.img,q,genFeatures,true,f,rows,columns);
                 break;
             default:
                 break;
             }
         }
     }
+    cv::destroyWindow(q);
 }
 
 
