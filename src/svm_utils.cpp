@@ -66,7 +66,7 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                 os << "0 ";
             }
             //set precision
-            os << std::setprecision(10);
+            //os << std::setprecision(10);
             //print features
             for (size_t i=0 ; i < features.size() ; i++)
             {
@@ -571,18 +571,19 @@ void hardTrainSchool2Station()
     */
 }
 
-bool classify_frame(cv::Mat frame, Characteristic c)
+bool classify_frame(cv::Mat frame, Characteristic& c)
 {
     //calculate features
     std::ostringstream ss;
     manual_train_with_imagegrid(frame, "", c.getFeature(), false, 0, c.getRows(), c.getColumns(), ss);
     std::string s = ss.str();
+    //std::cout << s << std::endl;
 
     //output to temp file
     FILE * fio = fopen(".tmp_feat", "w"); // create/overwrite
     if (fio == NULL)
         return false;
-    fwrite(fio,s.size(),sizeof(char),fio);
+    fwrite(s.c_str(),s.size(),sizeof(char),fio);
     fclose(fio);
 
     //call svmPerf
@@ -593,7 +594,7 @@ bool classify_frame(cv::Mat frame, Characteristic c)
     #endif
 
     char buf[100] = {0};
-    sprintf(buf, "%s .tmp_feat %s .tmp_result", svmperf_class, c.getName().c_str());
+    sprintf(buf, "%s .tmp_feat %s .tmp_result >/dev/null 2>/dev/null", svmperf_class, c.getName().c_str());
 
     if (system(buf) != 0)
         return false;
@@ -617,6 +618,8 @@ bool classify_frame(cv::Mat frame, Characteristic c)
     }
     fclose(fio);
 
+    std::cout << ">>>> " << pos_tally << std::endl;
+
     //save result
     if (pos_tally > 0 && pos_tally >= c.getRows()*c.getColumns()*c.getRequiredRatio())
         c.setWeight(pos_sum/pos_tally);
@@ -626,3 +629,40 @@ bool classify_frame(cv::Mat frame, Characteristic c)
     return true;
 }
 
+void gen_grid_predictions(const char* fvid, int rows, int columns, int once_every_x_frames)
+{
+    const char* winp = "predictions";
+    cv::VideoCapture cap(fvid);
+
+    std::string certainty;
+    cv::Mat img;
+
+    int f = 0;
+
+    while(cap.isOpened() && cap.read(img))
+    {
+        ++f;
+
+        //if (f%once_every_x_frames == 0)
+        {
+            Characteristic c("gras.model", &getTextnColour, rows, columns,0.05);
+            classify_frame(img, c);
+
+            //char buf[100] = {0};
+            //sprintf(buf, "%d/%d", pos,rows*columns);
+            certainty = (c.getWeight() > 0) ? ":)" : ":(";
+
+            printText(img, certainty);
+            cv::imshow(winp, img);
+            int k = td::waitKey(10);
+            //if (k == K_ESC || k == K_Q)
+            //    cap.release();
+        }
+    }
+
+    if (cap.isOpened())
+    {
+        std::cout << "not all frames shown" << std::endl;
+        cap.release();
+    }
+}

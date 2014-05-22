@@ -299,7 +299,7 @@ void testLocationRepository()
 
 int main(int argc, char **argv)
 {
-    bool CLI = true;
+    bool CLI = false;
     if (CLI)
     {
         return release(argc, argv);
@@ -320,6 +320,7 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
+    gen_grid_predictions(videoLocation, 9, 9, 50);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
