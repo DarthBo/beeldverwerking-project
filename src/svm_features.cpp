@@ -16,6 +16,14 @@ void getColourFeatures(const cv::Mat& in, std::vector<double>& features){
     }
 }
 
+
+/* Utility feature that calls  cv::cvtColor(in,dst,CV_BGR2HSV_FULL) before calling getColourFeatures*/
+void getHSVColourFeatures(const cv::Mat& in, std::vector<double>& features){
+    cv::Mat dst;
+    cv::cvtColor(in,dst,CV_BGR2HSV_FULL);
+    getColourFeatures(dst,features);
+}
+
 /*Utility function to get all texture features as a std::vector<double>*/
 void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
     int orientations[] = {0,45,90,135};
