@@ -133,6 +133,11 @@ void getTextnColour(const cv::Mat& in, std::vector<double>& features)
     getTextureFeatures(in, features);
 }
 
+void getTextnHSVColour(const cv::Mat& in, std::vector<double>& features){
+    getHSVColourFeatures(in, features);
+    getTextureFeatures(in, features);
+}
+
 void getColourAndContourFeatures(const cv::Mat& in, std::vector<double>& features){
     getColourFeatures(in, features);
     getContourFeatures(in,features);

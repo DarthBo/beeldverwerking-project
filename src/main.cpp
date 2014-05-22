@@ -121,13 +121,13 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
+        start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnHSVColour);
         //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
         //start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        print_imagegrid_features(videoLocation, &getTextnColour);
+        print_imagegrid_features(videoLocation, &getTextnHSVColour);
         //auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
         break;
     case CLASSIFY:
@@ -288,7 +288,7 @@ void testLocationRepository()
 /**********************************  MAIN  **********************************/
 
 int main(int argc, char **argv)
-{
+{    
     bool CLI = true;
     if (CLI)
     {
