@@ -34,7 +34,7 @@ void textureFilter(const cv::Mat& in, cv::Mat& out,int orientation){
     int sigma= 1;
     int theta = orientation; // orientation, 0 or 180 for vertical textures
     int lamda = 180;
-    int gamma = 1;
+    int gamma = 5;
     cv::Mat kernel = cv::getGaborKernel(ksize,sigma,theta,lamda,gamma);
     //cv::gpu::GpuMat temp;
     //cv::gpu::filter2D(cv::gpu::GpuMat(in), temp, CV_32F, kernel);

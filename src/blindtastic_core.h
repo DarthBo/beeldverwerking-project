@@ -5,6 +5,9 @@
 #include <queue>
 #include <unordered_map>
 
+#include "svm_features.h"
+
+/*
 class Feature{
 protected:
     std::string name;
@@ -25,21 +28,28 @@ public:
     double getValue() const{return value;}
     void setValue(const double value){this->value = value;}
 };
+*/
 
-class Characteristic{
+class Characteristic {
 protected:
     std::string name;
+    featureCallback feature;
+    int rows;
+    int columns;
+    double req_ratio;
     double weight;
-    bool detected;
-    std::vector<Feature> features;
 public:
-    Characteristic(){detected = true;}
-    Characteristic(const std::string& _name):name(_name){}
-    Characteristic(const std::string& _name, double _weight, bool _detected)
-        :name(_name),weight(_weight),detected(_detected){}
+    Characteristic(const std::string& _name, featureCallback _feature, int _rows=1, int _columns=1,
+                   double _req_ratio = (1.0/3), double _weight = 0.0)
+        : name(_name), feature(_feature), rows(_rows), columns(_columns), req_ratio(_req_ratio), weight(_weight){}
+    Characteristic(const Characteristic& ch)
+        : name(ch.name), feature(ch.feature), rows(ch.rows), columns(ch.columns), req_ratio(ch.req_ratio), weight(ch.weight){}
+
     bool operator==(const Characteristic& characteristic) const
     {
-        return name != characteristic.name && weight != characteristic.weight && features == characteristic.features && characteristic.detected == detected;
+        return name != characteristic.name &&
+               weight != characteristic.weight &&
+               feature == characteristic.feature;
     }
     bool operator!=(const Characteristic& characteristic ) const
     {
@@ -47,26 +57,27 @@ public:
     }
     const std::string& getName() const{return name;}
     void setName(const std::string& name){this->name=name;}
+    int getRows() const {return rows;}
+    int getColumns() const {return columns;}
+    double getRequiredRatio() const {return req_ratio;}
     double getWeight(){return weight;}
     void setWeight(double weight){this->weight = weight;}
-    const std::vector<Feature>& getFeatures() const{return features;}
-    void setFeatures(const std::vector<Feature>& features){this->features = features;}
-    bool isDetected(){return detected;}
-    void setDetected(bool detected){this->detected = detected;}
-
+    const featureCallback getFeature() const{return feature;}
+    //void setFeatures(const std::vector<Feature>& features){this->features = features;}
+    bool isDetected() const { return weight > 0; }
 };
 
 class GridElement{
 protected:
     cv::Mat element;
-    std::vector<Characteristic> characteristics;
+    //std::vector<Characteristic> characteristics;
     cv::Rect window;
 public:
     GridElement(){}
     GridElement(cv::Mat _element, cv::Rect _window)
         : element(_element), window(_window) {}
-    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
-    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
+    //const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
+    //void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
     const cv::Mat& getMat() const{return element;}
     const cv::Rect& getWindow() const {return window;}
     void setMat(const cv::Mat& mat){this->element = mat;}
@@ -75,13 +86,13 @@ public:
 class Image{
 protected:
     cv::Mat mat;
-    std::vector<Characteristic> characteristics;
+    //std::vector<Characteristic> characteristics;
 public:
     Image(cv::Mat _image):mat(_image){}
     const cv::Mat& getMat() const{return mat;}
     void setMat(const cv::Mat& mat){this->mat = mat;}
-    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
-    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
+    //const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
+    //void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
 };
 
 class ImageGrid{
@@ -309,6 +320,7 @@ private:
     std::unordered_map<std::string,std::vector<Location*>> locationIndex;
     std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
+        /*
         Characteristic grass("Grass");
         Characteristic paver_huge("Huge Pavers at P building");
         Characteristic paver_brick_grey_v("Brick style grey pavers");
@@ -377,6 +389,7 @@ private:
                 locationIndex[c.getName()].push_back(&l);
             }
         }
+        */
     }
 
 public:

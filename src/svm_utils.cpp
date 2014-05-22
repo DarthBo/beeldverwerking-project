@@ -1,6 +1,10 @@
 #include <svm_utils.h>
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include "video_utils.h"
 #include "blindtastic_core.h"
 #include "svm_features.h"
@@ -19,13 +23,14 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
 
 /*****************************************************************************/
 
-//Improved training function for SVM input for grass
+//Fucntion for training a frame (a single image) with grid
 void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                                  featureCallback genFeatures,
                                  bool train,
                                  int f,
                                  int rows,
-                                 int columns)
+                                 int columns,
+                                 std::ostream &os)
 {
     ImageGrid grid(frame, rows, columns);
 
@@ -54,19 +59,20 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                     col++;
                     continue;
                 }
-                std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+                os << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
             }
             else
             {
-                std::cout << "0 ";
+                os << "0 ";
             }
-
+            //set precision
+            os << std::setprecision(10);
             //print features
             for (size_t i=0 ; i < features.size() ; i++)
             {
-                std::cout << i+1 << ':' << features[i] << ' ';
+                os << i+1 << ':' << features[i] << ' ';
             }
-            std::cout << "# frame " << f << std::endl; // frame[x,y]
+            os << "# frame " << f << std::endl; // frame[x,y]
 
             col++;
         }
@@ -74,7 +80,7 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
     }
 }
 
-//method that calls a SVM input method used on an image
+//Function that starts playing the supplied video for manual training with a grid
 void start_manual_train_with_imagegrid_video(const char* videoLocation,
                                              const std::string& q,
                                              featureCallback genFeatures,
@@ -114,7 +120,8 @@ void manual_train_full_frame(cv::Mat& frame,
                              const std::string& q,
                              featureCallback genFeatures,
                              bool train,
-                             int f)
+                             int f,
+                             std::ostream& os = std::cout)
 {
     std::vector<double> features;
 
@@ -134,22 +141,23 @@ void manual_train_full_frame(cv::Mat& frame,
             if (hasCharacteristic == -1)
                 return;
         }
-        std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+        os << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
     }
     else
     {
-        std::cout << "0 ";
+        os << "0 ";
     }
-
+    //set precision
+    os << std::setprecision(10);
     //print features
     for (size_t i=0 ; i < features.size() ; i++)
     {
-        std::cout << i+1 << ':' << features[i] << ' ';
+        os << i+1 << ':' << features[i] << ' ';
     }
-    std::cout << "# frame " << f << std::endl; // frame[x,y]
+    os << "# frame " << f << std::endl; // frame[x,y]
 }
 
-//method that calls a SVM input method used on an image
+//Function that starts playing the supplied video for manual training
 void start_manual_train_frame_video(const char* videoLocation,
                                     const std::string& q,
                                     featureCallback genFeatures)
@@ -182,6 +190,7 @@ void start_manual_train_frame_video(const char* videoLocation,
     }
 }
 
+//Function that prints all ch11cs in a video (per frame, with grid) to stdout
 void print_imagegrid_features(const char* videoLocation, featureCallback genFeatures, int rows, int columns, int once_every_x_frames)
 {
     cv::VideoCapture cap(videoLocation);
@@ -234,6 +243,7 @@ int train_askuser(const cv::Mat& img, const cv::Rect rect, const std::string& qu
     return key;
 }
 
+//Function that prints characteristics, adds +/-1 based on framerange
 void auto_train_video (const char* vidloc,
                        featureCallback genFeatures,
                        int from_frame,
@@ -275,6 +285,7 @@ void auto_train_video (const char* vidloc,
     }
 }
 
+//Reads and shows gridpredictions (assumes 9x9 grid, 1 frame per 100)
 //this code is awful, save your soul by not reading it
 void play_grid_predictions(const char* fvid, const char* fpred, int rows, int columns, int once_every_x_frames)
 {
@@ -347,7 +358,7 @@ void play_grid_predictions(const char* fvid, const char* fpred, int rows, int co
     }
 }
 
-
+//Reads and shows predictions for full frame
 void play_frame_predictions(const char* fvid, const char* fpred, int once_every_x_frames)
 {
     const char* winp = "predictions";
@@ -515,6 +526,7 @@ void hardTrainSchool2Station()
      * 12: geen gras meer
      */
     std::vector<int> borders = {1,85,427,565,640,735,1205,1390,1570,2050,2100,2130,2200};
+    /*
     Characteristic grass("Grass");
     Characteristic paver_huge("Huge Pavers at P building");
     Characteristic paver_brick_grey_v("Brick style grey pavers");
@@ -556,6 +568,61 @@ void hardTrainSchool2Station()
     //7
     ch11cs = {paver_square_dull};//af en toe ook paver_brick_grey_v, voornamelijk opritten
     Location stdenijs("St Denijs",ch11cs);
+    */
 }
 
+bool classify_frame(cv::Mat frame, Characteristic c)
+{
+    //calculate features
+    std::ostringstream ss;
+    manual_train_with_imagegrid(frame, "", c.getFeature(), false, 0, c.getRows(), c.getColumns(), ss);
+    std::string s = ss.str();
+
+    //output to temp file
+    FILE * fio = fopen(".tmp_feat", "w"); // create/overwrite
+    if (fio == NULL)
+        return false;
+    fwrite(fio,s.size(),sizeof(char),fio);
+    fclose(fio);
+
+    //call svmPerf
+    #ifdef _WIN32
+        const char* svmperf_class = "svm_perf_classify.exe";
+    #else
+        const char* svmperf_class = "./svm_perf_classify";
+    #endif
+
+    char buf[100] = {0};
+    sprintf(buf, "%s .tmp_feat %s .tmp_result", svmperf_class, c.getName().c_str());
+
+    if (system(buf) != 0)
+        return false;
+
+    //read predictions
+    fio = fopen(".tmp_result", "r");
+    if (fio == NULL)
+        return false;
+
+    int pos_tally = 0;
+    double pos_sum = 0.0;
+
+    while (fgets (buf, 100, fio) != NULL)
+    {
+        double d = atof(buf);
+        if (d > 0)
+        {
+            pos_tally++;
+            pos_sum += d;
+        }
+    }
+    fclose(fio);
+
+    //save result
+    if (pos_tally > 0 && pos_tally >= c.getRows()*c.getColumns()*c.getRequiredRatio())
+        c.setWeight(pos_sum/pos_tally);
+    else
+        c.setWeight(-1); // weight doesn't really matter here, we're not going to use it anyway
+
+    return true;
+}
 
