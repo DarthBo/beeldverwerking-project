@@ -3,6 +3,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "svm_features.h"
+#include "blindtastic_core.h"
 
 #define K_ESC 27
 #define K_SPC 32
@@ -23,7 +24,8 @@ void manual_train_with_imagegrid(cv::Mat& frame,
                                  bool train,
                                  int f=0,
                                  int rows=9,
-                                 int columns=9);
+                                 int columns=9,
+                                 std::ostream& os = std::cout);
 
 //Function that starts playing the supplied video for manual training with a grid
 void start_manual_train_with_imagegrid_video(const char* videoLocation,
@@ -70,5 +72,7 @@ void play_frame_predictions(const char* fvid,
 void start_manual_training_image(const char* imgLocation, const std::string& q, bool train = true);
 
 void hardTrainSchool2Station();
+
+bool classify_frame(cv::Mat frame, Characteristic c);
 
 #endif // SVM_SHIT_H

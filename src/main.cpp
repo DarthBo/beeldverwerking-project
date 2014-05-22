@@ -280,6 +280,7 @@ void testContourFilter()
 
 void testLocationRepository()
 {
+    /*
     LocationRepository repo;
     Characteristic grass("Grass");
     grass.setWeight(3.2);
@@ -291,6 +292,7 @@ void testLocationRepository()
     for(auto p : refined){
         std::cout<<p.first->getName()<<" : "<<p.second<<std::endl;
     }
+    */
 }
 
 /**********************************  MAIN  **********************************/
