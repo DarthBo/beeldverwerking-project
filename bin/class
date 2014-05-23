@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BLINDTASTIC=./blindtastic
+BLINDTASTIC="./blindtastic"
 SVM_CLASS=./svm_perf_classify
 
 if (( $# < 1 ))

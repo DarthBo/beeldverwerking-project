@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BLINDTASTIC=./blindtastic
+BLINDTASTIC="./blindtastic"
 SVM_TRAIN=./svm_perf_learn
 
 MODE=REPLACE

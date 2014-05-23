@@ -1,69 +1,16 @@
 #include "blindtastic_core.h"
+#include "svm_utils.h"
 
+CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
+{
+    CharacteristicValue val;
+    val.definition = this;
+    val.weight = 0.0;
 
-/*CHARACTERISTICTREE */
-void CharacteristicTree::refine(Characteristic& characteristic){
-    if(current == nullptr)
-        return;
-    if(current->getCharacteristic() == characteristic){
-        if(characteristic.isDetected()){
-            current = *current->getLeftChild();
-        }else{
-            current = *current->getRightChild();
-        }
-        traverseWithPool();
-    }else{
-        characteristicPool.push_back(characteristic);
-    }
-}
+    if (!classify_frame(img,val,skip_datacalc)) //this will update val.weight when succesful
+        std::cerr << "UNKNOWN ERROR processing frame" << std::endl;
 
-void CharacteristicTree::traverseWithPool(){
-   for_each(characteristicPool.begin(),characteristicPool.end(),[=](Characteristic c){
-       if(current->getCharacteristic() == c){
-           if(c.isDetected()){
-               current = *current->getLeftChild();
-           }else{
-               current = *current->getRightChild();
-           }
-           characteristicPool.remove(c);
-           traverseWithPool();
-       }
-   });
-}
-
-void CharacteristicTree::addBreadthFirst(const Characteristic& characteristic,const std::vector<Location*>& possibleLocations){
-    CharacteristicNode** curr = &root;
-    std::queue<CharacteristicNode**> q;
-    if((*curr) != nullptr){
-        q.push((*curr)->getLeftChild());
-        q.push((*curr)->getRightChild());
-    }
-    while((*curr) != nullptr){
-        curr = q.front();
-        q.pop();
-        if((*curr) != nullptr){
-            q.push((*curr)->getLeftChild());
-            q.push((*curr)->getRightChild());
-        }
-    }
-    *curr = new CharacteristicNode(characteristic,possibleLocations);
-}
-
-void CharacteristicTree::printBreadthFirst(){
-    CharacteristicNode** curr = &root;
-    std::queue<CharacteristicNode**> q;
-    if((*curr) != nullptr){
-        q.push(curr);
-    }
-    while(q.size() != 0){
-        curr = q.front();
-        q.pop();
-        std::cout<<(*curr)->getCharacteristic().getName() <<std::endl;
-        if((*(*curr)->getLeftChild()) != nullptr)
-            q.push((*curr)->getLeftChild());
-        if((*(*curr)->getRightChild()) != nullptr)
-            q.push((*curr)->getRightChild());
-    }
+    return val;
 }
 
 /*IMAGEGRID */

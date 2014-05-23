@@ -1,7 +1,11 @@
 #include <svm_utils.h>
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <fstream>
+#include <sstream>
 #include <iomanip>
+
 #include "video_utils.h"
 #include "blindtastic_core.h"
 #include "svm_features.h"
@@ -26,7 +30,8 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                                  bool train,
                                  int f,
                                  int rows,
-                                 int columns)
+                                 int columns,
+                                 std::ostream &os)
 {
     ImageGrid grid(frame, rows, columns);
 
@@ -55,19 +60,20 @@ void manual_train_with_imagegrid(cv::Mat& frame, const std::string& q,
                     col++;
                     continue;
                 }
-                std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+                os << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
             }
             else
             {
-                std::cout << "0 ";
+                os << "0 ";
             }
-
+            //set precision
+            //os << std::setprecision(10);
             //print features
             for (size_t i=0 ; i < features.size() ; i++)
             {
-                std::cout << i+1 << ':' << features[i] << ' ';
+                os << i+1 << ':' << features[i] << ' ';
             }
-            std::cout << std::setprecision(10) << "# frame " << f << std::endl; // frame[x,y]
+            os << "# frame " << f << std::endl; // frame[x,y]
 
             col++;
         }
@@ -85,7 +91,7 @@ void start_manual_train_with_imagegrid_video(const char* videoLocation,
     struct trackdata data;
     data.cap.open(videoLocation);
     cv::namedWindow(q);
-    const char* track_class = "frame:";
+    const char* track_class = "frame";
 
     //cv::Mat frame;
     int f = 0;
@@ -123,7 +129,8 @@ void manual_train_full_frame(cv::Mat& frame,
                              const std::string& q,
                              featureCallback genFeatures,
                              bool train,
-                             int f)
+                             int f,
+                             std::ostream& os = std::cout)
 {
     std::vector<double> features;
 
@@ -143,19 +150,20 @@ void manual_train_full_frame(cv::Mat& frame,
             if (hasCharacteristic == -1)
                 return;
         }
-        std::cout << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
+        os << ((hasCharacteristic == K_Y) ? "+1 " : "-1 ");
     }
     else
     {
-        std::cout << "0 ";
+        os << "0 ";
     }
-
+    //set precision
+    os << std::setprecision(10);
     //print features
     for (size_t i=0 ; i < features.size() ; i++)
     {
-        std::cout << i+1 << ':' << features[i] << ' ';
+        os << i+1 << ':' << features[i] << ' ';
     }
-    std::cout << "# frame " << f << std::endl; // frame[x,y]
+    os << "# frame " << f << std::endl; // frame[x,y]
 }
 
 //Function that starts playing the supplied video for manual training
@@ -527,6 +535,7 @@ void hardTrainSchool2Station()
      * 12: geen gras meer
      */
     std::vector<int> borders = {1,85,427,565,640,735,1205,1390,1570,2050,2100,2130,2200};
+    /*
     Characteristic grass("Grass");
     Characteristic paver_huge("Huge Pavers at P building");
     Characteristic paver_brick_grey_v("Brick style grey pavers");
@@ -568,6 +577,72 @@ void hardTrainSchool2Station()
     //7
     ch11cs = {paver_square_dull};//af en toe ook paver_brick_grey_v, voornamelijk opritten
     Location stdenijs("St Denijs",ch11cs);
+    */
 }
 
+bool classify_frame(cv::Mat frame, CharacteristicValue& c, bool skip_datacalc)
+{
+    FILE * fio;
 
+    if (!skip_datacalc)
+    {
+        //calculate features
+        std::ostringstream ss;
+        manual_train_with_imagegrid(frame, "", c.definition->getFeature(), false, 0,
+                                    c.definition->getRows(), c.definition->getColumns(), ss);
+        std::string s = ss.str();
+
+        //output to temp file
+        fio = fopen(".tmp_feat", "w"); // create/overwrite
+        if (fio == NULL)
+        {
+            std::cerr << "can't open .tmp_feat for writing" << std::endl;
+            return false;
+        }
+        fwrite(s.c_str(),s.size(),sizeof(char),fio);
+        fclose(fio);
+    }
+    //else: reuse last calculated features
+
+    //call svmPerf
+    #ifdef _WIN32
+        const char* svmperf_class = "svm_perf_classify.exe";
+    #else
+        const char* svmperf_class = "./svm_perf_classify";
+    #endif
+
+    char buf[100] = {0};
+    sprintf(buf, "%s .tmp_feat %s .tmp_result >/dev/null 2>/dev/null", svmperf_class, c.definition->getModel().c_str());
+
+    if (system(buf) != 0)
+    {
+        std::cerr << "class failed" << std::endl;
+        return false;
+    }
+    //read predictions
+    fio = fopen(".tmp_result", "r");
+    if (fio == NULL)
+        return false;
+
+    int pos_tally = 0;
+    double pos_sum = 0.0;
+
+    while (fgets (buf, 100, fio) != NULL)
+    {
+        double d = atof(buf);
+        if (d > 0)
+        {
+            pos_tally++;
+            pos_sum += d;
+        }
+    }
+    fclose(fio);
+
+    //save result
+    if (pos_tally > 0 && pos_tally >= c.definition->getRows()*c.definition->getColumns()*c.definition->getRequiredRatio())
+        c.weight = pos_sum/pos_tally;
+    else
+        c.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+
+    return true;
+}

@@ -26,6 +26,8 @@ SET(SRC src/main.cpp
         src/svm_utils.cpp
         src/blindtastic_core.h
         src/blindtastic_core.cpp
+        src/blindtastic_models.h
+        src/blindtastic_models.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})
