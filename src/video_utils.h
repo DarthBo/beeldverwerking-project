@@ -55,6 +55,14 @@ int getFrameByNumber(const char* videoLocation, const int frameNumber, cv::Mat& 
 // Return frame from existing capture at given index
 int getFrameByNumber(cv::VideoCapture& video, const int frameNumber, cv::Mat& frame);
 
+struct trackdata
+{
+    cv::Mat img;
+    cv::VideoCapture cap;
+    int frame = 0;
+};
+
+void trackbar_moved(int frame_pos, void* _data);
 void play_video(const char* videoLocation);
 
 #endif
