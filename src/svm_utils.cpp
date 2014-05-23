@@ -607,12 +607,14 @@ bool classify_frame(cv::Mat frame, CharacteristicValue& c, bool skip_datacalc)
     //call svmPerf
     #ifdef _WIN32
         const char* svmperf_class = "svm_perf_classify.exe";
+        const char* nul = ">NUL";
     #else
         const char* svmperf_class = "./svm_perf_classify";
+        const char* nul = ">/dev/null 2>/dev/null";
     #endif
 
     char buf[100] = {0};
-    sprintf(buf, "%s .tmp_feat %s .tmp_result >/dev/null 2>/dev/null", svmperf_class, c.definition->getModel().c_str());
+    sprintf(buf, "%s .tmp_feat %s .tmp_result %s", svmperf_class, c.definition->getModel().c_str(), nul);
 
     if (system(buf) != 0)
     {
