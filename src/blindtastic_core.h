@@ -7,64 +7,57 @@
 
 #include "svm_features.h"
 
-/*
-class Feature{
+struct CharacteristicValue;
+class CharacteristicDefinition {
 protected:
     std::string name;
-    double value;
-public:
-    Feature(){}
-    Feature(const std::string& _name,double _value):name(_name),value(_value){}
-    bool operator==(const Feature& feature) const
-    {
-        return name == feature.name && value == feature.value;
-    }
-    bool operator!=(const Feature& feature) const
-    {
-        return !((*this).operator==(feature));
-    }
-    const std::string& getName() const{return name;}
-    void setName(const std::string& name){this->name = name;}
-    double getValue() const{return value;}
-    void setValue(const double value){this->value = value;}
-};
-*/
-
-class Characteristic {
-protected:
-    std::string name;
+    std::string model;
     featureCallback feature;
     int rows;
     int columns;
     double req_ratio;
-    double weight;
 public:
-    Characteristic(const std::string& _name, featureCallback _feature, int _rows=1, int _columns=1,
-                   double _req_ratio = (1.0/3), double _weight = 0.0)
-        : name(_name), feature(_feature), rows(_rows), columns(_columns), req_ratio(_req_ratio), weight(_weight){}
-    Characteristic(const Characteristic& ch)
-        : name(ch.name), feature(ch.feature), rows(ch.rows), columns(ch.columns), req_ratio(ch.req_ratio), weight(ch.weight){}
+    CharacteristicDefinition(  const std::string& _name,
+                               const std::string& _model,
+                               featureCallback _feature,
+                               int _rows=1,
+                               int _columns=1,
+                               double _req_ratio = (1.0/9)  )
+        : name(_name), model(_model), feature(_feature), rows(_rows),
+          columns(_columns), req_ratio(_req_ratio){}
 
-    bool operator==(const Characteristic& characteristic) const
+    CharacteristicDefinition(const CharacteristicDefinition& ch)
+        : name(ch.name), model(ch.model), feature(ch.feature), rows(ch.rows),
+          columns(ch.columns), req_ratio(ch.req_ratio){}
+
+    bool operator==(const CharacteristicDefinition& characteristic) const
     {
-        return name != characteristic.name &&
-               weight != characteristic.weight &&
-               feature == characteristic.feature;
+        return  name == characteristic.name &&
+                model == characteristic.model &&
+                feature == characteristic.feature &&
+                rows == characteristic.rows &&
+                columns == characteristic.columns &&
+                req_ratio == characteristic.req_ratio;
     }
-    bool operator!=(const Characteristic& characteristic ) const
+    bool operator!=(const CharacteristicDefinition& characteristic ) const
     {
         return !((*this).operator==(characteristic));
     }
-    const std::string& getName() const{return name;}
-    void setName(const std::string& name){this->name=name;}
+
+    const std::string& getName() const {return name;}
+    const std::string& getModel() const {return model;}
+    featureCallback getFeature() const {return feature;}
     int getRows() const {return rows;}
     int getColumns() const {return columns;}
     double getRequiredRatio() const {return req_ratio;}
-    double getWeight(){return weight;}
-    void setWeight(double weight){this->weight = weight;}
-    const featureCallback getFeature() const{return feature;}
-    //void setFeatures(const std::vector<Feature>& features){this->features = features;}
-    bool isDetected() const { return weight > 0; }
+
+    CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
+};
+
+struct CharacteristicValue
+{
+    const CharacteristicDefinition* definition;
+    double weight;
 };
 
 class GridElement{
@@ -140,12 +133,12 @@ public:
 class Location{
 protected:
     std::string name;
-    std::vector<Characteristic> characteristics;
+    std::vector<CharacteristicDefinition> characteristics;
 public:
     Location(){}
-    Location(const std::string& _name,std::vector<Characteristic> _characteristics):name(_name),characteristics(_characteristics){}
-    const std::vector<Characteristic>& getCharacteristics() const{return characteristics;}
-    void setCharacteristics(const std::vector<Characteristic>& characteristics){this->characteristics = characteristics;}
+    Location(const std::string& _name,std::vector<CharacteristicDefinition> _characteristics):name(_name),characteristics(_characteristics){}
+    const std::vector<CharacteristicDefinition>& getCharacteristics() const{return characteristics;}
+    void setCharacteristics(const std::vector<CharacteristicDefinition>& characteristics){this->characteristics = characteristics;}
     const std::string& getName() const{return name;}
     void setName(const std::string& name){this->name = name;}
 };
@@ -417,10 +410,10 @@ public:
         return out;
     }
 
-    void refine(Characteristic& characteristic){
-        if(nodeIndex.find(characteristic.getName()) != nodeIndex.end()){
-            for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.getName()]){
-                refinedLocations.increasePriority(node,characteristic.getWeight());
+    void refine(CharacteristicValue& characteristic){
+        if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
+            for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
+                refinedLocations.increasePriority(node,characteristic.weight);
             }
         }
     }
@@ -431,40 +424,11 @@ public:
         for(Location& l : locations){
             WeightedLocation wl(&l,0.0);
             typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(wl);
-            for(const Characteristic& c : l.getCharacteristics()){
+            for(const CharacteristicDefinition& c : l.getCharacteristics()){
                 nodeIndex[c.getName()].push_back(n);
             }
         }
     }
 };
 
-class CharacteristicTree {
-protected:
-    class CharacteristicNode{
-    protected:
-        Characteristic characteristic;
-        std::vector<Location*> possibleLocations;
-        CharacteristicNode* left;
-        CharacteristicNode* right;
-    public:
-        CharacteristicNode(const Characteristic& _characteristic,const std::vector<Location*>& _possibleLocations)
-            :characteristic(_characteristic),possibleLocations(_possibleLocations),left(nullptr),right(nullptr){}
-        CharacteristicNode** getLeftChild(){return &left;}
-        void SetLeftChild(CharacteristicNode * n){this->left = n;}
-        CharacteristicNode** getRightChild(){return &right;}
-        void SetRightChild(CharacteristicNode * n){this->right = n;}
-        const Characteristic& getCharacteristic(){return characteristic;}
-        const std::vector<Location*>& getPossibleLocations() const{return possibleLocations;}
-    };
-    std::list<Characteristic> characteristicPool;
-    CharacteristicNode* root;
-    CharacteristicNode* current;
-    void traverseWithPool();
-public:
-    CharacteristicTree():root(nullptr),current(nullptr){}
-    void refine(Characteristic& characteristic);
-    void addBreadthFirst(const Characteristic& characteristic, const std::vector<Location*>& possibleLocations);
-    void printBreadthFirst();
-    const std::vector<Location*>* getPossibleLocations() const{return current == nullptr? nullptr : &current->getPossibleLocations();}
-};
 #endif

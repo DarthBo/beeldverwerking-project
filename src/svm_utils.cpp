@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+
 #include "video_utils.h"
 #include "blindtastic_core.h"
 #include "svm_features.h"
@@ -90,7 +91,7 @@ void start_manual_train_with_imagegrid_video(const char* videoLocation,
     struct trackdata data;
     data.cap.open(videoLocation);
     cv::namedWindow(q);
-    const char* track_class = "frame:";
+    const char* track_class = "frame";
 
     //cv::Mat frame;
     int f = 0;
@@ -579,20 +580,29 @@ void hardTrainSchool2Station()
     */
 }
 
-bool classify_frame(cv::Mat frame, Characteristic& c)
+bool classify_frame(cv::Mat frame, CharacteristicValue& c, bool skip_datacalc)
 {
-    //calculate features
-    std::ostringstream ss;
-    manual_train_with_imagegrid(frame, "", c.getFeature(), false, 0, c.getRows(), c.getColumns(), ss);
-    std::string s = ss.str();
-    //std::cout << s << std::endl;
+    FILE * fio;
 
-    //output to temp file
-    FILE * fio = fopen(".tmp_feat", "w"); // create/overwrite
-    if (fio == NULL)
-        return false;
-    fwrite(s.c_str(),s.size(),sizeof(char),fio);
-    fclose(fio);
+    if (!skip_datacalc)
+    {
+        //calculate features
+        std::ostringstream ss;
+        manual_train_with_imagegrid(frame, "", c.definition->getFeature(), false, 0,
+                                    c.definition->getRows(), c.definition->getColumns(), ss);
+        std::string s = ss.str();
+
+        //output to temp file
+        fio = fopen(".tmp_feat", "w"); // create/overwrite
+        if (fio == NULL)
+        {
+            std::cerr << "can't open .tmp_feat for writing" << std::endl;
+            return false;
+        }
+        fwrite(s.c_str(),s.size(),sizeof(char),fio);
+        fclose(fio);
+    }
+    //else: reuse last calculated features
 
     //call svmPerf
     #ifdef _WIN32
@@ -602,11 +612,13 @@ bool classify_frame(cv::Mat frame, Characteristic& c)
     #endif
 
     char buf[100] = {0};
-    sprintf(buf, "%s .tmp_feat %s .tmp_result >/dev/null 2>/dev/null", svmperf_class, c.getName().c_str());
+    sprintf(buf, "%s .tmp_feat %s .tmp_result >/dev/null 2>/dev/null", svmperf_class, c.definition->getModel().c_str());
 
     if (system(buf) != 0)
+    {
+        std::cerr << "class failed" << std::endl;
         return false;
-
+    }
     //read predictions
     fio = fopen(".tmp_result", "r");
     if (fio == NULL)
@@ -626,51 +638,11 @@ bool classify_frame(cv::Mat frame, Characteristic& c)
     }
     fclose(fio);
 
-    std::cout << ">>>> " << pos_tally << std::endl;
-
     //save result
-    if (pos_tally > 0 && pos_tally >= c.getRows()*c.getColumns()*c.getRequiredRatio())
-        c.setWeight(pos_sum/pos_tally);
+    if (pos_tally > 0 && pos_tally >= c.definition->getRows()*c.definition->getColumns()*c.definition->getRequiredRatio())
+        c.weight = pos_sum/pos_tally;
     else
-        c.setWeight(-1); // weight doesn't really matter here, we're not going to use it anyway
+        c.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
 
     return true;
-}
-
-void gen_grid_predictions(const char* fvid, int rows, int columns, int once_every_x_frames)
-{
-    const char* winp = "predictions";
-    cv::VideoCapture cap(fvid);
-
-    std::string certainty;
-    cv::Mat img;
-
-    int f = 0;
-
-    while(cap.isOpened() && cap.read(img))
-    {
-        ++f;
-
-        //if (f%once_every_x_frames == 0)
-        {
-            Characteristic c("gras.model", &getTextnColour, rows, columns,0.05);
-            classify_frame(img, c);
-
-            //char buf[100] = {0};
-            //sprintf(buf, "%d/%d", pos,rows*columns);
-            certainty = (c.getWeight() > 0) ? ":)" : ":(";
-
-            printText(img, certainty);
-            cv::imshow(winp, img);
-            int k = td::waitKey(10);
-            if (k == K_ESC || k == K_Q)
-                cap.release();
-        }
-    }
-
-    if (cap.isOpened())
-    {
-        std::cout << "not all frames shown" << std::endl;
-        cap.release();
-    }
 }

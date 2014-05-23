@@ -73,6 +73,6 @@ void start_manual_training_image(const char* imgLocation, const std::string& q, 
 
 void hardTrainSchool2Station();
 
-bool classify_frame(cv::Mat frame, Characteristic &c);
-void gen_grid_predictions(const char* fvid, int rows, int columns, int once_every_x_frames);
+bool classify_frame(cv::Mat frame, CharacteristicValue &c, bool skip_datacalc = false);
+
 #endif // SVM_SHIT_H

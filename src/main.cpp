@@ -7,6 +7,7 @@
 #include "video_utils.h"
 #include "image_utils.h"
 #include "svm_utils.h"
+#include "blindtastic_models.h"
 
 using cv::namedWindow;
 using cv::Mat;
@@ -21,7 +22,7 @@ using std::endl;
 const char* defaultVideo = "../resources/vid/20140226_h_10fps.avi";
 
 
-enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY };
+enum train_mode { NONE, PLAY, TRAIN, PRINT, CLASSIFY, AUTOCLASS };
 
 void print_help_and_exit (const char* arg0)
 {
@@ -31,6 +32,7 @@ void print_help_and_exit (const char* arg0)
     std::cerr << " -t       Output training data to stdout" << std::endl;
     std::cerr << " -o       Output classification data to stdout" << std::endl;
     std::cerr << " -c FILE  Check classification, REQUIRES results file from SVM!" << std::endl;
+    std::cerr << " -x       Check classifications ON THE FLY (slow, but awesome)" << std::endl;
 
     exit(1);
 }
@@ -38,7 +40,6 @@ void print_help_and_exit (const char* arg0)
 int release (int argc, char **argv)
 {
     train_mode mode = NONE;
-    bool grid = false;
 
     const char* videoLocation = defaultVideo;
     const char* extra = "";
@@ -83,6 +84,12 @@ int release (int argc, char **argv)
                     print_help_and_exit(argv[0]);
                 }
                 break;
+            case 'x':
+                if (mode == NONE)
+                    mode = AUTOCLASS;
+                else
+                    print_help_and_exit(argv[0]);
+                break;
             case 'f':
                 it++;
                 if (it < argc)
@@ -120,21 +127,15 @@ int release (int argc, char **argv)
         break;
     case TRAIN:
         std::cerr << "Start training..." << std::endl;
-        if (grid)
-            start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
-        else
-            start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
-        //start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnHSVColour);
-        //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
+        start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnHSVColour);
+        //start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
+        //start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
         break;
     case PRINT:
         std::cerr << "Printing characteristic features..." << std::endl;
-        if (grid)
-            print_imagegrid_features(videoLocation, &getTextnColour);
-        else
-            auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
-        //print_imagegrid_features(videoLocation, &getTextnHSVColour);
-        //auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
+        print_imagegrid_features(videoLocation, &getTextnHSVColour);
+        //auto_train_video(videoLocation, &getRectFeatures, 0, 0, 50, false);
+        //print_imagegrid_features(videoLocation, &getTextnColour);
         break;
     case CLASSIFY:
         if (!file_exists(extra))
@@ -143,10 +144,11 @@ int release (int argc, char **argv)
             return 1;
         }
         std::cerr << "Checking classification found at " << extra << "!" << std::endl;
-        if (grid)
-            play_grid_predictions(videoLocation, extra);
-        else
-            play_frame_predictions(videoLocation, extra, 53);
+        play_grid_predictions(videoLocation, extra);
+        //play_frame_predictions(videoLocation, extra, 50);
+        break;
+    case AUTOCLASS:
+        play_classify(videoLocation);
         break;
     default:
         print_help_and_exit(argv[0]);
@@ -299,7 +301,7 @@ void testLocationRepository()
 
 int main(int argc, char **argv)
 {
-    bool CLI = false;
+    bool CLI = true;
     if (CLI)
     {
         return release(argc, argv);
@@ -320,7 +322,7 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
 
     // do something
-    gen_grid_predictions(videoLocation, 9, 9, 50);
+    play_classify(videoLocation,2);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
