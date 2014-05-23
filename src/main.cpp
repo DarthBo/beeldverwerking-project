@@ -83,9 +83,6 @@ int release (int argc, char **argv)
                     print_help_and_exit(argv[0]);
                 }
                 break;
-            case 'g':
-                grid = true;
-                break;
             case 'f':
                 it++;
                 if (it < argc)
@@ -127,6 +124,7 @@ int release (int argc, char **argv)
             start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnColour);
         else
             start_manual_train_frame_video(videoLocation, "Witte tegels?", &getRectFeatures);
+        //start_manual_train_with_imagegrid_video(videoLocation,std::string("Contains your characteristic? Y/N"), &getTextnHSVColour);
         //auto_train_video(videoLocation, &getRectFeatures, 735, 1205, 50, true);
         break;
     case PRINT:
@@ -135,6 +133,8 @@ int release (int argc, char **argv)
             print_imagegrid_features(videoLocation, &getTextnColour);
         else
             auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
+        //print_imagegrid_features(videoLocation, &getTextnHSVColour);
+        //auto_train_video(videoLocation, &getRectFeatures, 0, 0, 53, false);
         break;
     case CLASSIFY:
         if (!file_exists(extra))

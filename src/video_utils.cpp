@@ -306,13 +306,6 @@ int getFrameByNumber(cv::VideoCapture& video, const int frameNumber, cv::Mat& fr
     return video.read(frame);
 }
 
-struct trackdata
-{
-    cv::Mat img;
-    cv::VideoCapture cap;
-    int frame = 0;
-};
-
 void trackbar_moved(int frame_pos, void* _data)
 {
     struct trackdata* data = static_cast<struct trackdata*>(_data);
