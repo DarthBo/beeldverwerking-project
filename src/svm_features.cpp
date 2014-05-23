@@ -160,3 +160,15 @@ void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
     getRatioTiles(squares, features);
     getContourArea(squares,features);
 }
+
+void getWhiteFeatures(const cv::Mat& in, std::vector<double>& features){
+    cv::Mat temp;
+    std::vector<double> rows;
+    std::vector<double> cols;
+    whiteFilter(in,temp);
+    reduce(temp,cols,0,CV_REDUCE_SUM);
+    transpose(temp,temp);
+    reduce(temp,rows,0,CV_REDUCE_SUM);
+    for(unsigned int i=0; i<rows.size(); i++) features.push_back(rows[i]);
+    for(unsigned int i=0; i<cols.size(); i++) features.push_back(cols[i]);
+}

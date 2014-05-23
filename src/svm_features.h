@@ -23,6 +23,7 @@ void getAvgColorTiles(const cv::Mat& in,
 void getTextureTiles(const cv::Mat& in,
                      const std::vector<std::vector<cv::Point>>& squares,
                      std::vector<double>& means);
+void getWhiteFeatures(const cv::Mat& in, std::vector<double>& features);
 
 /***** co-co-combos *****/
 
