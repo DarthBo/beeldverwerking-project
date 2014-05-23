@@ -26,30 +26,6 @@ SET(SRC src/main.cpp
         src/svm_utils.cpp
         src/blindtastic_core.h
         src/blindtastic_core.cpp
-
-        src/svm_perf/svm_struct_api_types.h
-        src/svm_perf/svm_struct/svm_struct_common.h
-        src/svm_perf/svm_struct/svm_struct_learn.h
-        src/svm_perf/svm_light/kernel.h
-        src/svm_perf/svm_light/svm_common.h
-        src/svm_perf/svm_light/svm_learn.h
-        src/svm_perf/svm_struct_api.h
-
-        src/svm_perf/svm_struct_learn_custom.c
-        #src/svm_perf/svm_struct/svm_struct_main.c
-        src/svm_perf/svm_struct/svm_struct_learn.c
-        src/svm_perf/svm_struct/svm_struct_common.c
-        src/svm_perf/svm_struct/svm_struct_classify.c
-        src/svm_perf/svm_light/svm_common.c
-        src/svm_perf/svm_light/svm_hideo.c
-        #src/svm_perf/svm_light/svm_classify.c
-        src/svm_perf/svm_light/svm_learn.c
-        #src/svm_perf/svm_light/svm_learn_main.c
-        #src/svm_perf/svm_light/svm_loqo.c
-        src/svm_perf/svm_struct_api.c
-
-        src/svm_perf_lnk.h
-
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})

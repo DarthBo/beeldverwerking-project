@@ -46,7 +46,7 @@ void   wait_any_key();
 void   print_help();
 
 
-int svm_struct_main_main (int argc, char* argv[])
+int main (int argc, char* argv[])
 {  
   SAMPLE sample;  /* training sample */
   LEARN_PARM learn_parm;
@@ -405,7 +405,7 @@ void print_help()
   printf("    Methods for Structured and Interdependent Output Variables, Journal\n");
   printf("    of Machine Learning Research (JMLR), Vol. 6(Sep):1453-1484, 2005.\n");
   printf("[3] T. Joachims, Making Large-Scale SVM Learning Practical. Advances in\n");
-  printf("    Kernel Methods - Support Vector Learning, B. SchÃ¶lkopf and C. Burges and\n");
+  printf("    Kernel Methods - Support Vector Learning, B. Schölkopf and C. Burges and\n");
   printf("    A. Smola (ed.), MIT Press, 1999.\n");
   printf("[4] T. Joachims, Learning to Classify Text Using Support Vector\n");
   printf("    Machines: Methods, Theory, and Algorithms. Dissertation, Kluwer,\n");

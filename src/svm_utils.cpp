@@ -663,8 +663,8 @@ void gen_grid_predictions(const char* fvid, int rows, int columns, int once_ever
             printText(img, certainty);
             cv::imshow(winp, img);
             int k = td::waitKey(10);
-            //if (k == K_ESC || k == K_Q)
-            //    cap.release();
+            if (k == K_ESC || k == K_Q)
+                cap.release();
         }
     }
 
