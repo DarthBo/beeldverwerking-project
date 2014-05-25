@@ -4,11 +4,11 @@
 #include "opencv2/opencv.hpp"
 #include <queue>
 #include <unordered_map>
-
 #include "svm_features.h"
 
+
 struct CharacteristicValue;
-class CharacteristicDefinition {
+class  CharacteristicDefinition {
 protected:
     std::string name;
     std::string model;
@@ -16,13 +16,14 @@ protected:
     int rows;
     int columns;
     double req_ratio;
+    constexpr static double default_ratio = 1.0/9;
 public:
     CharacteristicDefinition(  const std::string& _name,
                                const std::string& _model,
                                featureCallback _feature,
                                int _rows=1,
                                int _columns=1,
-                               double _req_ratio = (1.0/9)  )
+                               double _req_ratio = default_ratio  )
         : name(_name), model(_model), feature(_feature), rows(_rows),
           columns(_columns), req_ratio(_req_ratio){}
 
@@ -290,145 +291,6 @@ void PairingHeap<T>::pop(){
     _size--;
 }
 
-class LocationRepository {
-    //TODO, stores all locations
-private:
-    class WeightedLocation{
-    private:
-        Location* location;
-        double weight;
-    public:
-        WeightedLocation(){}
-        WeightedLocation(Location* _location,double _weight):location(_location),weight(_weight){}
-        bool operator>(const WeightedLocation& l) const{return weight>l.weight;}
-        bool operator<(const WeightedLocation& l) const{return weight<l.weight;}
-        WeightedLocation& operator+(const double weight){this->weight += weight; return *this;}
-        double getWeight(){return weight;}
-        void setWeight(double weight){this->weight = weight;}
-        Location* getLocation(){return location;}
-        void setLocation(Location* location){this->location = location;}
-    };
-    std::vector<Location> locations;
-    PairingHeap<WeightedLocation> refinedLocations;
-    std::unordered_map<std::string,std::vector<Location*>> locationIndex;
-    std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
-    void init(){
-        /*
-        Characteristic grass("Grass");
-        Characteristic paver_huge("Huge Pavers at P building");
-        Characteristic paver_brick_grey_v("Brick style grey pavers");
-        Characteristic asphalt("Asphalt (black)");
-        Characteristic gravel_dirt("Brown gravel / dirt");
-        Characteristic paver_brick_pink_v("Brick style pink pavers (vertical)");
-        Characteristic paver_brick_pink_h("Brick style pink pavers (horizontal)");
-        Characteristic paver_pebble_white("Big square pebbled pavers");
-        Characteristic paver_square_dull("Dull coloured square pavers");
-        Characteristic paver_train_station("Fancy (diamond) pavers");
-        Characteristic zebra_crossing("Zebra crossing");
-        Characteristic white_train_station("(avg colour) bland white");
 
-        std::vector<Characteristic> ch11cs = {grass, paver_huge, paver_brick_grey_v};
-        Location school("P gebouw",ch11cs);
-        locations.push_back(school);
-
-        ch11cs = {asphalt};
-        Location p_road("P baan",ch11cs);
-        locations.push_back(p_road);
-
-        //missing: area inbetween
-
-        ch11cs = {grass, gravel_dirt};
-        Location dirt_path("Modderpad",ch11cs);
-        locations.push_back(dirt_path);
-
-        ch11cs = {grass, paver_brick_pink_v};
-        Location gym_a("gym A",ch11cs);
-        locations.push_back(gym_a);
-
-        ch11cs = {grass, paver_brick_pink_h};
-        Location gym_b("gym B",ch11cs);
-        locations.push_back(gym_b);
-
-        ch11cs = {grass, paver_pebble_white};
-        Location gym_c("gym C",ch11cs);
-        locations.push_back(gym_c);
-
-        ch11cs = {grass, paver_square_dull};//voornamelijk zonder gras, ook stukken met fiets
-        Location gym_d("gym D",ch11cs);
-        locations.push_back(gym_d);
-
-        ch11cs = {paver_square_dull};//af en toe ook paver_brick_grey_v, voornamelijk opritten
-        Location stdenijs("St Denijs",ch11cs);
-        locations.push_back(stdenijs);
-
-        ch11cs = {zebra_crossing, asphalt};
-        Location zebra("gym C",ch11cs);
-        locations.push_back(zebra);
-
-        ch11cs = {white_train_station};
-        Location railw_white("werken station",ch11cs);
-        locations.push_back(railw_white);
-
-        ch11cs = {paver_train_station};
-        Location railw_hall("Stationshal",ch11cs);
-        locations.push_back(railw_hall);
-
-        resetRefinement();
-        buildIndex();
-    }
-    void buildIndex(){
-        for(Location& l : locations){
-            for(const Characteristic& c : l.getCharacteristics()){
-                locationIndex[c.getName()].push_back(&l);
-            }
-        }
-        */
-    }
-
-public:
-    LocationRepository(){init();}
-    std::vector<Location>& getAllLocations(){
-        return locations;
-    }
-
-    std::pair<Location*,double> getTopLocation(){
-        WeightedLocation wl = refinedLocations.top();
-        std::pair<Location*,double> p(wl.getLocation(),wl.getWeight());
-        return p;
-    }
-
-    //warning: resets current refinement
-    std::vector<std::pair<Location*,double>> getRefinedLocations(){
-        std::vector<std::pair<Location*,double>> out;
-        while(refinedLocations.size() > 0){
-              WeightedLocation wl= refinedLocations.top();
-              std::pair<Location*,double> p(wl.getLocation(),wl.getWeight());
-              out.push_back(p);
-              refinedLocations.pop();
-        }
-        resetRefinement();
-        return out;
-    }
-
-    void refine(CharacteristicValue& characteristic){
-        if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
-            for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
-                refinedLocations.increasePriority(node,characteristic.weight);
-            }
-        }
-    }
-
-    void resetRefinement(){
-        refinedLocations = PairingHeap<WeightedLocation>();
-        nodeIndex.clear();
-        for(Location& l : locations){
-            WeightedLocation wl(&l,0.0);
-            typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(wl);
-            for(const CharacteristicDefinition& c : l.getCharacteristics()){
-                nodeIndex[c.getName()].push_back(n);
-            }
-        }
-    }
-};
 
 #endif

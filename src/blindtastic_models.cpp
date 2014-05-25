@@ -9,7 +9,7 @@ void play_classify(const char* fvid, int once_every_x_frames)
     data.cap.open(fvid);
 
     featureCallback last;
-    models m;
+    ModelRepository m;
 
     int f = 0;
 
@@ -26,9 +26,9 @@ void play_classify(const char* fvid, int once_every_x_frames)
             last = NULL;
 
             std::map<featureCallback, CharacteristicDefinition>::const_iterator featpair;
-            featpair = m.mCharacteristics.begin();
+            featpair = m.getCharacteristics().begin();
 
-            while (featpair != m.mCharacteristics.end())
+            while (featpair != m.getCharacteristics().end())
             {
                 CharacteristicDefinition cdef = featpair->second;
                 double cval;
@@ -64,3 +64,4 @@ void play_classify(const char* fvid, int once_every_x_frames)
     }
     cv::destroyWindow(winp);
 }
+
