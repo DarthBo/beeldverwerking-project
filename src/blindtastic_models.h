@@ -21,12 +21,18 @@ protected:
     const CharacteristicDefinition brick_pavers_vertical;
     const CharacteristicDefinition brick_pavers_horizontal;
     const CharacteristicDefinition big_square_pebbled_pavers;
+    const CharacteristicDefinition fence_station;
+    const CharacteristicDefinition square_pavers_sidewalk;
+    const CharacteristicDefinition square_pavers_crossroads;
 public:
     ModelRepository():grass_full("Grass (full frame)","../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
-        big_square_pebbled_pavers("Big square pebbled pavers","../model/tegelsGroot_sporthal.model",&getRectFeatures,1,1,0)
+        big_square_pebbled_pavers("Big square pebbled pavers","../model/tegelsGroot_sporthal.model",&getRectFeatures,1,1,0),
+        fence_station("Fence station","../model/hek_station.model",&getRectFeatures,1,1,0),
+        square_pavers_sidewalk("Square pavers sidewalk","../model/tegel_Denijs.model",&getRectFeatures,1,1,0),
+        square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0)
     {
         // features <-> characteristics
         CHARINSERT(&getTextnHSVColour, grass_full);
@@ -34,6 +40,9 @@ public:
         CHARINSERT(&getRectFeatures, brick_pavers_vertical);
         CHARINSERT(&getRectFeatures, brick_pavers_horizontal);
         CHARINSERT(&getRectFeatures, big_square_pebbled_pavers);
+        CHARINSERT(&getRectFeatures, fence_station);
+        CHARINSERT(&getRectFeatures, square_pavers_sidewalk);
+        CHARINSERT(&getRectFeatures, square_pavers_crossroads);
     }
 
     const std::multimap<featureCallback, CharacteristicDefinition>& getCharacteristics() const{return mCharacteristics;}
@@ -42,6 +51,9 @@ public:
     const CharacteristicDefinition& getBrickPaversVerticalCharDef() const{return brick_pavers_vertical;}
     const CharacteristicDefinition& getBrickPaversHorizontalCharDef() const{return brick_pavers_horizontal;}
     const CharacteristicDefinition& getBigSquarePebbledPaversCharDef() const{return big_square_pebbled_pavers;}
+    const CharacteristicDefinition& getFenceStationCharDef() const{return fence_station;}
+    const CharacteristicDefinition& getSquarePaversSidewalkCharDef() const{return square_pavers_sidewalk;}
+    const CharacteristicDefinition& getSquarePaversCrossroadsCharDef() const{return square_pavers_crossroads;}
 
 };
 
@@ -134,12 +146,20 @@ private:
 
         ch11cs = {models.getGrassFullCharDef(),models.getBigSquarePebbledPaversCharDef(),models.getBrickPaversHorizontalCharDef(),
                  models.getBrickPaversVerticalCharDef()};
-        Location sporthal("sporthal tot straat",ch11cs);
+        Location sporthal("Sporthal tot straat",ch11cs);
         locations.push_back(sporthal);
 
-        ch11cs = {models.getAsphaltCharDef()};
-        Location straatNaarStation("sporthal tot straat naar station",ch11cs);
-        locations.push_back(straatNaarStation);
+        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
+        Location sintDenijsStraat("Sporthal tot kruispunt",ch11cs);
+        locations.push_back(sintDenijsStraat);
+
+        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
+        Location sintDenijsKruispunt("Kruispunt",ch11cs);
+        locations.push_back(sintDenijsKruispunt);
+
+        ch11cs = {models.getFenceStationCharDef()};
+        Location station("Station",ch11cs);
+        locations.push_back(station);
 
         resetRefinement();
         buildIndex();
