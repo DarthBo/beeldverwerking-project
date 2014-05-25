@@ -7,10 +7,12 @@ void play_classify(const char* fvid, int once_every_x_frames)
     const char* track = "frame:";
     struct trackdata data;
     data.cap.open(fvid);
-
+    if (!data.cap.isOpened()){
+        return;
+    }
     featureCallback last;
     ModelRepository m;
-
+    LocationRepository locationRepository;
     int f = 0;
 
     cv::namedWindow(winp);
@@ -44,6 +46,11 @@ void play_classify(const char* fvid, int once_every_x_frames)
 
                 if (cval > 0)
                 {
+                    CharacteristicValue cv = cdef.getValue(data.img, true);
+                    locationRepository.refine(cv);
+                    std::string topLocation = locationRepository.getTopLocation().first->getName() +
+                            " : " + std::to_string(locationRepository.getTopLocation().second);
+                    printText(data.img,topLocation, 400,600);
                     printText(data.img, cdef.getName(), 50, 75 + (35*(match++)));
                 }
 
