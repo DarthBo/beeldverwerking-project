@@ -150,7 +150,7 @@ private:
         locations.push_back(sporthal);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
-        Location sintDenijsStraat("Sporthal tot kruispunt",ch11cs);
+        Location sintDenijsStraat("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
