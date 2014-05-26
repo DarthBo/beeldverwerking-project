@@ -6,7 +6,7 @@
 #include "blindtastic_core.h"
 #include "svm_features.h"
 
-#define CHARINSERT(x,y) mCharacteristics.insert(std::pair<featureCallback, CharacteristicDefinition>(x,y))
+#define CHARINSERT(x) mCharacteristics.insert(std::pair<featureCallback, CharacteristicDefinition>(x.getFeature(),x))
 
 class ModelRepository
 {
@@ -35,14 +35,14 @@ public:
         square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0)
     {
         // features <-> characteristics
-        CHARINSERT(&getTextnHSVColour, grass_full);
-        CHARINSERT(&getTextnHSVColour, asphalt);
-        CHARINSERT(&getRectFeatures, brick_pavers_vertical);
-        CHARINSERT(&getRectFeatures, brick_pavers_horizontal);
-        CHARINSERT(&getRectFeatures, big_square_pebbled_pavers);
-        CHARINSERT(&getRectFeatures, fence_station);
-        CHARINSERT(&getRectFeatures, square_pavers_sidewalk);
-        CHARINSERT(&getRectFeatures, square_pavers_crossroads);
+        CHARINSERT(grass_full);
+        CHARINSERT(asphalt);
+        CHARINSERT(brick_pavers_vertical);
+        CHARINSERT(brick_pavers_horizontal);
+        CHARINSERT(big_square_pebbled_pavers);
+        CHARINSERT(fence_station);
+        CHARINSERT(square_pavers_sidewalk);
+        CHARINSERT(square_pavers_crossroads);
     }
 
     const std::multimap<featureCallback, CharacteristicDefinition>& getCharacteristics() const{return mCharacteristics;}
