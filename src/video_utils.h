@@ -60,6 +60,7 @@ struct trackdata
     cv::Mat img;
     cv::VideoCapture cap;
     int frame = 0;
+    int skipped = 1;
 };
 
 void trackbar_moved(int frame_pos, void* _data);

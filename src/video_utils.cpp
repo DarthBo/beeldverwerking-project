@@ -309,9 +309,13 @@ int getFrameByNumber(cv::VideoCapture& video, const int frameNumber, cv::Mat& fr
 void trackbar_moved(int frame_pos, void* _data)
 {
     struct trackdata* data = static_cast<struct trackdata*>(_data);
+
     if (frame_pos != data->frame + 1)
     {
+        data->skipped = frame_pos - data->frame;
         getFrameByNumber(data->cap, frame_pos, data->img);
+    } else{
+        data->skipped = 1;
     }
     data->frame = frame_pos;
 }

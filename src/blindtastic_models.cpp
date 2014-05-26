@@ -1,7 +1,7 @@
 #include "blindtastic_models.h"
 #include "svm_utils.h"
 
-void play_classify(const char* fvid, int once_every_x_frames)
+void play_classify(const char* fvid, int once_every_x_frames, int reset_location_every_x_frames,bool reset_on_skip)
 {
     const char* winp = "Detecting classifications live...";
     const char* track = "frame:";
@@ -14,15 +14,15 @@ void play_classify(const char* fvid, int once_every_x_frames)
     ModelRepository m;
     LocationRepository locationRepository;
     int f = 0;
-
     cv::namedWindow(winp);
     cv::createTrackbar(track, winp, &f, getFrameCount(fvid),&trackbar_moved, &data);
 
+    int frames_processed = 1;
     while(data.cap.isOpened() && data.cap.read(data.img))
     {
         ++f;
 
-        if (f%once_every_x_frames == 0)
+        if (f % once_every_x_frames == 0)
         {
             int match = 0;
             last = NULL;
@@ -46,6 +46,9 @@ void play_classify(const char* fvid, int once_every_x_frames)
 
                 if (cval > 0)
                 {
+                    if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1)){
+                        locationRepository.resetRefinement();
+                    }
                     CharacteristicValue cv = cdef.getValue(data.img, true);
                     locationRepository.refine(cv);
                     std::string topLocation = locationRepository.getTopLocation().first->getName() +
@@ -56,7 +59,7 @@ void play_classify(const char* fvid, int once_every_x_frames)
 
                 featpair++;
             }
-
+            frames_processed++;
             cv::imshow(winp, data.img);
             int k = td::waitKey(10);
             if (k == K_ESC || k == K_Q)
