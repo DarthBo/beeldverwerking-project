@@ -299,11 +299,31 @@ void testLocationRepository()
 }
 
 /**********************************  MAIN  **********************************/
+
+template <class T>
+class cCallable:public Callable<T>{
+public:
+    std::string s;
+    std::string call(){return s;}
+};
+
+#include <future>
 int main(int argc, char **argv)
 {
 
-    SingleThreadExecutorService<int> ex;
-
+    SingleThreadExecutorService<std::string> ex;
+    std::vector<std::future<std::string>> futures;
+    for(auto i = 0; i< 10;i++){
+        cCallable<std::string> c;
+        c.s = std::to_string(i);
+        std::future<std::string> f = ex.submit(c);
+        futures.push_back(std::move(f));
+    }
+    for(auto &f : futures){
+        std::cout<<f.get()<<std::endl;
+    }
+    ex.shutdown();
+    return 0;
     /*
     bool CLI = true;
     if (CLI)

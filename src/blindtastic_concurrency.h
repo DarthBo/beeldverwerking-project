@@ -6,34 +6,55 @@
 
 template <class T>
 class Callable{
-    virtual T call();
+public:
+    virtual T call() = 0;
 };
 
 template <class T>
 class ExecutorService{
 public:
-    virtual std::future<T> submit(const Callable<T>&);
+    virtual std::future<T> submit(Callable<T>&) = 0;
 };
 
 template <class T>
 /* Executes tasks in another thread*/
 class SingleThreadExecutorService: public ExecutorService<T>{
 protected:
-    std::queue<std::packaged_task<T>*> taskQueue;
+    std::queue<std::packaged_task<T()>*> taskQueue;
     std::thread singleThread;
     bool isInterrupted;
     bool isShutdown;
-    void start();
-    void run();
+    void run(){
+        while (!this->isInterrupted || (!isShutdown && !taskQueue.empty())) {
+            if(!taskQueue.empty()){
+                std::packaged_task<T()>* task = taskQueue.front();
+                taskQueue.pop();
+                std::thread(std::move(*task)).detach();
+            }
+        }
+    }
+    void start(){
+        singleThread = std::thread(&SingleThreadExecutorService<T>::run,this);
+    }
+
 public:
+    SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
     /* Start a single thread*/
-    SingleThreadExecutorService();
+    //SingleThreadExecutorService();
     /* Submit a task to be executed in a different thread*/
-    std::future<T> submit(const Callable<T>&);
+    std::future<T> submit(Callable<T>& callable){
+        std::packaged_task<T()>* task = new std::packaged_task<T()>([&callable](){ return callable.call(); });
+        taskQueue.push(task);
+        return task->get_future();
+    }
     /* Finish current task and stop executing*/
-    void interrupt();
+    void interrupt(){
+        isInterrupted = true;
+    }
     /* Finish all currenty submitted tasks and don't allow any new tasks*/
-    void shutdown();
+    void shutdown(){
+        isShutdown = true;
+    }
 };
 
 #endif

@@ -1,10 +1,10 @@
 #include "blindtastic_concurrency.h"
 
 /* SingleThreadExecutorService*/
-
+/*
 template <class T>
 void SingleThreadExecutorService<T>::start(){
-    singleThread(run);
+    singleThread = std::thread(&SingleThreadExecutorService<T>::run,this);
 }
 
 template <class T>
@@ -19,15 +19,14 @@ void SingleThreadExecutorService<T>::run(){
 }
 
 template <class T>
-std::future<T> SingleThreadExecutorService<T>::submit(const Callable<T>& callable){
+SingleThreadExecutorService<T>::SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
+
+template <class T>
+std::future<T> SingleThreadExecutorService<T>::submit(Callable<T>& callable){
     std::packaged_task<T> task = new std::packaged_task<T>([callable](){ return callable.call(); });
     taskQueue.push(task);
     return task.get_future();
 }
-
-template <class T>
-SingleThreadExecutorService<T>::SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
-
 
 template <class T>
 void SingleThreadExecutorService<T>::interrupt(){
@@ -39,4 +38,4 @@ void SingleThreadExecutorService<T>::shutdown(){
     isShutdown = true;
 }
 
-
+*/
