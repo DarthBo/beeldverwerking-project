@@ -28,6 +28,8 @@ SET(SRC src/main.cpp
         src/blindtastic_core.cpp
         src/blindtastic_models.h
         src/blindtastic_models.cpp
+        src/blindtastic_concurrency.h
+        src/blindtastic_concurrency.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRC})

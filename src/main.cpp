@@ -8,6 +8,7 @@
 #include "image_utils.h"
 #include "svm_utils.h"
 #include "blindtastic_models.h"
+#include "blindtastic_concurrency.h"
 
 using cv::namedWindow;
 using cv::Mat;
@@ -298,9 +299,12 @@ void testLocationRepository()
 }
 
 /**********************************  MAIN  **********************************/
-
 int main(int argc, char **argv)
 {
+
+    SingleThreadExecutorService<int> ex;
+
+    /*
     bool CLI = true;
     if (CLI)
     {
@@ -323,7 +327,7 @@ int main(int argc, char **argv)
 
     // do something
     play_classify(videoLocation,2);
-
+*/
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }
