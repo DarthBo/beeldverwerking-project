@@ -25,12 +25,16 @@ protected:
     bool isInterrupted;
     bool isShutdown;
     void run(){
-        while (!this->isInterrupted || (!isShutdown && !taskQueue.empty())) {
+        while (true) {
+            if(this->isInterrupted)
+                break;
+            if(isShutdown && taskQueue.empty())
+                break;
             if(!taskQueue.empty()){
                 std::packaged_task<T()>* task = taskQueue.front();
                 taskQueue.pop();
                 std::thread t(std::move(*task));
-                t.join(); // we want this thread to be blocking
+                t.join(); // we want to block
             }
         }
     }
@@ -48,13 +52,15 @@ public:
         taskQueue.push(task);
         return task->get_future();
     }
-    /* Finish current task and stop executing*/
+    /* Finish current task and stop executing. This action blocks.*/
     void interrupt(){
         isInterrupted = true;
+        singleThread.join();
     }
-    /* Finish all currenty submitted tasks and don't allow any new tasks*/
+    /* Finish all currenty submitted tasks and don't allow any new tasks. This action blocks.*/
     void shutdown(){
         isShutdown = true;
+        singleThread.join();
     }
 };
 

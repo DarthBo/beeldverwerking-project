@@ -322,7 +322,6 @@ int main(int argc, char **argv)
         std::cout<<f.get()<<std::endl;
     }
     ex.shutdown();
-    return 0;
     /*
     bool CLI = true;
     if (CLI)
