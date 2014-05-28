@@ -47,10 +47,6 @@ protected:
     bool isShutdown;
     void run(){
         while (true) {
-            if(isInterrupted)
-                break;
-            if(isShutdown && taskQueue.empty())
-                break;
             if(!taskQueue.empty()){
                 Callable<T>* task = taskQueue.front();
                 taskQueue.pop();
@@ -58,6 +54,12 @@ protected:
                 resultMutex.lock();
                 resultQueue.push(std::move(t));
                 resultMutex.unlock();
+            }
+            if(isInterrupted){
+                break;
+            }
+            if(isShutdown && taskQueue.empty()){
+                break;
             }
         }
     }
@@ -74,11 +76,11 @@ public:
             taskQueue.push(callable);
         }
     }
-
+    /* Returns true if nextResult is defined.*/
     bool hasNextResult(){
         return !resultQueue.empty();
     }
-
+    /* Returns next finished T.*/
     T nextResult(){
         resultMutex.lock();
         T result = resultQueue.front();

@@ -308,13 +308,11 @@ public:
     std::string call(){return s;}
 };
 
-int main(int argc, char **argv)
-{
-
+void testExecutor(){
     SingleThreadExecutorService<std::string> ex;
     std::cout<<"Started..."<<std::endl;
     std::vector<cCallable*> callables;
-    for(int i = 0; i< 10; i++){
+    for(int i = 0; i< 10000; i++){
         cCallable* c = new cCallable;
         c->s = std::to_string(i);
         callables.push_back(c);
@@ -330,6 +328,12 @@ int main(int argc, char **argv)
     for(auto callable:callables){
         delete callable;
     }
+}
+
+int main(int argc, char **argv)
+{
+
+
     /*
     bool CLI = true;
     if (CLI)
