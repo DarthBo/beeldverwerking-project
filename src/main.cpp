@@ -298,8 +298,6 @@ void testLocationRepository()
     */
 }
 
-/**********************************  MAIN  **********************************/
-
 template <class T>
 class cCallable:public Callable<T>{
 public:
@@ -308,8 +306,7 @@ public:
 };
 
 #include <future>
-int main(int argc, char **argv)
-{
+void testExecutor(){
     SingleThreadExecutorService<int> ex;
     std::vector<std::future<int>> futures;
     std::vector<cCallable<int>*> callables;
@@ -326,6 +323,12 @@ int main(int argc, char **argv)
         delete c;
     }
     ex.shutdown();
+}
+
+/**********************************  MAIN  **********************************/
+
+int main(int argc, char **argv)
+{
     /*
     bool CLI = true;
     if (CLI)
@@ -346,10 +349,10 @@ int main(int argc, char **argv)
         return 1;
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
-
+    */
     // do something
-    play_classify(videoLocation,2);
-*/
+    play_classify_in_background(defaultVideo,1);
+
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
 }

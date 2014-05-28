@@ -5,12 +5,16 @@
 #include <future>
 #include "blindtastic_core.h"
 
+template<typename T>
+bool is_ready(std::future<T>& f){
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
 template <class T>
 class Callable{
 public:
     virtual T call() = 0;
 };
-
 
 class SVMCallable: public Callable<CharacteristicValue>{
 private:
