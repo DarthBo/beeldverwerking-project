@@ -312,14 +312,18 @@ int main(int argc, char **argv)
 {
     SingleThreadExecutorService<int> ex;
     std::vector<std::future<int>> futures;
+    std::vector<cCallable<int>*> callables;
     for(auto i = 0; i< 10;i++){
-        cCallable<int> c;
-        c.s = i;
-        auto f = ex.submit(c);
+        cCallable<int>* c = new cCallable<int>;
+        c->s = i;
+        auto f = ex.submit(*c);
         futures.push_back(std::move(f));
     }
     for(auto &f : futures){
         std::cout<<f.get()<<std::endl;
+    }
+    for(auto c : callables){
+        delete c;
     }
     ex.shutdown();
     /*

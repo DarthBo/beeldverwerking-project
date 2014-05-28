@@ -43,9 +43,8 @@ protected:
     }
 
 public:
-    SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
     /* Start a single thread*/
-    //SingleThreadExecutorService();
+    SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
     /* Submit a task to be executed in a different thread*/
     std::future<T> submit(Callable<T>& callable){
         std::packaged_task<T()>* task = new std::packaged_task<T()>([&](){ return callable.call(); });
