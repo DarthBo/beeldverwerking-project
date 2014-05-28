@@ -303,6 +303,7 @@ class cCallable:public Callable<T>{
 public:
     int s;
     int call(){return s;}
+    virtual ~cCallable() { this->~cCallable(); }
 };
 
 #include <future>

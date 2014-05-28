@@ -91,68 +91,83 @@ void play_classify_in_background(const char* fvid, int once_every_x_frames, int 
     LocationRepository locationRepository;
     SingleThreadExecutorService<CharacteristicValue> executor;
     std::vector<std::future<CharacteristicValue>> futures;
+    std::vector<std::future<CharacteristicValue>> futures_next;
     int f = 0;
     cv::namedWindow(winp);
     cv::createTrackbar(track, winp, &f, getFrameCount(fvid),&trackbar_moved, &data);
 
-    int frames_processed = 1;
-    while(data.cap.isOpened() && data.cap.read(data.img))
+    try
     {
-        ++f;
-
-        if (f % once_every_x_frames == 0)
+        int frames_processed = 1;
+        while(data.cap.isOpened() && data.cap.read(data.img))
         {
-            int match = 0;
-            last = NULL;
+            ++f;
 
-            std::map<featureCallback, CharacteristicDefinition>::const_iterator featpair;
-            featpair = m.getCharacteristics().begin();
-
-            while (featpair != m.getCharacteristics().end())
+            if (f % once_every_x_frames == 0)
             {
-                CharacteristicDefinition cdef = featpair->second;
-                double cval;
-                if (featpair->first == last)
-                {
-                    SVMCallable callable(cdef,data.img,true);
-                    auto future = executor.submit(callable);
-                    futures.push_back(std::move(future));
-                }
-                else
-                {
-                    SVMCallable callable(cdef,data.img,false);
-                    auto future = executor.submit(callable);
-                    futures.push_back(std::move(future));
-                    last = featpair->first;
-                }
+                int match = 0;
+                last = NULL;
 
-                for(auto &future : futures){
-                    if(is_ready(future)){
-                        cval = future.get().weight;
-                        if (cval > 0)
-                        {
-                            if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1)){
-                                locationRepository.resetRefinement();
+                std::map<featureCallback, CharacteristicDefinition>::const_iterator featpair;
+                featpair = m.getCharacteristics().begin();
+
+                while (featpair != m.getCharacteristics().end())
+                {
+                    CharacteristicDefinition cdef = featpair->second;
+                    double cval;
+                    if (featpair->first == last)
+                    {
+                        SVMCallable callable(cdef,data.img,true);
+                        auto future = executor.submit(callable);
+                        futures.push_back(std::move(future));
+                    }
+                    else
+                    {
+                        SVMCallable callable(cdef,data.img,false);
+                        auto future = executor.submit(callable);
+                        futures.push_back(std::move(future));
+                        last = featpair->first;
+                    }
+
+                    for(std::future<CharacteristicValue> &future : futures){
+                        if(is_ready(future)){
+                            cval = future.get().weight;
+
+                            if (cval > 0)
+                            {
+                                if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1)){
+                                    locationRepository.resetRefinement();
+                                }
+                                CharacteristicValue cv = cdef.getValue(data.img, true);
+                                locationRepository.refine(cv);
+                                std::string topLocation = locationRepository.getTopLocation().first->getName() +
+                                        " : " + std::to_string(locationRepository.getTopLocation().second);
+                                printText(data.img,topLocation, 400,600);
+                                printText(data.img, cdef.getName(), 50, 75 + (35*(match++)));
                             }
-                            CharacteristicValue cv = cdef.getValue(data.img, true);
-                            locationRepository.refine(cv);
-                            std::string topLocation = locationRepository.getTopLocation().first->getName() +
-                                    " : " + std::to_string(locationRepository.getTopLocation().second);
-                            printText(data.img,topLocation, 400,600);
-                            printText(data.img, cdef.getName(), 50, 75 + (35*(match++)));
+                        }
+                        else
+                        {
+                            futures_next.push_back(std::move(future));
                         }
                     }
-                }
 
-                featpair++;
+                    std::swap(futures, futures_next);
+                    futures_next.clear();
+
+                    featpair++;
+                }
+                frames_processed++;
+                cv::imshow(winp, data.img);
+                int k = td::waitKey(10);
+                if (k == K_ESC || k == K_Q)
+                    data.cap.release();
             }
-            frames_processed++;
-            cv::imshow(winp, data.img);
-            int k = td::waitKey(10);
-            if (k == K_ESC || k == K_Q)
-                data.cap.release();
+            cv::setTrackbarPos(track, winp, f);
         }
-        cv::setTrackbarPos(track, winp, f);
+    }
+    catch(std::future_error er) {
+        std::cout << er.code() << "! " << er.what() << std::endl;
     }
     //wait for final futures, show on screen?
     executor.shutdown();
