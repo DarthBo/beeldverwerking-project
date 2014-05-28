@@ -298,38 +298,38 @@ void testLocationRepository()
     */
 }
 
-template <class T>
-class cCallable:public Callable<T>{
-public:
-    int s;
-    int call(){return s;}
-    virtual ~cCallable() { this->~cCallable(); }
-};
-
-#include <future>
-void testExecutor(){
-    SingleThreadExecutorService<int> ex;
-    std::vector<std::future<int>> futures;
-    std::vector<cCallable<int>*> callables;
-    for(auto i = 0; i< 10;i++){
-        cCallable<int>* c = new cCallable<int>;
-        c->s = i;
-        auto f = ex.submit(*c);
-        futures.push_back(std::move(f));
-    }
-    for(auto &f : futures){
-        std::cout<<f.get()<<std::endl;
-    }
-    for(auto c : callables){
-        delete c;
-    }
-    ex.shutdown();
-}
 
 /**********************************  MAIN  **********************************/
 
+
+class cCallable : public Callable<std::string>{
+public:
+    std::string s;
+    std::string call(){return s;}
+};
+
 int main(int argc, char **argv)
 {
+
+    SingleThreadExecutorService<std::string> ex;
+    std::cout<<"Started..."<<std::endl;
+    std::vector<cCallable*> callables;
+    for(int i = 0; i< 10; i++){
+        cCallable* c = new cCallable;
+        c->s = std::to_string(i);
+        callables.push_back(c);
+        ex.submit(c);
+        std::cout<<"Submitted "<<c->s<<std::endl;
+    }
+    std::cout<<"Shutting down..."<<std::flush;
+    ex.shutdown();
+    std::cout<<" Done!"<<std::endl;
+    while(ex.hasNextResult()){
+        std::cout<<ex.nextResult()<<std::endl;
+    }
+    for(auto callable:callables){
+        delete callable;
+    }
     /*
     bool CLI = true;
     if (CLI)
@@ -352,7 +352,7 @@ int main(int argc, char **argv)
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
     */
     // do something
-    play_classify_in_background(defaultVideo,1);
+    //play_classify_in_background(defaultVideo,1);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

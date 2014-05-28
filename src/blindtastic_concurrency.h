@@ -32,28 +32,32 @@ public:
 template <class T>
 class ExecutorService{
 public:
-    virtual std::future<T> submit(Callable<T>&) = 0;
+    virtual void submit(Callable<T>*) = 0;
 };
 
 template <class T>
-/* Executes tasks in another thread*/
+/* Executes tasks in another thread. Expects T to be moveable.*/
 class SingleThreadExecutorService: public ExecutorService<T>{
 protected:
-    std::queue<std::packaged_task<T()>*> taskQueue;
+    std::queue<Callable<T>*> taskQueue;
+    std::queue<T> resultQueue;
+    std::mutex resultMutex;
     std::thread singleThread;
     bool isInterrupted;
     bool isShutdown;
     void run(){
         while (true) {
-            if(this->isInterrupted)
+            if(isInterrupted)
                 break;
             if(isShutdown && taskQueue.empty())
                 break;
             if(!taskQueue.empty()){
-                std::packaged_task<T()>* task = taskQueue.front();
+                Callable<T>* task = taskQueue.front();
                 taskQueue.pop();
-                std::thread t(std::move(*task));
-                t.join(); // we want to block
+                T t = task->call();
+                resultMutex.lock();
+                resultQueue.push(std::move(t));
+                resultMutex.unlock();
             }
         }
     }
@@ -62,19 +66,33 @@ protected:
     }
 
 public:
-    /* Start a single thread*/
+    /* Start a single thread.*/
     SingleThreadExecutorService():isInterrupted(false),isShutdown(false){ start(); }
-    /* Submit a task to be executed in a different thread*/
-    std::future<T> submit(Callable<T>& callable){
-        std::packaged_task<T()>* task = new std::packaged_task<T()>([&](){ return callable.call(); });
-        taskQueue.push(task);
-        return task->get_future();
+    /* Submit a task to be executed in a different thread. Will be ignored if Executor is shutdown.*/
+    void submit(Callable<T>* callable){
+        if(!isShutdown){
+            taskQueue.push(callable);
+        }
     }
+
+    bool hasNextResult(){
+        return !resultQueue.empty();
+    }
+
+    T nextResult(){
+        resultMutex.lock();
+        T result = resultQueue.front();
+        resultQueue.pop();
+        resultMutex.unlock();
+        return result;
+    }
+
     /* Finish current task and stop executing. This action blocks.*/
     void interrupt(){
         isInterrupted = true;
         singleThread.join();
     }
+
     /* Finish all currenty submitted tasks and don't allow any new tasks. This action blocks.*/
     void shutdown(){
         isShutdown = true;
