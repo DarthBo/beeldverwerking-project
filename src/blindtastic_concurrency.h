@@ -29,7 +29,8 @@ protected:
             if(!taskQueue.empty()){
                 std::packaged_task<T()>* task = taskQueue.front();
                 taskQueue.pop();
-                std::thread(std::move(*task)).detach();
+                std::thread t(std::move(*task));
+                t.join(); // we want this thread to be blocking
             }
         }
     }
@@ -43,7 +44,7 @@ public:
     //SingleThreadExecutorService();
     /* Submit a task to be executed in a different thread*/
     std::future<T> submit(Callable<T>& callable){
-        std::packaged_task<T()>* task = new std::packaged_task<T()>([&callable](){ return callable.call(); });
+        std::packaged_task<T()>* task = new std::packaged_task<T()>([&](){ return callable.call(); });
         taskQueue.push(task);
         return task->get_future();
     }

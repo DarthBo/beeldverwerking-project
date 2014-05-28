@@ -303,20 +303,19 @@ void testLocationRepository()
 template <class T>
 class cCallable:public Callable<T>{
 public:
-    std::string s;
-    std::string call(){return s;}
+    int s;
+    int call(){return s;}
 };
 
 #include <future>
 int main(int argc, char **argv)
 {
-
-    SingleThreadExecutorService<std::string> ex;
-    std::vector<std::future<std::string>> futures;
+    SingleThreadExecutorService<int> ex;
+    std::vector<std::future<int>> futures;
     for(auto i = 0; i< 10;i++){
-        cCallable<std::string> c;
-        c.s = std::to_string(i);
-        std::future<std::string> f = ex.submit(c);
+        cCallable<int> c;
+        c.s = i;
+        auto f = ex.submit(c);
         futures.push_back(std::move(f));
     }
     for(auto &f : futures){
