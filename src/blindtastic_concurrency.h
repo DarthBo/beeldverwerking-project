@@ -3,11 +3,26 @@
 #include <queue>
 #include <thread>
 #include <future>
+#include "blindtastic_core.h"
 
 template <class T>
 class Callable{
 public:
     virtual T call() = 0;
+};
+
+
+class SVMCallable: public Callable<CharacteristicValue>{
+private:
+    const CharacteristicDefinition characteristicDefinition;
+    const cv::Mat& image;
+    bool skipDatacalculation;
+public:
+    SVMCallable(const CharacteristicDefinition& _charDef, const cv::Mat& _img, bool _skipDatacalc)
+        : characteristicDefinition(_charDef),image(_img),skipDatacalculation(_skipDatacalc){}
+    CharacteristicValue call(){
+        return characteristicDefinition.getValue(image,skipDatacalculation);
+    }
 };
 
 template <class T>
