@@ -63,14 +63,30 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
                             locationRepository.resetRefinement();
                         }
                         locationRepository.refine(cv);
+                        /*
                         topLocation = locationRepository.getTopLocation().first->getName() +
                                 " : " + std::to_string(locationRepository.getTopLocation().second);
                         std::cout<<"Most likely location: "<<topLocation<<std::endl;
+                        */
                         detectedChars.push_back(cv.definition->getName());
                     }
                 }
+                if (detectedChars.size() > 0)
+                {
+                    topLocation = locationRepository.getTopLocation().first->getName();
+                    topLocation += " : ";
+                    topLocation += std::to_string(locationRepository.getTopLocation().second);
+                }
                 printText(data.img,topLocation, 400,600);
-                for(size_t i = 0; i< detectedChars.size();i++){printText(data.img, detectedChars[i], 50, 75 + (35*(i+1)));}
+
+                std::string dcs = "chars: ";
+                dcs += std::to_string(detectedChars.size());
+                printText(data.img, dcs, 700);
+
+                for(size_t i = 0; i< detectedChars.size();i++)
+                {
+                    printText(data.img, detectedChars[i], 50, 75 + (35*(i+1)));
+                }
                 featpair++;
             }
             frames_processed++;
