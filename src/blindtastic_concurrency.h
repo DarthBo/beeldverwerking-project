@@ -30,6 +30,23 @@ public:
     }
 };
 
+/* Bundles multiple Callables in one Callable and returns their output as an std::vector*/
+template <class T>
+class BundledCallable: public Callable<std::vector<T>>{
+private:
+    std::vector<Callable<T>*> callables;
+    BundledCallable(){}
+    BundledCallable(std::vector<Callable<T>*>& _callables):callables(_callables){}
+    void addCallable(Callable<T>* callable){callables.push_back(callable);}
+    std::vector<T> call(){
+        std::vector<T> values;
+        for(Callable<T>* callable : callables){
+            values.push_back(callable->call());
+        }
+        return values;
+    }
+};
+
 template <class T>
 class ExecutorService{
 public:
