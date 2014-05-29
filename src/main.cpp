@@ -306,7 +306,7 @@ class cCallable : public Callable<std::string>{
 public:
     std::string s;
     std::string call(){return s;}
-    virtual ~cCallable() { this->~cCallable(); }
+    virtual ~cCallable() { }
 };
 
 void testExecutor(){
@@ -333,8 +333,6 @@ void testExecutor(){
 
 int main(int argc, char **argv)
 {
-    play_classify_in_background(defaultVideo,1);
-    /*
     bool CLI = true;
     if (CLI)
     {
@@ -354,9 +352,9 @@ int main(int argc, char **argv)
         return 1;
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
-    */
+
     // do something
-    //play_classify_in_background(defaultVideo,1);
+    play_classify(defaultVideo,1);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
