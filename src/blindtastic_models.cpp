@@ -141,11 +141,6 @@ void play_classify_in_background(const char* fvid, int once_every_x_frames, int 
                             locationRepository.resetRefinement();
                         }
                         locationRepository.refine(cv);
-                        /*
-                        topLocation = locationRepository.getTopLocation().first->getName() +
-                                " : " + std::to_string(locationRepository.getTopLocation().second);
-                        std::cout<<"Most likely location: "<<topLocation<<std::endl;
-                        */
                         detectedChars.push_back(cv.definition->getName());
                     }
                 }
@@ -156,10 +151,6 @@ void play_classify_in_background(const char* fvid, int once_every_x_frames, int 
                     topLocation += std::to_string(locationRepository.getTopLocation().second);
                 }
                 printText(data.img,topLocation, 400,600);
-
-                std::string dcs = "chars: ";
-                dcs += std::to_string(detectedChars.size());
-                printText(data.img, dcs, 700);
 
                 for(size_t i = 0; i< detectedChars.size();i++)
                 {
