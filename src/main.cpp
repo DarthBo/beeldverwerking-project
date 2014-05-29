@@ -306,6 +306,7 @@ class cCallable : public Callable<std::string>{
 public:
     std::string s;
     std::string call(){return s;}
+    virtual ~cCallable() { this->~cCallable(); }
 };
 
 void testExecutor(){
@@ -332,8 +333,7 @@ void testExecutor(){
 
 int main(int argc, char **argv)
 {
-
-
+    play_classify_in_background(defaultVideo,1);
     /*
     bool CLI = true;
     if (CLI)

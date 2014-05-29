@@ -24,6 +24,7 @@ private:
 public:
     SVMCallable(const CharacteristicDefinition& _charDef, const cv::Mat& _img, bool _skipDatacalc)
         : characteristicDefinition(_charDef),image(_img),skipDatacalculation(_skipDatacalc){}
+    //virtual ~SVMCallable() { this->~SVMCallable(); }
     CharacteristicValue call(){
         return characteristicDefinition.getValue(image,skipDatacalculation);
     }
