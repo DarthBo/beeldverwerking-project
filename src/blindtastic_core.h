@@ -52,6 +52,38 @@ public:
     int getColumns() const {return columns;}
     double getRequiredRatio() const {return req_ratio;}
 
+    virtual CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
+};
+
+class LeftHalfCharacteristicDefinition : public CharacteristicDefinition
+{
+public:
+    LeftHalfCharacteristicDefinition(const std::string& _name,
+                                     const std::string& _model,
+                                     featureCallback _feature,
+                                     int _rows=1,
+                                     int _columns=1,
+                                     double _req_ratio = default_ratio)
+        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
+
+    LeftHalfCharacteristicDefinition(const LeftHalfCharacteristicDefinition& ch)
+        : CharacteristicDefinition(ch){}
+    CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
+};
+
+class RightHalfCharacteristicDefinition : public CharacteristicDefinition
+{
+public:
+    RightHalfCharacteristicDefinition(const std::string& _name,
+                                      const std::string& _model,
+                                      featureCallback _feature,
+                                      int _rows=1,
+                                      int _columns=1,
+                                      double _req_ratio = default_ratio)
+        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
+
+    RightHalfCharacteristicDefinition(const LeftHalfCharacteristicDefinition& ch)
+        : CharacteristicDefinition(ch){}
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 

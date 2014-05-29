@@ -18,15 +18,15 @@ public:
 
 class SVMCallable: public Callable<CharacteristicValue>{
 private:
-    const CharacteristicDefinition characteristicDefinition;
+    const CharacteristicDefinition* characteristicDefinition;
     const cv::Mat& image;
     bool skipDatacalculation;
 public:
-    SVMCallable(const CharacteristicDefinition& _charDef, const cv::Mat& _img, bool _skipDatacalc)
+    SVMCallable(const CharacteristicDefinition* _charDef, const cv::Mat& _img, bool _skipDatacalc)
         : characteristicDefinition(_charDef),image(_img),skipDatacalculation(_skipDatacalc){}
     virtual ~SVMCallable() {}
     CharacteristicValue call(){
-        return characteristicDefinition.getValue(image,skipDatacalculation);
+        return characteristicDefinition->getValue(image,skipDatacalculation);
     }
 };
 

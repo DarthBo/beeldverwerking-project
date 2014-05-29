@@ -6,17 +6,19 @@
 #include "blindtastic_core.h"
 #include "svm_features.h"
 
-#define CHARINSERT(x) mCharacteristics.insert(std::pair<featureCallback, CharacteristicDefinition>(x.getFeature(),x))
+#define CHARINSERT(x) mCharacteristics.insert(std::pair<featureCallback, const CharacteristicDefinition*>(x.getFeature(),&x))
 
 class ModelRepository
 {
 protected:
-    std::multimap<featureCallback, CharacteristicDefinition> mCharacteristics;
+    std::multimap<featureCallback, const CharacteristicDefinition*> mCharacteristics;
     constexpr static double asphalt_rows = 9;
     constexpr static double asphalt_cols = 9;
     constexpr static double asphalt_ratio = 5/(asphalt_rows*asphalt_cols);
 
     const CharacteristicDefinition grass_full;
+    const LeftHalfCharacteristicDefinition grass_left;
+    const RightHalfCharacteristicDefinition grass_right;
     const CharacteristicDefinition asphalt;
     const CharacteristicDefinition brick_pavers_vertical;
     const CharacteristicDefinition brick_pavers_horizontal;
@@ -25,7 +27,10 @@ protected:
     const CharacteristicDefinition square_pavers_sidewalk;
     const CharacteristicDefinition square_pavers_crossroads;
 public:
-    ModelRepository():grass_full("Grass (full frame)","../model/gras.model",&getTextnHSVColour,9,9),
+    ModelRepository():
+        grass_full("Grass (full frame)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_left("Grass (left)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_right("Grass (right)","../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
@@ -36,6 +41,8 @@ public:
     {
         // features <-> characteristics
         CHARINSERT(grass_full);
+        CHARINSERT(grass_left);
+        CHARINSERT(grass_right);
         CHARINSERT(asphalt);
         CHARINSERT(brick_pavers_vertical);
         CHARINSERT(brick_pavers_horizontal);
@@ -45,8 +52,10 @@ public:
         CHARINSERT(square_pavers_crossroads);
     }
 
-    const std::multimap<featureCallback, CharacteristicDefinition>& getCharacteristics() const{return mCharacteristics;}
+    const std::multimap<featureCallback, const CharacteristicDefinition*>& getCharacteristics() const{return mCharacteristics;}
     const CharacteristicDefinition& getGrassFullCharDef() const{return grass_full;}
+    const CharacteristicDefinition& getGrassLeftCharDef() const{return grass_left;}
+    const CharacteristicDefinition& getGrassRightCharDef() const{return grass_right;}
     const CharacteristicDefinition& getAsphaltCharDef() const{return asphalt;}
     const CharacteristicDefinition& getBrickPaversVerticalCharDef() const{return brick_pavers_vertical;}
     const CharacteristicDefinition& getBrickPaversHorizontalCharDef() const{return brick_pavers_horizontal;}
