@@ -25,7 +25,10 @@ void getHSVColourFeatures(const cv::Mat& in, std::vector<double>& features){
 }
 
 /*Utility function to get all texture features as a std::vector<double>*/
-void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
+void getTextureFeatures(const cv::Mat& input, std::vector<double>& features){
+    cv::Mat in;
+    histEqual(input,in);
+
     int orientations[] = {0,45,90,135};
     cv::Mat out;
     for(int o : orientations){
@@ -43,7 +46,10 @@ void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
     }
 }
 
-void getContourFeatures(const cv::Mat& in, std::vector<double>& features){
+void getContourFeatures(const cv::Mat& input, std::vector<double>& features){
+   cv::Mat in;
+   histEqual(input,in);
+
    cv::Mat out;
    contourFilter(in,out);
    std::vector<double> sums;
@@ -149,8 +155,10 @@ void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features)
     getTextureFeatures(in, features);
 }
 
-void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
+void getRectFeatures(const cv::Mat& input, std::vector<double>& features)
 {
+    cv::Mat img;
+    histEqual(input,img);
     std::vector<std::vector<cv::Point>> squares;
     findSquares(img,squares);
 
