@@ -227,3 +227,13 @@ void cornerFilter(const cv::Mat& in, std::vector<double>& out){
         out.push_back(static_cast<double>(pt.y));
     }
 }
+
+// equalize the intensitydistribution to improve the contrast in the image
+void histEqual(const cv::Mat& in, cv::Mat&out){
+    std::vector<cv::Mat> planes;
+    cv::split( in, planes );
+    cv::equalizeHist(planes[0],planes[0]);
+    cv::equalizeHist(planes[1],planes[1]);
+    cv::equalizeHist(planes[2],planes[2]);
+    cv::merge(planes, out);
+}
