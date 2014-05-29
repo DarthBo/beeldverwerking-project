@@ -580,8 +580,11 @@ void hardTrainSchool2Station()
     */
 }
 
-bool classify_frame(cv::Mat frame, CharacteristicValue& c, bool skip_datacalc)
+bool classify_frame(cv::Mat frame, CharacteristicValue& c, std::vector<std::vector<double> >& grid, bool skip_datacalc)
 {
+    assert(grid.size() == c.definition->getRows());
+    assert(grid[0].size() == c.definition->getColumns());
+
     FILE * fio;
 
     if (!skip_datacalc)
@@ -621,30 +624,23 @@ bool classify_frame(cv::Mat frame, CharacteristicValue& c, bool skip_datacalc)
         std::cerr << "class failed" << std::endl;
         return false;
     }
+
     //read predictions
     fio = fopen(".tmp_result", "r");
     if (fio == NULL)
         return false;
 
-    int pos_tally = 0;
-    double pos_sum = 0.0;
-
-    while (fgets (buf, 100, fio) != NULL)
+    for (int row=0 ; row<c.definition->getRows() ; row++)
     {
-        double d = atof(buf);
-        if (d > 0)
+        for (int col=0 ; col<c.definition->getColumns() ; col++)
         {
-            pos_tally++;
-            pos_sum += d;
+            assert(fgets (buf, 100, fio) != NULL);
+            double d = atof(buf);
+            grid[row][col] = d;
         }
     }
-    fclose(fio);
 
-    //save result
-    if (pos_tally > 0 && pos_tally >= c.definition->getRows()*c.definition->getColumns()*c.definition->getRequiredRatio())
-        c.weight = pos_sum/pos_tally;
-    else
-        c.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+    fclose(fio);
 
     return true;
 }
