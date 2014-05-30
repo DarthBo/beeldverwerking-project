@@ -103,17 +103,20 @@ private:
     void init(){
         ModelRepository models;
         std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
-        Location* PGebouw = new Location("P gebouw tot modderpad",ch11cs);
+        Location* PGebouw = new Location("P gebouw tot grindpad",ch11cs);
         locations.push_back(PGebouw);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
-        Location* modderpad = new Location("Modderpad tot sporthal",ch11cs);
+        Location* modderpad = new Location("Grindpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
 
-        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef(),
-                 models.getBrickPaversVerticalCharDef()};
-        Location* sporthal = new Location("Sporthal tot straat",ch11cs);
-        locations.push_back(sporthal);
+        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversVerticalCharDef()};
+        Location* sporthal_v = new Location("Sporthal (verticale stenen)",ch11cs);
+        locations.push_back(sporthal_v);
+
+        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef()};
+        Location* sporthal_h = new Location("Sporthal (horizontale stenen)",ch11cs);
+        locations.push_back(sporthal_h);
 
         ch11cs = { models.getGrassLeftCharDef(), models.getBigSquarePebbledPaversCharDef() };
         Location* sporthal_pebble = new Location("Sporthal (grote witte stenen)",ch11cs);
@@ -124,8 +127,12 @@ private:
         locations.push_back(sportdenijs);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
-        Location* sportdenijs_2 = new Location("Sporthal tot St Denijs (LR gras)", ch11cs);
+        Location* sportdenijs_2 = new Location("Sporthal (voorbij fietsen)", ch11cs);
         locations.push_back(sportdenijs_2);
+
+        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
+        Location* sportdenijs_3 = new Location("Sporthal tot St Denijs", ch11cs);
+        locations.push_back(sportdenijs_3);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
         Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
