@@ -80,111 +80,115 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
     cv::destroyWindow(winp);
 }
 
-void play_classify_in_background(const char* fvid, int once_every_x_frames, int reset_location_every_x_frames,bool reset_on_skip)
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames, bool reset_on_skip)
 {
-    const char* winp = "Detecting classifications live...";
+    const char* window_name = "Detecting classifications live...";
+    cv::namedWindow(window_name);
+
     const char* track = "frame:";
+    int current_frame_nr = 0;
     struct trackdata data;
     data.cap.open(fvid);
     if (!data.cap.isOpened()){
         return;
     }
-    featureCallback last;
+    cv::createTrackbar(track, window_name, &current_frame_nr, getFrameCount(fvid),&trackbar_moved, &data);
+
     ModelRepository modelRepository;
     LocationRepository locationRepository;
-    SingleThreadExecutorService<CharacteristicValue> executor;
-    std::vector<SVMCallable*> callables;
-    int f = 0;
-    cv::namedWindow(winp);
-    cv::createTrackbar(track, winp, &f, getFrameCount(fvid),&trackbar_moved, &data);
+    SingleThreadExecutorService<std::vector<CharacteristicValue>> executor;
+    BundledCallable<CharacteristicValue> svmtask;
 
-    int frames_processed = 1;
-    std::string topLocation = "Unknown";
+    int frames_processed = 0;
+    int svm_frame_nr = 0;
     std::vector<std::string> detectedChars;
+    std::string topLocation = "Unknown";
+
     while(data.cap.isOpened() && data.cap.read(data.img))
     {
-        ++f;
+        ++current_frame_nr;
 
-        if (f % once_every_x_frames == 0)
+        if (executor.hasNextResult() || executor.isIdle())
         {
-            int match = 0;
-            last = NULL;
+            /****** update current results *****/
 
-            std::map<featureCallback, const CharacteristicDefinition*>::const_iterator featpair;
-            featpair = modelRepository.getCharacteristics().begin();
-
-            while (featpair != modelRepository.getCharacteristics().end())
+            if (executor.hasNextResult()) //can be false on frame nr 1
             {
-                const CharacteristicDefinition* cdef = featpair->second;
-                if (featpair->first == last)
+                detectedChars.clear();
+                detectedChars.push_back(std::string("results of frame ")+std::to_string(svm_frame_nr));
+                std::vector<CharacteristicValue> cvals = executor.nextResult();
+                for (std::vector<CharacteristicValue>::const_iterator cv = cvals.begin() ; cv != cvals.end() ; cv++)
                 {
-                    SVMCallable* callable = new SVMCallable(cdef,data.img,true);
-                    callables.push_back(callable);
-                    executor.submit(callable);
+                    if (cv->weight > 0)
+                    {
+                        if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1))
+                        {
+                            locationRepository.resetRefinement();
+                        }
+                        locationRepository.refine(*cv);
+                        detectedChars.push_back(cv->definition->getName());
+                    }
+                }
+            }
+
+            /****** prepare current frame to be processed *****/
+
+            svmtask.clear();
+            svm_frame_nr = current_frame_nr;
+            featureCallback last = NULL;
+            std::map<featureCallback, const CharacteristicDefinition*>::const_iterator feature_pair;
+            feature_pair = modelRepository.getCharacteristics().begin();
+
+            while (feature_pair != modelRepository.getCharacteristics().end())
+            {
+                const CharacteristicDefinition* cdef = feature_pair->second;
+                if (feature_pair->first == last)
+                {
+                    svmtask.addCallable(new SVMCallable(cdef,data.img,true));
                 }
                 else
                 {
-                    SVMCallable* callable = new SVMCallable(cdef,data.img,false);
-                    callables.push_back(callable);
-                    executor.submit(callable);
+                    svmtask.addCallable(new SVMCallable(cdef,data.img,false));
+                    last = feature_pair->first;
                 }
 
-                while (executor.hasNextResult()) {
-                    CharacteristicValue cv = executor.nextResult();
-                    if (cv.weight > 0)
-                    {
-                        if(match == 0){
-                            detectedChars.clear();
-                        }
-                        match++;
-                        if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1)){
-                            locationRepository.resetRefinement();
-                        }
-                        locationRepository.refine(cv);
-                        /*
-                        topLocation = locationRepository.getTopLocation().first->getName() +
-                                " : " + std::to_string(locationRepository.getTopLocation().second);
-                        std::cout<<"Most likely location: "<<topLocation<<std::endl;
-                        */
-                        detectedChars.push_back(cv.definition->getName());
-                    }
-                }
-                if (detectedChars.size() > 0)
-                {
-                    topLocation = locationRepository.getTopLocation().first->getName();
-                    topLocation += " : ";
-                    topLocation += std::to_string(locationRepository.getTopLocation().second);
-                }
-                printText(data.img,topLocation, 400,600);
-
-                std::string dcs = "chars: ";
-                dcs += std::to_string(detectedChars.size());
-                printText(data.img, dcs, 700);
-
-                for(size_t i = 0; i< detectedChars.size();i++)
-                {
-                    printText(data.img, detectedChars[i], 50, 75 + (35*(i+1)));
-                }
-                featpair++;
+                feature_pair++;
             }
-            frames_processed++;
-            cv::imshow(winp, data.img);
-            int k = td::waitKey(100);
-            if (k == K_ESC || k == K_Q)
-                data.cap.release();
+            executor.submit(&svmtask);
+
+            ++frames_processed;
         }
-        cv::setTrackbarPos(track, winp, f);
+
+        //print (last) results on image
+
+        if (detectedChars.size() > 1)
+        {
+            topLocation = locationRepository.getTopLocation().first->getName();
+            topLocation += " : ";
+            topLocation += std::to_string(locationRepository.getTopLocation().second);
+        }
+        printText(data.img,topLocation, 400,600);
+
+        for(size_t i = 0; i< detectedChars.size();i++)
+        {
+            printText(data.img, detectedChars[i], 50, 75 + (35*i));
+        }
+
+        //show image
+
+        cv::setTrackbarPos(track, window_name, current_frame_nr);
+        cv::imshow(window_name, data.img);
+        int k = td::waitKey(100);
+        if (k == K_ESC || k == K_Q)
+            data.cap.release();
     }
     //release resources
     executor.interrupt(); //executor.shutdown(); finishes all tasks first
-    for(auto callable : callables){
-        delete callable;
-    }
     if (data.cap.isOpened())
     {
         data.cap.release();
     }
-    cv::destroyWindow(winp);
+    cv::destroyWindow(window_name);
 }
 
 
