@@ -106,6 +106,14 @@ private:
         Location sporthal_pebble("Sporthal (grote witte stenen)",ch11cs);
         locations.push_back(sporthal_pebble);
 
+        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
+        Location sportdenijs("Sporthal tot St Denijs", ch11cs);
+        locations.push_back(sportdenijs);
+
+        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
+        Location sportdenijs_2("Sporthal tot St Denijs (LR gras)", ch11cs);
+        locations.push_back(sportdenijs_2);
+
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
         Location sintDenijsStraat("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
