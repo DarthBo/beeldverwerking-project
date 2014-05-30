@@ -210,7 +210,7 @@ public:
     return out;
     }
 
-    void refine(CharacteristicValue& characteristic){
+    void refine(const CharacteristicValue& characteristic){
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
                 refinedLocations.increasePriority(node,characteristic.weight);
@@ -232,6 +232,6 @@ void resetRefinement(){
 };
 
 void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
-void play_classify_in_background(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=20, bool reset_on_skip=true);
 
 #endif
