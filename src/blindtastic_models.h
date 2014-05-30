@@ -92,7 +92,7 @@ private:
         void addPossibleNextLocation(WeightedLocation* l){possibleNextLocations.push_back(l);}
         const std::vector<WeightedLocation*> getPossibleNextLocations() const{return possibleNextLocations;}
     };
-    constexpr static double defaultMinimumWeight = 5.0;
+    constexpr static double defaultMinimumWeight = 3.0;
     bool ignoreCharacteristicWhenUnreachable;
     const WeightedLocation* referenceLocation;
     std::vector<Location*> locations;
@@ -225,8 +225,8 @@ public:
                 refinedLocations.increasePriority(node,characteristic.weight);
             }
         }
-        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() > refinedLocations.top().getAcceptableWeight()){
-            referenceLocation = &refinedLocations.top();
+        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()){
+            referenceLocation = weightedLocations[refinedLocations.top().getId()];
         }
     }
     //saves current location when true and ignoring unreachable locations, assumes non empty locations
@@ -234,7 +234,7 @@ public:
         WeightedLocation previousTop;
         if(saveCurrentLocation)
             previousTop = refinedLocations.top();
-        int idCount = 1;
+        int idCount = 0;
         refinedLocations = PairingHeap<WeightedLocation>();
         for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
         weightedLocations.clear();
@@ -255,7 +255,7 @@ public:
     }
 };
 
-void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
-void play_classify_mt(const char* fvid, int reset_location_every_x_frames=20, bool reset_on_skip=true);
+void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=10, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=10, bool reset_on_skip=true);
 
 #endif
