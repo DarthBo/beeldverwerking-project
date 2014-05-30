@@ -25,7 +25,26 @@ void getHSVColourFeatures(const cv::Mat& in, std::vector<double>& features){
 }
 
 /*Utility function to get all texture features as a std::vector<double>*/
-void getTextureFeatures(const cv::Mat& input, std::vector<double>& features){
+void getTextureFeatures(const cv::Mat& in, std::vector<double>& features){
+    int orientations[] = {0,45,90,135};
+    cv::Mat out;
+    for(int o : orientations){
+        textureFilter(in,out,o);
+        std::vector<double> sums;
+        squaredSum(out,sums);                   // local energy
+        for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+            features.push_back(sums[i]/1000000);//normalise for SVM
+        }
+        sums.clear();
+        absoluteSum(out,sums);                  //Mean Amplitude
+        for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+            features.push_back(sums[i]/10000);  //normalise for SVM
+        }
+    }
+}
+
+/*Utility function to get all texture features as a std::vector<double>*/
+void getTextureFeatures2(const cv::Mat& input, std::vector<double>& features){
     cv::Mat in;
     histEqual(input,in);
 
@@ -46,7 +65,22 @@ void getTextureFeatures(const cv::Mat& input, std::vector<double>& features){
     }
 }
 
-void getContourFeatures(const cv::Mat& input, std::vector<double>& features){
+void getContourFeatures(const cv::Mat& in, std::vector<double>& features){
+   cv::Mat out;
+   contourFilter(in,out);
+   std::vector<double> sums;
+   squaredSum(out,sums);                   // local energy
+   for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+       features.push_back(sums[i]);
+   }
+   sums.clear();
+   absoluteSum(out,sums);                  //Mean Amplitude
+   for(size_t i = 0; i< sums.size() ;i++){ // for every channel
+       features.push_back(sums[i]);
+   }
+}
+
+void getContourFeatures2(const cv::Mat& input, std::vector<double>& features){
    cv::Mat in;
    histEqual(input,in);
 
@@ -155,10 +189,23 @@ void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features)
     getTextureFeatures(in, features);
 }
 
-void getRectFeatures(const cv::Mat& input, std::vector<double>& features)
+void getRectFeatures(const cv::Mat& img, std::vector<double>& features)
+{
+    std::vector<std::vector<cv::Point>> squares;
+    findSquares(img,squares);
+
+    features.push_back(squares.size());
+    getAvgColorTiles(img, squares, features);
+    getTextureTiles(img, squares, features);
+    getRatioTiles(squares, features);
+    getContourArea(squares,features);
+}
+
+void getRectFeatures2(const cv::Mat& input, std::vector<double>& features)
 {
     cv::Mat img;
     histEqual(input,img);
+
     std::vector<std::vector<cv::Point>> squares;
     findSquares(img,squares);
 
