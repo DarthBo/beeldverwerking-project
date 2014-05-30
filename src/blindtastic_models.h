@@ -88,66 +88,6 @@ private:
     std::unordered_map<std::string,std::vector<Location*>> locationIndex;
     std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
-        /*
-        Characteristic grass("Grass");models.getGrassFullCharDef(),
-        Characteristic paver_huge("Huge Pavers at P building");
-        Characteristic paver_brick_grey_v("Brick style grey pavers");
-        Characteristic asphalt("Asphalt (black)");
-        Characteristic gravel_dirt("Brown gravel / dirt");
-        Characteristic paver_brick_pink_v("Brick style pink pavers (vertical)");
-        Characteristic paver_brick_pink_h("Brick style pink pavers (horizontal)");
-        Characteristic paver_pebble_white("Big square pebbled pavers");
-        Characteristic paver_square_dull("Dull coloured square pavers");
-        Characteristic paver_train_station("Fancy (diamond) pavers");
-        Characteristic zebra_crossing("Zebra crossing");
-        Characteristic white_train_station("(avg colour) bland white");
-
-        std::vector<Characteristic> ch11cs = {grass, paver_huge, paver_brick_grey_v};
-        Location school("P gebouw",ch11cs);
-        locations.push_back(school);
-
-        ch11cs = {asphalt};
-        Location p_road("P baan",ch11cs);
-        locations.push_back(p_road);
-
-        //missing: area inbetween
-
-        ch11cs = {grass, gravel_dirt};
-        Location dirt_path("Modderpad",ch11cs);
-        locations.push_back(dirt_path);
-
-        ch11cs = {grass, paver_brick_pink_v};
-        Location gym_a("gym A",ch11cs);
-        locations.push_back(gym_a);
-
-        ch11cs = {grass, paver_brick_pink_h};
-        Location gym_b("gym B",ch11cs);
-        locations.push_back(gym_b);
-
-        ch11cs = {grass, paver_pebble_white};
-        Location gym_c("gym C",ch11cs);
-        locations.push_back(gym_c);
-
-        ch11cs = {grass, paver_square_dull};//voornamelijk zonder gras, ook stukken met fiets
-        Location gym_d("gym D",ch11cs);
-        locations.push_back(gym_d);
-
-        ch11cs = {paver_square_dull};//af en toe ook paver_brick_grey_v, voornamelijk opritten
-        Location stdenijs("St Denijs",ch11cs);
-        locations.push_back(stdenijs);
-
-        ch11cs = {zebra_crossing, asphalt};
-        Location zebra("gym C",ch11cs);
-        locations.push_back(zebra);
-
-        ch11cs = {white_train_station};
-        Location railw_white("werken station",ch11cs);
-        locations.push_back(railw_white);
-
-        ch11cs = {paver_train_station};
-        Location railw_hall("Stationshal",ch11cs);
-        locations.push_back(railw_hall);
-        */
         ModelRepository models;
         std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
         Location PGebouw("P gebouw tot modderpad",ch11cs);
@@ -157,10 +97,14 @@ private:
         Location modderpad("Modderpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
 
-        ch11cs = {models.getGrassLeftCharDef(),models.getBigSquarePebbledPaversCharDef(),models.getBrickPaversHorizontalCharDef(),
+        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef(),
                  models.getBrickPaversVerticalCharDef()};
         Location sporthal("Sporthal tot straat",ch11cs);
         locations.push_back(sporthal);
+
+        ch11cs = { models.getGrassLeftCharDef(), models.getBigSquarePebbledPaversCharDef() };
+        Location sporthal_pebble("Sporthal (grote witte stenen)",ch11cs);
+        locations.push_back(sporthal_pebble);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
         Location sintDenijsStraat("Sint-Denijs tot kruispunt",ch11cs);

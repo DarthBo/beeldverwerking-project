@@ -353,7 +353,7 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
     // do something
-    play_classify_mt(defaultVideo);
+    play_classify_mt(defaultVideo,5);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
