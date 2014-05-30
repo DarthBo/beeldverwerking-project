@@ -141,10 +141,8 @@ private:
 
         resetRefinement(false);
         buildIndex();
-        if(ignoreCharacteristicWhenUnreachable){
-            linkLocations();
-            if(!weightedLocations.empty())
-                referenceLocation = weightedLocations[0];
+        if(ignoreCharacteristicWhenUnreachable && !weightedLocations.empty()){
+            referenceLocation = weightedLocations[0];
         }
     }
     void buildIndex(){
@@ -252,10 +250,12 @@ public:
                 nodeIndex[c.getName()].push_back(n);
             }
         }
+        if(ignoreCharacteristicWhenUnreachable)
+            linkLocations();
     }
 };
 
-void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=5, bool reset_on_skip=true);
-void play_classify_mt(const char* fvid, int reset_location_every_x_frames=5, bool reset_on_skip=true);
+void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=20, bool reset_on_skip=true);
 
 #endif
