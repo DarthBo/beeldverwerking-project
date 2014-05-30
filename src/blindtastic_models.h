@@ -84,13 +84,13 @@ private:
         WeightedLocation& operator+(const double weight){this->weight += weight; return *this;}
         double getWeight(){return weight;}
         void setWeight(double weight){this->weight = weight;}
-        Location* getLocation(){return location;}
+        Location* getLocation() const{return location;}
         void setLocation(Location* location){this->location = location;}
         void addPossibleNextLocation(WeightedLocation* l){possibleNextLocations.push_back(l);}
-        const std::vector<WeightedLocation*> getPossibleNextLocations(){return possibleNextLocations;}
+        const std::vector<WeightedLocation*> getPossibleNextLocations() const{return possibleNextLocations;}
     };
     bool ignoreCharacteristicWhenUnreachable;
-    WeightedLocation* referenceLocation;
+    const WeightedLocation* referenceLocation;
     std::vector<Location*> locations;
     std::vector<WeightedLocation*> weightedLocations;
     PairingHeap<WeightedLocation> refinedLocations;
@@ -116,11 +116,11 @@ private:
         locations.push_back(sporthal_pebble);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
-        Location sportdenijs("Sporthal tot St Denijs", ch11cs);
+        Location* sportdenijs = new Location("Sporthal tot St Denijs", ch11cs);
         locations.push_back(sportdenijs);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
-        Location sportdenijs_2("Sporthal tot St Denijs (LR gras)", ch11cs);
+        Location* sportdenijs_2 = new Location("Sporthal tot St Denijs (LR gras)", ch11cs);
         locations.push_back(sportdenijs_2);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
@@ -135,7 +135,7 @@ private:
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
 
-        resetRefinement();
+        resetRefinement(ignoreCharacteristicWhenUnreachable);
         buildIndex();
         if(ignoreCharacteristicWhenUnreachable){
             linkLocations();
@@ -150,7 +150,7 @@ private:
             }
         }
     }
-
+    // Assumes lineair path
     void linkLocations(){
         if(weightedLocations.empty())
             return;
@@ -173,7 +173,7 @@ private:
     bool characteristicReachable(const CharacteristicValue& characteristic){ // naïve implementation with single hop
         if(referenceLocation == nullptr)
             return true;
-        for(WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
+        for(const WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
             for(const CharacteristicDefinition &c : location->getLocation()->getCharacteristics()){
                 if( c.getName() == characteristic.definition->getName())
                     return true;
@@ -201,7 +201,7 @@ public:
         return p;
     }
 
-    //warning: resets current refinement
+    //warning: resets current refinement, saves location when ignoring unreachable locations
     std::vector<std::pair<Location*,double>> getRefinedLocations(){
         std::vector<std::pair<Location*,double>> out;
         while(refinedLocations.size() > 0){
@@ -210,7 +210,7 @@ public:
             out.push_back(p);
             refinedLocations.pop();
         }
-        resetRefinement();
+        resetRefinement(ignoreCharacteristicWhenUnreachable);
         return out;
     }
 
@@ -224,21 +224,23 @@ public:
             }
         }
     }
-
-void resetRefinement(){
-    int idCount = 1;
-    refinedLocations = PairingHeap<WeightedLocation>();
-    nodeIndex.clear();
-    for(Location* l : locations){
-        WeightedLocation* wl = new WeightedLocation(idCount,l,0.0);
-        weightedLocations.push_back(wl);
-        idCount++;
-        typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(*wl);
-        for(const CharacteristicDefinition& c : l->getCharacteristics()){
-            nodeIndex[c.getName()].push_back(n);
+    //saves current location when true and ignoring unreachable locations
+    void resetRefinement(bool saveCurrentLocation){
+        if(ignoreCharacteristicWhenUnreachable && saveCurrentLocation)
+            referenceLocation = &refinedLocations.top();
+        int idCount = 1;
+        refinedLocations = PairingHeap<WeightedLocation>();
+        nodeIndex.clear();
+        for(Location* l : locations){
+            WeightedLocation* wl = new WeightedLocation(idCount,l,0.0);
+            weightedLocations.push_back(wl);
+            idCount++;
+            typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(*wl);
+            for(const CharacteristicDefinition& c : l->getCharacteristics()){
+                nodeIndex[c.getName()].push_back(n);
+            }
         }
     }
-}
 };
 
 void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
