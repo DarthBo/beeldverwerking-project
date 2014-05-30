@@ -70,40 +70,49 @@ class LocationRepository {
 private:
     class WeightedLocation{
     private:
+        int id; // prevents comparison of strings
         Location* location;
         double weight;
+        std::vector<WeightedLocation*> possibleNextLocations; // simple graph representation
     public:
         WeightedLocation(){}
-        WeightedLocation(Location* _location,double _weight):location(_location),weight(_weight){}
+        WeightedLocation(int _id, Location* _location,double _weight):id(_id),location(_location),weight(_weight){}
         bool operator>(const WeightedLocation& l) const{return weight>l.weight;}
         bool operator<(const WeightedLocation& l) const{return weight<l.weight;}
+        int getId() const{return id;}
+        void setId(int id){this->id = id;}
         WeightedLocation& operator+(const double weight){this->weight += weight; return *this;}
         double getWeight(){return weight;}
         void setWeight(double weight){this->weight = weight;}
         Location* getLocation(){return location;}
         void setLocation(Location* location){this->location = location;}
+        void addPossibleNextLocation(WeightedLocation* l){possibleNextLocations.push_back(l);}
+        const std::vector<WeightedLocation*> getPossibleNextLocations(){return possibleNextLocations;}
     };
-    std::vector<Location> locations;
+    bool ignoreCharacteristicWhenUnreachable;
+    WeightedLocation* referenceLocation;
+    std::vector<Location*> locations;
+    std::vector<WeightedLocation*> weightedLocations;
     PairingHeap<WeightedLocation> refinedLocations;
     std::unordered_map<std::string,std::vector<Location*>> locationIndex;
     std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
         ModelRepository models;
         std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
-        Location PGebouw("P gebouw tot modderpad",ch11cs);
+        Location* PGebouw = new Location("P gebouw tot modderpad",ch11cs);
         locations.push_back(PGebouw);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
-        Location modderpad("Modderpad tot sporthal",ch11cs);
+        Location* modderpad = new Location("Modderpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef(),
                  models.getBrickPaversVerticalCharDef()};
-        Location sporthal("Sporthal tot straat",ch11cs);
+        Location* sporthal = new Location("Sporthal tot straat",ch11cs);
         locations.push_back(sporthal);
 
         ch11cs = { models.getGrassLeftCharDef(), models.getBigSquarePebbledPaversCharDef() };
-        Location sporthal_pebble("Sporthal (grote witte stenen)",ch11cs);
+        Location* sporthal_pebble = new Location("Sporthal (grote witte stenen)",ch11cs);
         locations.push_back(sporthal_pebble);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
@@ -115,31 +124,74 @@ private:
         locations.push_back(sportdenijs_2);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
-        Location sintDenijsStraat("Sint-Denijs tot kruispunt",ch11cs);
+        Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
-        Location sintDenijsKruispunt("Kruispunt",ch11cs);
+        Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
 
         ch11cs = {models.getFenceStationCharDef()};
-        Location station("Station",ch11cs);
+        Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
 
         resetRefinement();
         buildIndex();
+        if(ignoreCharacteristicWhenUnreachable){
+            linkLocations();
+            if(!weightedLocations.empty())
+                referenceLocation = weightedLocations[0];
+        }
     }
     void buildIndex(){
-        for(Location& l : locations){
-            for(const CharacteristicDefinition& c : l.getCharacteristics()){
-                locationIndex[c.getName()].push_back(&l);
+        for(Location* l : locations){
+            for(const CharacteristicDefinition& c : l->getCharacteristics()){
+                locationIndex[c.getName()].push_back(l);
             }
         }
     }
 
+    void linkLocations(){
+        if(weightedLocations.empty())
+            return;
+        WeightedLocation* current = weightedLocations[0];
+        current->addPossibleNextLocation(current);
+        if(weightedLocations.size() > 1){
+            current->addPossibleNextLocation(weightedLocations[1]);
+            size_t i = 1;
+            for(; i<weightedLocations.size()-1; i++){
+                current = weightedLocations[i];
+                current->addPossibleNextLocation(current);
+                current->addPossibleNextLocation(weightedLocations[i-1]);
+                current->addPossibleNextLocation(weightedLocations[i+1]);
+            }
+            current = weightedLocations[i];
+            current->addPossibleNextLocation(current);
+            current->addPossibleNextLocation(weightedLocations[i-1]);
+        }
+    }
+    bool characteristicReachable(const CharacteristicValue& characteristic){ // naïve implementation with single hop
+        if(referenceLocation == nullptr)
+            return true;
+        for(WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
+            for(const CharacteristicDefinition &c : location->getLocation()->getCharacteristics()){
+                if( c.getName() == characteristic.definition->getName())
+                    return true;
+            }
+        }
+        return false;
+    }
+
 public:
-    LocationRepository(){init();}
-    std::vector<Location>& getAllLocations(){
+    LocationRepository( bool _ignoreCharacteristicWhenUnreachable = false)
+        :ignoreCharacteristicWhenUnreachable(_ignoreCharacteristicWhenUnreachable){
+        init();
+    }
+    ~LocationRepository(){
+        for(Location* location : locations) delete location;
+        for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
+    }
+    std::vector<Location*>& getAllLocations(){
         return locations;
     }
 
@@ -158,11 +210,14 @@ public:
             out.push_back(p);
             refinedLocations.pop();
         }
-       resetRefinement();
-    return out;
+        resetRefinement();
+        return out;
     }
 
     void refine(const CharacteristicValue& characteristic){
+        if(ignoreCharacteristicWhenUnreachable && !characteristicReachable(characteristic))
+            return;
+
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
                 refinedLocations.increasePriority(node,characteristic.weight);
@@ -171,12 +226,15 @@ public:
     }
 
 void resetRefinement(){
+    int idCount = 1;
     refinedLocations = PairingHeap<WeightedLocation>();
     nodeIndex.clear();
-    for(Location& l : locations){
-        WeightedLocation wl(&l,0.0);
-        typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(wl);
-        for(const CharacteristicDefinition& c : l.getCharacteristics()){
+    for(Location* l : locations){
+        WeightedLocation* wl = new WeightedLocation(idCount,l,0.0);
+        weightedLocations.push_back(wl);
+        idCount++;
+        typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(*wl);
+        for(const CharacteristicDefinition& c : l->getCharacteristics()){
             nodeIndex[c.getName()].push_back(n);
         }
     }

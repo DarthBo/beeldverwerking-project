@@ -13,7 +13,7 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
     }
     featureCallback last;
     ModelRepository modelRepository;
-    LocationRepository locationRepository;
+    LocationRepository locationRepository(true);
     std::string topLocation;
     int f = 0;
     cv::namedWindow(winp);
