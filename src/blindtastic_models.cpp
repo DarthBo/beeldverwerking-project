@@ -13,7 +13,7 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
     }
     featureCallback last;
     ModelRepository modelRepository;
-    LocationRepository locationRepository;
+    LocationRepository locationRepository(true);
     std::string topLocation;
     int f = 0;
     cv::namedWindow(winp);
@@ -49,7 +49,7 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
                 if (cval > 0)
                 {
                     if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1)){
-                        locationRepository.resetRefinement();
+                        locationRepository.resetRefinement(true);
                     }
                     CharacteristicValue cv = cdef->getValue(data.img, true);
                     locationRepository.refine(cv);
@@ -95,7 +95,7 @@ void play_classify_mt(const char* fvid, int reset_location_every_x_frames, bool 
     cv::createTrackbar(track, window_name, &current_frame_nr, getFrameCount(fvid),&trackbar_moved, &data);
 
     ModelRepository modelRepository;
-    LocationRepository locationRepository;
+    LocationRepository locationRepository(true);
     SingleThreadExecutorService<std::vector<CharacteristicValue>> executor;
     BundledCallable<CharacteristicValue> svmtask;
 
@@ -123,7 +123,7 @@ void play_classify_mt(const char* fvid, int reset_location_every_x_frames, bool 
                     {
                         if(frames_processed % reset_location_every_x_frames == 0 || (reset_on_skip && data.skipped > 1))
                         {
-                            locationRepository.resetRefinement();
+                            locationRepository.resetRefinement(true);
                         }
                         locationRepository.refine(*cv);
                         detectedChars.push_back(cv->definition->getName());
