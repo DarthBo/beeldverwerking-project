@@ -71,24 +71,28 @@ private:
     class WeightedLocation{
     private:
         int id; // prevents comparison of strings
+        double acceptableWeight; // minimum weight to accept this location
         Location* location;
         double weight;
         std::vector<WeightedLocation*> possibleNextLocations; // simple graph representation
     public:
         WeightedLocation(){}
-        WeightedLocation(int _id, Location* _location,double _weight):id(_id),location(_location),weight(_weight){}
+        WeightedLocation(int _id, double _acceptableWeight, Location* _location,double _weight)
+            :id(_id),acceptableWeight(_acceptableWeight),location(_location),weight(_weight){}
         bool operator>(const WeightedLocation& l) const{return weight>l.weight;}
         bool operator<(const WeightedLocation& l) const{return weight<l.weight;}
         int getId() const{return id;}
         void setId(int id){this->id = id;}
         WeightedLocation& operator+(const double weight){this->weight += weight; return *this;}
-        double getWeight(){return weight;}
+        double getWeight() const{return weight;}
         void setWeight(double weight){this->weight = weight;}
+        double getAcceptableWeight() const{return acceptableWeight;}
         Location* getLocation() const{return location;}
         void setLocation(Location* location){this->location = location;}
         void addPossibleNextLocation(WeightedLocation* l){possibleNextLocations.push_back(l);}
         const std::vector<WeightedLocation*> getPossibleNextLocations() const{return possibleNextLocations;}
     };
+    constexpr static double defaultMinimumWeight = 5.0;
     bool ignoreCharacteristicWhenUnreachable;
     const WeightedLocation* referenceLocation;
     std::vector<Location*> locations;
@@ -135,7 +139,7 @@ private:
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
 
-        resetRefinement(ignoreCharacteristicWhenUnreachable);
+        resetRefinement(false);
         buildIndex();
         if(ignoreCharacteristicWhenUnreachable){
             linkLocations();
@@ -215,26 +219,34 @@ public:
     }
 
     void refine(const CharacteristicValue& characteristic){
-        if(ignoreCharacteristicWhenUnreachable && !characteristicReachable(characteristic))
+        bool reachable = characteristicReachable(characteristic);
+        if(ignoreCharacteristicWhenUnreachable && !reachable)
             return;
-
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
                 refinedLocations.increasePriority(node,characteristic.weight);
             }
         }
-    }
-    //saves current location when true and ignoring unreachable locations
-    void resetRefinement(bool saveCurrentLocation){
-        if(ignoreCharacteristicWhenUnreachable && saveCurrentLocation)
+        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() > refinedLocations.top().getAcceptableWeight()){
             referenceLocation = &refinedLocations.top();
+        }
+    }
+    //saves current location when true and ignoring unreachable locations, assumes non empty locations
+    void resetRefinement(bool saveCurrentLocation){
+        WeightedLocation previousTop;
+        if(saveCurrentLocation)
+            previousTop = refinedLocations.top();
         int idCount = 1;
         refinedLocations = PairingHeap<WeightedLocation>();
+        for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
+        weightedLocations.clear();
         nodeIndex.clear();
         for(Location* l : locations){
-            WeightedLocation* wl = new WeightedLocation(idCount,l,0.0);
-            weightedLocations.push_back(wl);
+            WeightedLocation* wl = new WeightedLocation(idCount,defaultMinimumWeight,l,0.0);
             idCount++;
+            weightedLocations.push_back(wl);
+            if(saveCurrentLocation && wl->getId() == previousTop.getId())
+                referenceLocation = wl;
             typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(*wl);
             for(const CharacteristicDefinition& c : l->getCharacteristics()){
                 nodeIndex[c.getName()].push_back(n);
@@ -243,7 +255,7 @@ public:
     }
 };
 
-void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
-void play_classify_mt(const char* fvid, int reset_location_every_x_frames=20, bool reset_on_skip=true);
+void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=5, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=5, bool reset_on_skip=true);
 
 #endif
