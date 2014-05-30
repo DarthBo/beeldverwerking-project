@@ -106,67 +106,67 @@ private:
         std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
         Location* PGebouw = new Location("P gebouw tot grindpad",ch11cs);
         locations.push_back(PGebouw);
-        WeightedLocation* wPGebouw = new WeightedLocation(0,defaultMinimumWeight,PGebouw,0.0);
+        WeightedLocation* wPGebouw = new WeightedLocation(0,INT_MAX,PGebouw,0.0);
         defaultWeightedLocations.push_back(wPGebouw);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
         Location* modderpad = new Location("Grindpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
-        WeightedLocation* wModderpad = new WeightedLocation(1,defaultMinimumWeight,modderpad,0.0);
+        WeightedLocation* wModderpad = new WeightedLocation(1,11,modderpad,0.0);
         defaultWeightedLocations.push_back(wModderpad);
 
-        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversVerticalCharDef()};
-        Location* sporthal_v = new Location("Sporthal (verticale stenen)",ch11cs);
+        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversVerticalCharDef(),models.getBrickPaversHorizontalCharDef()};
+        Location* sporthal_v = new Location("Sporthal",ch11cs);
         locations.push_back(sporthal_v);
-        WeightedLocation* wSporthal_v = new WeightedLocation(2,defaultMinimumWeight,sporthal_v,0.0);
+        WeightedLocation* wSporthal_v = new WeightedLocation(2,8,sporthal_v,0.0);
         defaultWeightedLocations.push_back(wSporthal_v);
 
-        ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef()};
+        /*ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef()};
         Location* sporthal_h = new Location("Sporthal (horizontale stenen)",ch11cs);
         locations.push_back(sporthal_h);
-        WeightedLocation* wSporthal_h = new WeightedLocation(3,defaultMinimumWeight,sporthal_h,00.0);
-        defaultWeightedLocations.push_back(wSporthal_h);
+        WeightedLocation* wSporthal_h = new WeightedLocation(3,2.5,sporthal_h,00.0);
+        defaultWeightedLocations.push_back(wSporthal_h);*/
 
         ch11cs = { models.getGrassLeftCharDef(), models.getBigSquarePebbledPaversCharDef() };
         Location* sporthal_pebble = new Location("Sporthal (grote witte stenen)",ch11cs);
         locations.push_back(sporthal_pebble);
-        WeightedLocation* wSporthal_pebble = new WeightedLocation(4,defaultMinimumWeight,sporthal_pebble,0.0);
+        WeightedLocation* wSporthal_pebble = new WeightedLocation(3,5,sporthal_pebble,0.0);
         defaultWeightedLocations.push_back(wSporthal_pebble);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
         Location* sportdenijs = new Location("Sporthal tot St Denijs", ch11cs);
         locations.push_back(sportdenijs);
-        WeightedLocation* wSportdenijs = new WeightedLocation(5,defaultMinimumWeight,sportdenijs,0.0);
+        WeightedLocation* wSportdenijs = new WeightedLocation(4,defaultMinimumWeight,sportdenijs,0.0);
         defaultWeightedLocations.push_back(wSportdenijs);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
         Location* sportdenijs_2 = new Location("Sporthal (voorbij fietsen)", ch11cs);
         locations.push_back(sportdenijs_2);
-        WeightedLocation* wSportdenijs_2 = new WeightedLocation(6,defaultMinimumWeight,sportdenijs_2,0.0);
+        WeightedLocation* wSportdenijs_2 = new WeightedLocation(5,defaultMinimumWeight,sportdenijs_2,0.0);
         defaultWeightedLocations.push_back(wSportdenijs_2);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
         Location* sportdenijs_3 = new Location("Sporthal tot St Denijs", ch11cs);
         locations.push_back(sportdenijs_3);
-        WeightedLocation* wSportdenijs_3 = new WeightedLocation(7,defaultMinimumWeight,sportdenijs_3,0.0);
+        WeightedLocation* wSportdenijs_3 = new WeightedLocation(6,defaultMinimumWeight,sportdenijs_3,0.0);
         defaultWeightedLocations.push_back(wSportdenijs_3);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
         Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
-        WeightedLocation* wSintDenijsStraat = new WeightedLocation(8,defaultMinimumWeight,sintDenijsStraat,0.0);
+        WeightedLocation* wSintDenijsStraat = new WeightedLocation(7,defaultMinimumWeight,sintDenijsStraat,0.0);
         defaultWeightedLocations.push_back(wSintDenijsStraat);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
         Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
-        WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(9,defaultMinimumWeight,sintDenijsKruispunt,0.0);
+        WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(8,defaultMinimumWeight,sintDenijsKruispunt,0.0);
         defaultWeightedLocations.push_back(wSintDenijsKruispunt);
 
         ch11cs = {models.getFenceStationCharDef()};
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
-        WeightedLocation* wStation = new WeightedLocation(10,defaultMinimumWeight,station,0.0);
+        WeightedLocation* wStation = new WeightedLocation(9,defaultMinimumWeight,station,0.0);
         defaultWeightedLocations.push_back(wStation);
 
         resetRefinement(false);
@@ -205,11 +205,22 @@ private:
     bool characteristicReachable(const CharacteristicValue& characteristic){ // naïve implementation with single hop
         if(referenceLocation == nullptr)
             return true;
+        if(characteristic.definition->getName() == "Big square pebbled pavers")
+            std::cout<<"";
         for(const WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
             for(const CharacteristicDefinition &c : location->getLocation()->getCharacteristics()){
                 if( c.getName() == characteristic.definition->getName())
                     return true;
             }
+        }
+        return false;
+    }
+    bool locationReachable(const WeightedLocation* wLocation){
+        if(referenceLocation == nullptr)
+            return true;
+        for(const WeightedLocation* wl : referenceLocation->getPossibleNextLocations()){
+            if(wl->getId() == wLocation->getId())
+                return true;
         }
         return false;
     }
@@ -256,9 +267,12 @@ public:
                 refinedLocations.increasePriority(node,characteristic.weight);
             }
         }
-        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()){
-            referenceLocation = weightedLocations[refinedLocations.top().getId()];
+        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()
+           && locationReachable(weightedLocations[refinedLocations.top().getId()])){
+            referenceLocation =  weightedLocations[refinedLocations.top().getId()];
+            std::cout<<referenceLocation->getLocation()->getName()<<std::endl;
         }
+
     }
     //saves current location when true and ignoring unreachable locations, assumes non empty locations
     void resetRefinement(bool saveCurrentLocation){
