@@ -40,7 +40,7 @@ public:
         square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0)
     {
         // features <-> characteristics
-        CHARINSERT(grass_full);
+        //CHARINSERT(grass_full);
         CHARINSERT(grass_left);
         CHARINSERT(grass_right);
         CHARINSERT(asphalt);
@@ -89,7 +89,7 @@ private:
     std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
         /*
-        Characteristic grass("Grass");
+        Characteristic grass("Grass");models.getGrassFullCharDef(),
         Characteristic paver_huge("Huge Pavers at P building");
         Characteristic paver_brick_grey_v("Brick style grey pavers");
         Characteristic asphalt("Asphalt (black)");
@@ -149,11 +149,15 @@ private:
         locations.push_back(railw_hall);
         */
         ModelRepository models;
-        std::vector<CharacteristicDefinition> ch11cs = {models.getGrassFullCharDef(),models.getAsphaltCharDef()};
-        Location PGebouw("P gebouw tot sporthal",ch11cs);
+        std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
+        Location PGebouw("P gebouw tot modderpad",ch11cs);
         locations.push_back(PGebouw);
 
-        ch11cs = {models.getGrassFullCharDef(),models.getBigSquarePebbledPaversCharDef(),models.getBrickPaversHorizontalCharDef(),
+        ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
+        Location modderpad("Modderpad tot sporthal",ch11cs);
+        locations.push_back(modderpad);
+
+        ch11cs = {models.getGrassLeftCharDef(),models.getBigSquarePebbledPaversCharDef(),models.getBrickPaversHorizontalCharDef(),
                  models.getBrickPaversVerticalCharDef()};
         Location sporthal("Sporthal tot straat",ch11cs);
         locations.push_back(sporthal);
@@ -206,7 +210,7 @@ public:
     return out;
     }
 
-    void refine(CharacteristicValue& characteristic){
+    void refine(const CharacteristicValue& characteristic){
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
                 refinedLocations.increasePriority(node,characteristic.weight);
@@ -228,6 +232,6 @@ void resetRefinement(){
 };
 
 void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
-void play_classify_in_background(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=20, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=20, bool reset_on_skip=true);
 
 #endif

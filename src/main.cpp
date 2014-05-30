@@ -149,7 +149,7 @@ int release (int argc, char **argv)
         //play_frame_predictions(videoLocation, extra, 50);
         break;
     case AUTOCLASS:
-        play_classify(videoLocation);
+        play_classify_mt(videoLocation);
         break;
     default:
         print_help_and_exit(argv[0]);
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
     // do something
-    play_classify_in_background(defaultVideo,1);
+    play_classify_mt(defaultVideo);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;
