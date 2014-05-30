@@ -92,10 +92,11 @@ private:
         void addPossibleNextLocation(WeightedLocation* l){possibleNextLocations.push_back(l);}
         const std::vector<WeightedLocation*> getPossibleNextLocations() const{return possibleNextLocations;}
     };
-    constexpr static double defaultMinimumWeight = 3.0;
+    constexpr static double defaultMinimumWeight = 6.0;
     bool ignoreCharacteristicWhenUnreachable;
     const WeightedLocation* referenceLocation;
     std::vector<Location*> locations;
+    std::vector<WeightedLocation*> defaultWeightedLocations;
     std::vector<WeightedLocation*> weightedLocations;
     PairingHeap<WeightedLocation> refinedLocations;
     std::unordered_map<std::string,std::vector<Location*>> locationIndex;
@@ -105,46 +106,68 @@ private:
         std::vector<CharacteristicDefinition> ch11cs = {models.getGrassRightCharDef(),models.getAsphaltCharDef()};
         Location* PGebouw = new Location("P gebouw tot grindpad",ch11cs);
         locations.push_back(PGebouw);
+        WeightedLocation* wPGebouw = new WeightedLocation(0,defaultMinimumWeight,PGebouw,0.0);
+        defaultWeightedLocations.push_back(wPGebouw);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
         Location* modderpad = new Location("Grindpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
+        WeightedLocation* wModderpad = new WeightedLocation(1,defaultMinimumWeight,modderpad,0.0);
+        defaultWeightedLocations.push_back(wModderpad);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversVerticalCharDef()};
         Location* sporthal_v = new Location("Sporthal (verticale stenen)",ch11cs);
         locations.push_back(sporthal_v);
+        WeightedLocation* wSporthal_v = new WeightedLocation(2,defaultMinimumWeight,sporthal_v,0.0);
+        defaultWeightedLocations.push_back(wSporthal_v);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversHorizontalCharDef()};
         Location* sporthal_h = new Location("Sporthal (horizontale stenen)",ch11cs);
         locations.push_back(sporthal_h);
+        WeightedLocation* wSporthal_h = new WeightedLocation(3,defaultMinimumWeight,sporthal_h,00.0);
+        defaultWeightedLocations.push_back(wSporthal_h);
 
         ch11cs = { models.getGrassLeftCharDef(), models.getBigSquarePebbledPaversCharDef() };
         Location* sporthal_pebble = new Location("Sporthal (grote witte stenen)",ch11cs);
         locations.push_back(sporthal_pebble);
+        WeightedLocation* wSporthal_pebble = new WeightedLocation(4,defaultMinimumWeight,sporthal_pebble,0.0);
+        defaultWeightedLocations.push_back(wSporthal_pebble);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
         Location* sportdenijs = new Location("Sporthal tot St Denijs", ch11cs);
         locations.push_back(sportdenijs);
+        WeightedLocation* wSportdenijs = new WeightedLocation(5,defaultMinimumWeight,sportdenijs,0.0);
+        defaultWeightedLocations.push_back(wSportdenijs);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
         Location* sportdenijs_2 = new Location("Sporthal (voorbij fietsen)", ch11cs);
         locations.push_back(sportdenijs_2);
+        WeightedLocation* wSportdenijs_2 = new WeightedLocation(6,defaultMinimumWeight,sportdenijs_2,0.0);
+        defaultWeightedLocations.push_back(wSportdenijs_2);
 
         ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
         Location* sportdenijs_3 = new Location("Sporthal tot St Denijs", ch11cs);
         locations.push_back(sportdenijs_3);
+        WeightedLocation* wSportdenijs_3 = new WeightedLocation(7,defaultMinimumWeight,sportdenijs_3,0.0);
+        defaultWeightedLocations.push_back(wSportdenijs_3);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
         Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
+        WeightedLocation* wSintDenijsStraat = new WeightedLocation(8,defaultMinimumWeight,sintDenijsStraat,0.0);
+        defaultWeightedLocations.push_back(wSintDenijsStraat);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
         Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
+        WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(9,defaultMinimumWeight,sintDenijsKruispunt,0.0);
+        defaultWeightedLocations.push_back(wSintDenijsKruispunt);
 
         ch11cs = {models.getFenceStationCharDef()};
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
+        WeightedLocation* wStation = new WeightedLocation(10,defaultMinimumWeight,station,0.0);
+        defaultWeightedLocations.push_back(wStation);
 
         resetRefinement(false);
         buildIndex();
@@ -198,6 +221,7 @@ public:
     }
     ~LocationRepository(){
         for(Location* location : locations) delete location;
+        for(WeightedLocation* defaultWeightedLocation : defaultWeightedLocations) delete defaultWeightedLocation;
         for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
     }
     std::vector<Location*>& getAllLocations(){
@@ -241,13 +265,14 @@ public:
         WeightedLocation previousTop;
         if(saveCurrentLocation)
             previousTop = refinedLocations.top();
-        int idCount = 0;
+
         refinedLocations = PairingHeap<WeightedLocation>();
         for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
         weightedLocations.clear();
         nodeIndex.clear();
+        int idCount = 0;
         for(Location* l : locations){
-            WeightedLocation* wl = new WeightedLocation(idCount,defaultMinimumWeight,l,0.0);
+            WeightedLocation* wl = new WeightedLocation(*defaultWeightedLocations[idCount]);
             idCount++;
             weightedLocations.push_back(wl);
             if(saveCurrentLocation && wl->getId() == previousTop.getId())
@@ -262,7 +287,7 @@ public:
     }
 };
 
-void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=10, bool reset_on_skip=true);
-void play_classify_mt(const char* fvid, int reset_location_every_x_frames=10, bool reset_on_skip=true);
+void play_classify(const char* fvid, int once_every_x_frames=1, int reset_location_every_x_frames=5, bool reset_on_skip=true);
+void play_classify_mt(const char* fvid, int reset_location_every_x_frames=5, bool reset_on_skip=true);
 
 #endif
