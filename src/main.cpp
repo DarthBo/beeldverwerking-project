@@ -333,7 +333,7 @@ void testExecutor(){
 
 int main(int argc, char **argv)
 {
-    bool CLI = false;
+    bool CLI = true;
     if (CLI)
     {
         return release(argc, argv);
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
     }
     std::cerr << "Found file at " << videoLocation << "! \nProcessing..." << std::endl;
     // do something
-    play_classify_mt(defaultVideo);
+    //play_classify_mt(defaultVideo);
 
     std::cerr << "Done. Bye!" << std::endl;
     return 0;

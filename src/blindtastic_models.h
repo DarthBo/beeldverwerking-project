@@ -153,28 +153,28 @@ private:
         WeightedLocation* wSportdenijs_2 = new WeightedLocation(5,defaultMinimumWeight,sportdenijs_2,0.0);
         defaultWeightedLocations.push_back(wSportdenijs_2);
 
-        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
-        Location* sportdenijs_3 = new Location("Sporthal tot St Denijs", ch11cs);
+        /*ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef() };
+        Location* sportdenijs_3 = new Location("Sporthal tot St Denijs (struiken)", ch11cs);
         locations.push_back(sportdenijs_3);
         WeightedLocation* wSportdenijs_3 = new WeightedLocation(6,defaultMinimumWeight,sportdenijs_3,0.0);
-        defaultWeightedLocations.push_back(wSportdenijs_3);
+        defaultWeightedLocations.push_back(wSportdenijs_3);*/
 
-        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef(), models.getNoGrassCharDef()};
+        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef(), models.getBrickPaversHorizontalCharDef(),models.getBrickPaversVerticalCharDef(),models.getNoGrassCharDef()};
         Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
-        WeightedLocation* wSintDenijsStraat = new WeightedLocation(7,defaultMinimumWeight,sintDenijsStraat,0.0);
+        WeightedLocation* wSintDenijsStraat = new WeightedLocation(6,defaultMinimumWeight,sintDenijsStraat,0.0);
         defaultWeightedLocations.push_back(wSintDenijsStraat);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef(), models.getNoGrassCharDef()};
         Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
-        WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(8,defaultMinimumWeight,sintDenijsKruispunt,0.0);
+        WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(7,defaultMinimumWeight,sintDenijsKruispunt,0.0);
         defaultWeightedLocations.push_back(wSintDenijsKruispunt);
 
         ch11cs = {models.getFenceStationCharDef(), models.getNoGrassCharDef()};
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
-        WeightedLocation* wStation = new WeightedLocation(9,defaultMinimumWeight,station,0.0);
+        WeightedLocation* wStation = new WeightedLocation(8,defaultMinimumWeight,station,0.0);
         defaultWeightedLocations.push_back(wStation);
 
         resetRefinement(false);
@@ -216,8 +216,6 @@ private:
     bool characteristicReachable(const CharacteristicValue& characteristic,bool backtrack = true){ // naïve implementation with single hop
         if(referenceLocation == nullptr)
             return true;
-        if(characteristic.definition->getName() == "Big square pebbled pavers")
-            std::cout<<"";
         for(const WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
             if(!backtrack && location->getId() < referenceLocation->getId())
                 continue;
@@ -295,13 +293,11 @@ public:
                 refinedLocations.increasePriority(node,weight);
             }
         }
-        //std::cout<<"reachable: "<<reachable<< " "<< refinedLocations.top().getWeight() << " >= "<< refinedLocations.top().getAcceptableWeight()
-        //         <<" location reachable: "<<locationReachable(weightedLocations[refinedLocations.top().getId()]) <<std::endl;
-        //&& refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()
+        //ADD THIS TO ONLY CHANGE LOCATIONS WHEN A MIN WEIGHT IS REACHED:
+        // && refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()
         if(ignoreCharacteristicWhenUnreachable && charReachable
            && locationReachable(weightedLocations[refinedLocations.top().getId()])){
             referenceLocation =  weightedLocations[refinedLocations.top().getId()];
-            std::cout<<referenceLocation->getLocation()->getName()<<std::endl;
         }
 
     }
@@ -310,7 +306,6 @@ public:
         WeightedLocation previousReference;
         if(saveCurrentLocation)
             previousReference = *referenceLocation;
-
         refinedLocations = PairingHeap<WeightedLocation>();
         for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
         weightedLocations.clear();

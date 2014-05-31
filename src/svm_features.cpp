@@ -16,7 +16,6 @@ void getColourFeatures(const cv::Mat& in, std::vector<double>& features){
     }
 }
 
-
 /* Utility feature that calls  cv::cvtColor(in,dst,CV_BGR2HSV_FULL) before calling getColourFeatures*/
 void getHSVColourFeatures(const cv::Mat& in, std::vector<double>& features){
     cv::Mat dst;
