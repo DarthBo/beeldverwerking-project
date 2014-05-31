@@ -58,13 +58,8 @@ public:
 class FakeCharacteristicDefinition : public CharacteristicDefinition
 {
 public:
-    FakeCharacteristicDefinition(const std::string& _name,
-                                     const std::string& _model,
-                                     featureCallback _feature,
-                                     int _rows=1,
-                                     int _columns=1,
-                                     double _req_ratio = default_ratio)
-        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
+    FakeCharacteristicDefinition(const std::string& _name)
+        : CharacteristicDefinition(_name, "", NULL){}
 
     FakeCharacteristicDefinition(const FakeCharacteristicDefinition& ch)
         : CharacteristicDefinition(ch){}
@@ -84,13 +79,12 @@ public:
                                   const FakeCharacteristicDefinition* _left,
                                   const FakeCharacteristicDefinition* _right,
                                   const FakeCharacteristicDefinition* _leftright,
-                                  const std::string& _name,
                                   const std::string& _model,
                                   featureCallback _feature,
                                   int _rows=1,
                                   int _columns=1,
                                   double _req_ratio = default_ratio)
-        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio),
+        : CharacteristicDefinition("<helper - don't show>", _model, _feature, _rows, _columns, _req_ratio),
           def_none(_none), def_left(_left), def_right(_right), def_leftright(_leftright) {}
 
     LRHelperCharacteristicDefinition(const LRHelperCharacteristicDefinition& ch)

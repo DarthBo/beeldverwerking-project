@@ -53,7 +53,7 @@ CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool 
 CharacteristicValue LRHelperCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
 {
     CharacteristicValue val;
-    val.definition = def_leftright;
+    val.definition = this;
     val.weight = 0.0;
     double w_left = 0.0;
     double w_right = 0.0;

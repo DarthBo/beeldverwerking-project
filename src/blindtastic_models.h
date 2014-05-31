@@ -32,12 +32,12 @@ protected:
     const CharacteristicDefinition square_pavers_crossroads;
 public:
     ModelRepository():
-        grass_none("No Grass","../model/gras.model",&getTextnHSVColour,9,9),
-        grass_left("Grass (left)","../model/gras.model",&getTextnHSVColour,9,9),
-        grass_right("Grass (right)","../model/gras.model",&getTextnHSVColour,9,9),
-        grass_leftright("Grass (left+right)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_none("No Grass"),
+        grass_left("Grass (left)"),
+        grass_right("Grass (right)"),
+        grass_leftright("Grass (left+right)"),
         grass_helper(&grass_none,&grass_left,&grass_right,&grass_leftright,
-                     "-- dont't use --","../model/gras.model",&getTextnHSVColour,9,9),
+                     "../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
