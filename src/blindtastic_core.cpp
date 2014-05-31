@@ -127,6 +127,80 @@ CharacteristicValue RightHalfCharacteristicDefinition::getValue(const cv::Mat& i
     return val;
 }
 
+CharacteristicValue LeftRightHalfCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
+{
+    CharacteristicValue val;
+    val.definition = this;
+    val.weight = 0.0;
+
+    //init result grid
+    std::vector<std::vector<double> > grid(getRows());
+    for (int r=0 ; r<getRows() ; r++)
+    {
+        grid[r] = std::vector<double>(getColumns());
+    }
+
+    //fill result grid
+    if (!classify_frame(img, val, grid, skip_datacalc))
+        std::cerr << "UNKNOWN ERROR processing frame" << std::endl;
+
+    //process results
+    int pos_tally = 0;
+    double pos_sum = 0.0;
+
+    /****** try left ******/
+
+    for (int row=0 ; row<getRows() ; row++)
+    {
+        for (int col=0 ; col<getColumns()/2 ; col++)
+        {
+            if (grid[row][col] > 0)
+            {
+                pos_tally++;
+                pos_sum += grid[row][col];
+            }
+        }
+    }
+
+    //save result
+    if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
+        val.weight = pos_sum/pos_tally;
+    else
+        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+
+    if (val.weight < 0)
+        return val;
+
+    /****** try right ******/
+    pos_tally = 0;
+    pos_sum = 0.0;
+
+    for (int row=0 ; row<getRows() ; row++)
+    {
+        for (int col=getColumns()/2 ; col<getColumns() ; col++)
+        {
+            if (grid[row][col] > 0)
+            {
+                pos_tally++;
+                pos_sum += grid[row][col];
+            }
+        }
+    }
+
+    //save result
+    if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
+    {
+        val.weight += pos_sum/pos_tally;
+        val.weight /= 2;
+    }
+    else
+    {
+        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+    }
+
+    return val;
+}
+
 /*IMAGEGRID */
 void ImageGrid::populate(){
 

@@ -16,7 +16,8 @@ protected:
     constexpr static double asphalt_cols = 9;
     constexpr static double asphalt_ratio = 5/(asphalt_rows*asphalt_cols);
 
-    const CharacteristicDefinition grass_full;
+    //const CharacteristicDefinition grass_full;
+    const LeftRightHalfCharacteristicDefinition grass_leftright;
     const LeftHalfCharacteristicDefinition grass_left;
     const RightHalfCharacteristicDefinition grass_right;
     const CharacteristicDefinition asphalt;
@@ -28,7 +29,7 @@ protected:
     const CharacteristicDefinition square_pavers_crossroads;
 public:
     ModelRepository():
-        grass_full("Grass (full frame)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_leftright("Grass (left+right)","../model/gras.model",&getTextnHSVColour,9,9),
         grass_left("Grass (left)","../model/gras.model",&getTextnHSVColour,9,9),
         grass_right("Grass (right)","../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
@@ -40,7 +41,7 @@ public:
         square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0)
     {
         // features <-> characteristics
-        //CHARINSERT(grass_full);
+        CHARINSERT(grass_leftright);
         CHARINSERT(grass_left);
         CHARINSERT(grass_right);
         CHARINSERT(asphalt);
@@ -53,7 +54,7 @@ public:
     }
 
     const std::multimap<featureCallback, const CharacteristicDefinition*>& getCharacteristics() const{return mCharacteristics;}
-    const CharacteristicDefinition& getGrassFullCharDef() const{return grass_full;}
+    const CharacteristicDefinition& getGrassLeftRightCharDef() const{return grass_leftright;}
     const CharacteristicDefinition& getGrassLeftCharDef() const{return grass_left;}
     const CharacteristicDefinition& getGrassRightCharDef() const{return grass_right;}
     const CharacteristicDefinition& getAsphaltCharDef() const{return asphalt;}
@@ -109,7 +110,7 @@ private:
         WeightedLocation* wPGebouw = new WeightedLocation(0,INT_MAX,PGebouw,0.0);
         defaultWeightedLocations.push_back(wPGebouw);
 
-        ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
+        ch11cs = {models.getGrassLeftRightCharDef()};
         Location* modderpad = new Location("Grindpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
         WeightedLocation* wModderpad = new WeightedLocation(1,7,modderpad,0.0);
@@ -139,7 +140,7 @@ private:
         WeightedLocation* wSportdenijs = new WeightedLocation(4,defaultMinimumWeight,sportdenijs,0.0);
         defaultWeightedLocations.push_back(wSportdenijs);
 
-        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftCharDef(), models.getGrassRightCharDef() };
+        ch11cs = { models.getSquarePaversSidewalkCharDef(), models.getGrassLeftRightCharDef() };
         Location* sportdenijs_2 = new Location("Sporthal (voorbij fietsen)", ch11cs);
         locations.push_back(sportdenijs_2);
         WeightedLocation* wSportdenijs_2 = new WeightedLocation(5,defaultMinimumWeight,sportdenijs_2,0.0);

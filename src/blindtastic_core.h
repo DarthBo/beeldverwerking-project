@@ -87,6 +87,22 @@ public:
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 
+class LeftRightHalfCharacteristicDefinition : public CharacteristicDefinition
+{
+public:
+    LeftRightHalfCharacteristicDefinition(const std::string& _name,
+                                     const std::string& _model,
+                                     featureCallback _feature,
+                                     int _rows=1,
+                                     int _columns=1,
+                                     double _req_ratio = default_ratio)
+        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
+
+    LeftRightHalfCharacteristicDefinition(const LeftRightHalfCharacteristicDefinition& ch)
+        : CharacteristicDefinition(ch){}
+    CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
+};
+
 struct CharacteristicValue
 {
     const CharacteristicDefinition* definition;
