@@ -112,7 +112,7 @@ private:
         ch11cs = {models.getGrassLeftCharDef(),models.getGrassRightCharDef()};
         Location* modderpad = new Location("Grindpad tot sporthal",ch11cs);
         locations.push_back(modderpad);
-        WeightedLocation* wModderpad = new WeightedLocation(1,11,modderpad,0.0);
+        WeightedLocation* wModderpad = new WeightedLocation(1,7,modderpad,0.0);
         defaultWeightedLocations.push_back(wModderpad);
 
         ch11cs = {models.getGrassLeftCharDef(),models.getBrickPaversVerticalCharDef(),models.getBrickPaversHorizontalCharDef()};
@@ -202,12 +202,14 @@ private:
             current->addPossibleNextLocation(weightedLocations[i-1]);
         }
     }
-    bool characteristicReachable(const CharacteristicValue& characteristic){ // naïve implementation with single hop
+    bool characteristicReachable(const CharacteristicValue& characteristic,bool backtrack = true){ // naïve implementation with single hop
         if(referenceLocation == nullptr)
             return true;
         if(characteristic.definition->getName() == "Big square pebbled pavers")
             std::cout<<"";
         for(const WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
+            if(!backtrack && location->getId() < referenceLocation->getId())
+                continue;
             for(const CharacteristicDefinition &c : location->getLocation()->getCharacteristics()){
                 if( c.getName() == characteristic.definition->getName())
                     return true;
@@ -215,11 +217,13 @@ private:
         }
         return false;
     }
-    bool locationReachable(const WeightedLocation* wLocation){
+    bool locationReachable(const WeightedLocation* wLocation, bool backtrack = false){
         if(referenceLocation == nullptr)
             return true;
-        for(const WeightedLocation* wl : referenceLocation->getPossibleNextLocations()){
-            if(wl->getId() == wLocation->getId())
+        for(const WeightedLocation* location : referenceLocation->getPossibleNextLocations()){
+            if(!backtrack && location->getId() < referenceLocation->getId())
+                continue;
+            if(location->getId() == wLocation->getId())
                 return true;
         }
         return false;
@@ -259,15 +263,18 @@ public:
     }
 
     void refine(const CharacteristicValue& characteristic){
-        bool reachable = characteristicReachable(characteristic);
-        if(ignoreCharacteristicWhenUnreachable && !reachable)
+        bool charReachable = characteristicReachable(characteristic);
+        if(ignoreCharacteristicWhenUnreachable && !charReachable)
             return;
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
                 refinedLocations.increasePriority(node,characteristic.weight);
             }
         }
-        if(ignoreCharacteristicWhenUnreachable && reachable && refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()
+        //std::cout<<"reachable: "<<reachable<< " "<< refinedLocations.top().getWeight() << " >= "<< refinedLocations.top().getAcceptableWeight()
+        //         <<" location reachable: "<<locationReachable(weightedLocations[refinedLocations.top().getId()]) <<std::endl;
+        //&& refinedLocations.top().getWeight() >= refinedLocations.top().getAcceptableWeight()
+        if(ignoreCharacteristicWhenUnreachable && charReachable
            && locationReachable(weightedLocations[refinedLocations.top().getId()])){
             referenceLocation =  weightedLocations[refinedLocations.top().getId()];
             std::cout<<referenceLocation->getLocation()->getName()<<std::endl;
@@ -276,9 +283,9 @@ public:
     }
     //saves current location when true and ignoring unreachable locations, assumes non empty locations
     void resetRefinement(bool saveCurrentLocation){
-        WeightedLocation previousTop;
+        WeightedLocation previousReference;
         if(saveCurrentLocation)
-            previousTop = refinedLocations.top();
+            previousReference = *referenceLocation;
 
         refinedLocations = PairingHeap<WeightedLocation>();
         for(WeightedLocation* wLocation: weightedLocations) delete wLocation;
@@ -289,7 +296,7 @@ public:
             WeightedLocation* wl = new WeightedLocation(*defaultWeightedLocations[idCount]);
             idCount++;
             weightedLocations.push_back(wl);
-            if(saveCurrentLocation && wl->getId() == previousTop.getId())
+            if(saveCurrentLocation && wl->getId() == previousReference.getId())
                 referenceLocation = wl;
             typename PairingHeap<WeightedLocation>::Node* n = refinedLocations.push(*wl);
             for(const CharacteristicDefinition& c : l->getCharacteristics()){
