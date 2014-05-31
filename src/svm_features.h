@@ -35,4 +35,9 @@ void getColourAndContourFeatures(const cv::Mat& in, std::vector<double>& feature
 //old ones
 void getTextnColour_legacy(const cv::Mat& in, std::vector<double>& features);
 
+
+// with equalizeHist
+void getTextureFeatures2(const cv::Mat& input, std::vector<double>& features);
+void getContourFeatures2(const cv::Mat& input, std::vector<double>& features);
+void getRectFeatures2(const cv::Mat& input, std::vector<double>& features);
 #endif

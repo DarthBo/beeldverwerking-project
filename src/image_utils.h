@@ -55,4 +55,7 @@ void whiteFilter(const cv::Mat& in, cv::Mat&out, const double thresh=200);
 // filter to find corners
 void cornerFilter(const cv::Mat& in, std::vector<double>& out);
 
+// equalize the intensitydistribution to improve the contrast in the image
+void histEqual(const cv::Mat& in, cv::Mat&out);
+
 #endif

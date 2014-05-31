@@ -149,7 +149,7 @@ int release (int argc, char **argv)
         //play_frame_predictions(videoLocation, extra, 50);
         break;
     case AUTOCLASS:
-        play_classify(videoLocation);
+        play_classify_mt(videoLocation);
         break;
     default:
         print_help_and_exit(argv[0]);
@@ -333,7 +333,7 @@ void testExecutor(){
 
 int main(int argc, char **argv)
 {
-    bool CLI = false;
+    bool CLI = true;
     if (CLI)
     {
         return release(argc, argv);
