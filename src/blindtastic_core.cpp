@@ -43,95 +43,13 @@ CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool 
     return val;
 }
 
-CharacteristicValue LeftHalfCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
+CharacteristicValue GrassCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
 {
     CharacteristicValue val;
-    val.definition = this;
+    val.definition = leftright;
     val.weight = 0.0;
-
-    //init result grid
-    std::vector<std::vector<double> > grid(getRows());
-    for (int r=0 ; r<getRows() ; r++)
-    {
-        grid[r] = std::vector<double>(getColumns());
-    }
-
-    //fill result grid
-    if (!classify_frame(img, val, grid, skip_datacalc))
-        std::cerr << "UNKNOWN ERROR processing frame" << std::endl;
-
-    //process results
-    int pos_tally = 0;
-    double pos_sum = 0.0;
-
-    for (int row=0 ; row<getRows() ; row++)
-    {
-        for (int col=0 ; col<getColumns()/2 ; col++)
-        {
-            if (grid[row][col] > 0)
-            {
-                pos_tally++;
-                pos_sum += grid[row][col];
-            }
-        }
-    }
-
-    //save result
-    if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
-        val.weight = pos_sum/pos_tally;
-    else
-        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
-
-    return val;
-}
-
-CharacteristicValue RightHalfCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
-{
-    CharacteristicValue val;
-    val.definition = this;
-    val.weight = 0.0;
-
-    //init result grid
-    std::vector<std::vector<double> > grid(getRows());
-    for (int r=0 ; r<getRows() ; r++)
-    {
-        grid[r] = std::vector<double>(getColumns());
-    }
-
-    //fill result grid
-    if (!classify_frame(img, val, grid, skip_datacalc))
-        std::cerr << "UNKNOWN ERROR processing frame" << std::endl;
-
-    //process results
-    int pos_tally = 0;
-    double pos_sum = 0.0;
-
-    for (int row=0 ; row<getRows() ; row++)
-    {
-        for (int col=getColumns()/2 ; col<getColumns() ; col++)
-        {
-            if (grid[row][col] > 0)
-            {
-                pos_tally++;
-                pos_sum += grid[row][col];
-            }
-        }
-    }
-
-    //save result
-    if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
-        val.weight = pos_sum/pos_tally;
-    else
-        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
-
-    return val;
-}
-
-CharacteristicValue LeftRightHalfCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
-{
-    CharacteristicValue val;
-    val.definition = this;
-    val.weight = 0.0;
+    double w_left = 0.0;
+    double w_right = 0.0;
 
     //init result grid
     std::vector<std::vector<double> > grid(getRows());
@@ -161,17 +79,14 @@ CharacteristicValue LeftRightHalfCharacteristicDefinition::getValue(const cv::Ma
             }
         }
     }
-
-    //save result
     if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
-        val.weight = pos_sum/pos_tally;
+        w_left = pos_sum/pos_tally;
     else
-        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+        w_left = -1; // weight doesn't really matter here, we're not going to use it anyway
 
-    if (val.weight < 0)
-        return val;
 
     /****** try right ******/
+
     pos_tally = 0;
     pos_sum = 0.0;
 
@@ -186,19 +101,47 @@ CharacteristicValue LeftRightHalfCharacteristicDefinition::getValue(const cv::Ma
             }
         }
     }
-
-    //save result
     if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
+        w_right= pos_sum/pos_tally;
+    else
+        w_right = -1; // weight doesn't really matter here, we're not going to use it anyway
+
+    /**** determine definition type ****/
+
+    if (w_left > 0)
     {
-        val.weight += pos_sum/pos_tally;
-        val.weight /= 2;
+        if (right > 0)
+        {
+            val.definition = leftright;
+            val.weight = (w_left + w_right)/2;
+        }
+        else
+        {
+            val.definition = left;
+            val.weight = w_left;
+        }
     }
     else
     {
-        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+        if (right > 0)
+        {
+            val.definition = right;
+            val.weight = w_right;
+        }
+        else
+        {
+            val.definition = leftright; //replace with none
+            val.weight = -1;
+        }
     }
 
     return val;
+}
+
+CharacteristicValue FakeCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
+{
+    assert(false);
+    return CharacteristicValue();
 }
 
 /*IMAGEGRID */

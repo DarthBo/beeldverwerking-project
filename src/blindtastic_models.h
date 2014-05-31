@@ -17,9 +17,10 @@ protected:
     constexpr static double asphalt_ratio = 5/(asphalt_rows*asphalt_cols);
 
     //const CharacteristicDefinition grass_full;
-    const LeftRightHalfCharacteristicDefinition grass_leftright;
-    const LeftHalfCharacteristicDefinition grass_left;
-    const RightHalfCharacteristicDefinition grass_right;
+    const FakeCharacteristicDefinition grass_leftright;
+    const FakeCharacteristicDefinition grass_left;
+    const FakeCharacteristicDefinition grass_right;
+    const GrassCharacteristicDefinition grass_helper;
     const CharacteristicDefinition asphalt;
     const CharacteristicDefinition brick_pavers_vertical;
     const CharacteristicDefinition brick_pavers_horizontal;
@@ -32,6 +33,7 @@ public:
         grass_leftright("Grass (left+right)","../model/gras.model",&getTextnHSVColour,9,9),
         grass_left("Grass (left)","../model/gras.model",&getTextnHSVColour,9,9),
         grass_right("Grass (right)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_helper(&grass_left,&grass_right,&grass_leftright,"-- dont't use --","../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
@@ -41,9 +43,7 @@ public:
         square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0)
     {
         // features <-> characteristics
-        CHARINSERT(grass_leftright);
-        CHARINSERT(grass_left);
-        CHARINSERT(grass_right);
+        CHARINSERT(grass_helper); //don't insert the ACTUAL grass definitions
         CHARINSERT(asphalt);
         CHARINSERT(brick_pavers_vertical);
         CHARINSERT(brick_pavers_horizontal);

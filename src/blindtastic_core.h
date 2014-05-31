@@ -55,10 +55,10 @@ public:
     virtual CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 
-class LeftHalfCharacteristicDefinition : public CharacteristicDefinition
+class FakeCharacteristicDefinition : public CharacteristicDefinition
 {
 public:
-    LeftHalfCharacteristicDefinition(const std::string& _name,
+    FakeCharacteristicDefinition(const std::string& _name,
                                      const std::string& _model,
                                      featureCallback _feature,
                                      int _rows=1,
@@ -66,40 +66,33 @@ public:
                                      double _req_ratio = default_ratio)
         : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
 
-    LeftHalfCharacteristicDefinition(const LeftHalfCharacteristicDefinition& ch)
+    FakeCharacteristicDefinition(const FakeCharacteristicDefinition& ch)
         : CharacteristicDefinition(ch){}
+    //seriously, don't use this
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 
-class RightHalfCharacteristicDefinition : public CharacteristicDefinition
+class GrassCharacteristicDefinition : public CharacteristicDefinition
 {
+private:
+    const CharacteristicDefinition* left;
+    const CharacteristicDefinition* right;
+    const CharacteristicDefinition* leftright;
 public:
-    RightHalfCharacteristicDefinition(const std::string& _name,
-                                      const std::string& _model,
-                                      featureCallback _feature,
-                                      int _rows=1,
-                                      int _columns=1,
-                                      double _req_ratio = default_ratio)
-        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
+    GrassCharacteristicDefinition(const FakeCharacteristicDefinition* _left,
+                                  const FakeCharacteristicDefinition* _right,
+                                  const FakeCharacteristicDefinition* _leftright,
+                                  const std::string& _name,
+                                  const std::string& _model,
+                                  featureCallback _feature,
+                                  int _rows=1,
+                                  int _columns=1,
+                                  double _req_ratio = default_ratio)
+        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio),
+          left(_left), right(_right), leftright(_leftright) {}
 
-    RightHalfCharacteristicDefinition(const LeftHalfCharacteristicDefinition& ch)
-        : CharacteristicDefinition(ch){}
-    CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
-};
-
-class LeftRightHalfCharacteristicDefinition : public CharacteristicDefinition
-{
-public:
-    LeftRightHalfCharacteristicDefinition(const std::string& _name,
-                                     const std::string& _model,
-                                     featureCallback _feature,
-                                     int _rows=1,
-                                     int _columns=1,
-                                     double _req_ratio = default_ratio)
-        : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio){}
-
-    LeftRightHalfCharacteristicDefinition(const LeftRightHalfCharacteristicDefinition& ch)
-        : CharacteristicDefinition(ch){}
+    GrassCharacteristicDefinition(const GrassCharacteristicDefinition& ch)
+        : CharacteristicDefinition(ch), left(ch.left), right(ch.right), leftright(ch.leftright){}
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 
