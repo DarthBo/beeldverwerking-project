@@ -20,7 +20,9 @@ CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool 
 
     //process results
     int pos_tally = 0;
+    int neg_tally = 0;
     double pos_sum = 0.0;
+    double neg_sum = 0.0;
 
     for (int row=0 ; row<getRows() ; row++)
     {
@@ -31,6 +33,11 @@ CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool 
                 pos_tally++;
                 pos_sum += grid[row][col];
             }
+            else
+            {
+                neg_tally++;
+                neg_sum += grid[row][col];
+            }
         }
     }
 
@@ -38,15 +45,15 @@ CharacteristicValue CharacteristicDefinition::getValue(const cv::Mat& img, bool 
     if (pos_tally > 0 && pos_tally >= getRows()*getColumns()*getRequiredRatio())
         val.weight = pos_sum/pos_tally;
     else
-        val.weight = -1; // weight doesn't really matter here, we're not going to use it anyway
+        val.weight = neg_sum/neg_tally;
 
     return val;
 }
 
-CharacteristicValue GrassCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
+CharacteristicValue LRHelperCharacteristicDefinition::getValue(const cv::Mat& img, bool skip_datacalc) const
 {
     CharacteristicValue val;
-    val.definition = leftright;
+    val.definition = def_leftright;
     val.weight = 0.0;
     double w_left = 0.0;
     double w_right = 0.0;
@@ -64,7 +71,9 @@ CharacteristicValue GrassCharacteristicDefinition::getValue(const cv::Mat& img, 
 
     //process results
     int pos_tally = 0;
+    int neg_tally = 0;
     double pos_sum = 0.0;
+    double neg_sum = 0.0;
 
     /****** try left ******/
 
@@ -77,18 +86,25 @@ CharacteristicValue GrassCharacteristicDefinition::getValue(const cv::Mat& img, 
                 pos_tally++;
                 pos_sum += grid[row][col];
             }
+            else
+            {
+                neg_tally++;
+                neg_sum += grid[row][col];
+            }
         }
     }
     if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
         w_left = pos_sum/pos_tally;
     else
-        w_left = -1; // weight doesn't really matter here, we're not going to use it anyway
+        w_left = neg_sum/neg_tally;
 
 
     /****** try right ******/
 
     pos_tally = 0;
+    neg_tally = 0;
     pos_sum = 0.0;
+    neg_sum = 0.0;
 
     for (int row=0 ; row<getRows() ; row++)
     {
@@ -99,39 +115,44 @@ CharacteristicValue GrassCharacteristicDefinition::getValue(const cv::Mat& img, 
                 pos_tally++;
                 pos_sum += grid[row][col];
             }
+            else
+            {
+                neg_tally++;
+                neg_sum += grid[row][col];
+            }
         }
     }
     if (pos_tally > 0 && pos_tally >= getRows()*getColumns()/2*getRequiredRatio())
-        w_right= pos_sum/pos_tally;
+        w_right = pos_sum/pos_tally;
     else
-        w_right = -1; // weight doesn't really matter here, we're not going to use it anyway
+        w_right = neg_sum/neg_tally;
 
     /**** determine definition type ****/
 
     if (w_left > 0)
     {
-        if (right > 0)
+        if (def_right > 0)
         {
-            val.definition = leftright;
+            val.definition = def_leftright;
             val.weight = (w_left + w_right)/2;
         }
         else
         {
-            val.definition = left;
+            val.definition = def_left;
             val.weight = w_left;
         }
     }
     else
     {
-        if (right > 0)
+        if (def_right > 0)
         {
-            val.definition = right;
+            val.definition = def_right;
             val.weight = w_right;
         }
         else
         {
-            val.definition = leftright; //replace with none
-            val.weight = -1;
+            val.definition = def_none;
+            val.weight = (w_left + w_right)/(-2);
         }
     }
 

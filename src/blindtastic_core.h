@@ -72,14 +72,16 @@ public:
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 
-class GrassCharacteristicDefinition : public CharacteristicDefinition
+class LRHelperCharacteristicDefinition : public CharacteristicDefinition
 {
 private:
-    const CharacteristicDefinition* left;
-    const CharacteristicDefinition* right;
-    const CharacteristicDefinition* leftright;
+    const CharacteristicDefinition* def_none;
+    const CharacteristicDefinition* def_left;
+    const CharacteristicDefinition* def_right;
+    const CharacteristicDefinition* def_leftright;
 public:
-    GrassCharacteristicDefinition(const FakeCharacteristicDefinition* _left,
+    LRHelperCharacteristicDefinition(const FakeCharacteristicDefinition* _none,
+                                  const FakeCharacteristicDefinition* _left,
                                   const FakeCharacteristicDefinition* _right,
                                   const FakeCharacteristicDefinition* _leftright,
                                   const std::string& _name,
@@ -89,10 +91,11 @@ public:
                                   int _columns=1,
                                   double _req_ratio = default_ratio)
         : CharacteristicDefinition(_name, _model, _feature, _rows, _columns, _req_ratio),
-          left(_left), right(_right), leftright(_leftright) {}
+          def_none(_none), def_left(_left), def_right(_right), def_leftright(_leftright) {}
 
-    GrassCharacteristicDefinition(const GrassCharacteristicDefinition& ch)
-        : CharacteristicDefinition(ch), left(ch.left), right(ch.right), leftright(ch.leftright){}
+    LRHelperCharacteristicDefinition(const LRHelperCharacteristicDefinition& ch)
+        : CharacteristicDefinition(ch), def_none(ch.def_none), def_left(ch.def_left),
+          def_right(ch.def_right), def_leftright(ch.def_leftright){}
     CharacteristicValue getValue(const cv::Mat& img, bool skip_datacalc = false) const;
 };
 

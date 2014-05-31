@@ -17,10 +17,12 @@ protected:
     constexpr static double asphalt_ratio = 5/(asphalt_rows*asphalt_cols);
 
     //const CharacteristicDefinition grass_full;
-    const FakeCharacteristicDefinition grass_leftright;
+    const FakeCharacteristicDefinition grass_none;
     const FakeCharacteristicDefinition grass_left;
     const FakeCharacteristicDefinition grass_right;
-    const GrassCharacteristicDefinition grass_helper;
+    const FakeCharacteristicDefinition grass_leftright;
+
+    const LRHelperCharacteristicDefinition grass_helper;
     const CharacteristicDefinition asphalt;
     const CharacteristicDefinition brick_pavers_vertical;
     const CharacteristicDefinition brick_pavers_horizontal;
@@ -30,10 +32,12 @@ protected:
     const CharacteristicDefinition square_pavers_crossroads;
 public:
     ModelRepository():
-        grass_leftright("Grass (left+right)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_none("No Grass","../model/gras.model",&getTextnHSVColour,9,9),
         grass_left("Grass (left)","../model/gras.model",&getTextnHSVColour,9,9),
         grass_right("Grass (right)","../model/gras.model",&getTextnHSVColour,9,9),
-        grass_helper(&grass_left,&grass_right,&grass_leftright,"-- dont't use --","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_leftright("Grass (left+right)","../model/gras.model",&getTextnHSVColour,9,9),
+        grass_helper(&grass_none,&grass_left,&grass_right,&grass_leftright,
+                     "-- dont't use --","../model/gras.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
@@ -54,9 +58,10 @@ public:
     }
 
     const std::multimap<featureCallback, const CharacteristicDefinition*>& getCharacteristics() const{return mCharacteristics;}
-    const CharacteristicDefinition& getGrassLeftRightCharDef() const{return grass_leftright;}
+    const CharacteristicDefinition& getNoGrassCharDef() const{return grass_none;}
     const CharacteristicDefinition& getGrassLeftCharDef() const{return grass_left;}
     const CharacteristicDefinition& getGrassRightCharDef() const{return grass_right;}
+    const CharacteristicDefinition& getGrassLeftRightCharDef() const{return grass_leftright;}
     const CharacteristicDefinition& getAsphaltCharDef() const{return asphalt;}
     const CharacteristicDefinition& getBrickPaversVerticalCharDef() const{return brick_pavers_vertical;}
     const CharacteristicDefinition& getBrickPaversHorizontalCharDef() const{return brick_pavers_horizontal;}
@@ -152,19 +157,19 @@ private:
         WeightedLocation* wSportdenijs_3 = new WeightedLocation(6,defaultMinimumWeight,sportdenijs_3,0.0);
         defaultWeightedLocations.push_back(wSportdenijs_3);
 
-        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef()};
+        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef(), models.getNoGrassCharDef()};
         Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
         locations.push_back(sintDenijsStraat);
         WeightedLocation* wSintDenijsStraat = new WeightedLocation(7,defaultMinimumWeight,sintDenijsStraat,0.0);
         defaultWeightedLocations.push_back(wSintDenijsStraat);
 
-        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef()};
+        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef(), models.getNoGrassCharDef()};
         Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
         WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(8,defaultMinimumWeight,sintDenijsKruispunt,0.0);
         defaultWeightedLocations.push_back(wSintDenijsKruispunt);
 
-        ch11cs = {models.getFenceStationCharDef()};
+        ch11cs = {models.getFenceStationCharDef(), models.getNoGrassCharDef()};
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
         WeightedLocation* wStation = new WeightedLocation(9,defaultMinimumWeight,station,0.0);
