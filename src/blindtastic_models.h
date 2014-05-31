@@ -94,12 +94,14 @@ private:
         const std::vector<WeightedLocation*> getPossibleNextLocations() const{return possibleNextLocations;}
     };
     constexpr static double defaultMinimumWeight = 6.0;
+    bool useRelativeWeights;
     bool ignoreCharacteristicWhenUnreachable;
     const WeightedLocation* referenceLocation;
     std::vector<Location*> locations;
     std::vector<WeightedLocation*> defaultWeightedLocations;
     std::vector<WeightedLocation*> weightedLocations;
     PairingHeap<WeightedLocation> refinedLocations;
+    std::unordered_map<std::string,double> relativeCharacteristicImportance;
     std::unordered_map<std::string,std::vector<Location*>> locationIndex;
     std::unordered_map<std::string,std::vector<typename PairingHeap<WeightedLocation>::Node*>> nodeIndex;
     void init(){
@@ -171,6 +173,9 @@ private:
         defaultWeightedLocations.push_back(wStation);
 
         resetRefinement(false);
+        if(useRelativeWeights){
+            calculateRelativeCharacteristicImportance();
+        }
         buildIndex();
         if(ignoreCharacteristicWhenUnreachable && !weightedLocations.empty()){
             referenceLocation = weightedLocations[0];
@@ -229,10 +234,20 @@ private:
         }
         return false;
     }
+    void calculateRelativeCharacteristicImportance(){
+        for(const WeightedLocation* location:defaultWeightedLocations){
+            for(const CharacteristicDefinition &characteristic : location->getLocation()->getCharacteristics()){
+                relativeCharacteristicImportance[characteristic.getName()]++;
+            }
+        }
+        for(auto it = relativeCharacteristicImportance.begin(); it != relativeCharacteristicImportance.end();it++){
+            relativeCharacteristicImportance[it->first] = defaultWeightedLocations.size() / it->second;
+        }
+    }
 
 public:
-    LocationRepository( bool _ignoreCharacteristicWhenUnreachable = false)
-        :ignoreCharacteristicWhenUnreachable(_ignoreCharacteristicWhenUnreachable){
+    LocationRepository(bool _useRelativeWeights = true, bool _ignoreCharacteristicWhenUnreachable = true)
+        :useRelativeWeights(_useRelativeWeights),ignoreCharacteristicWhenUnreachable(_ignoreCharacteristicWhenUnreachable){
         init();
     }
     ~LocationRepository(){
@@ -264,12 +279,15 @@ public:
     }
 
     void refine(const CharacteristicValue& characteristic){
+        double weight = useRelativeWeights?
+                characteristic.weight* relativeCharacteristicImportance[characteristic.definition->getName()]
+                : characteristic.weight;
         bool charReachable = characteristicReachable(characteristic);
         if(ignoreCharacteristicWhenUnreachable && !charReachable)
             return;
         if(nodeIndex.find(characteristic.definition->getName()) != nodeIndex.end()){
             for(typename PairingHeap<WeightedLocation>::Node* node : nodeIndex[characteristic.definition->getName()]){
-                refinedLocations.increasePriority(node,characteristic.weight);
+                refinedLocations.increasePriority(node,weight);
             }
         }
         //std::cout<<"reachable: "<<reachable<< " "<< refinedLocations.top().getWeight() << " >= "<< refinedLocations.top().getAcceptableWeight()

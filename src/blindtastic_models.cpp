@@ -13,7 +13,7 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
     }
     featureCallback last;
     ModelRepository modelRepository;
-    LocationRepository locationRepository(true);
+    LocationRepository locationRepository;
     std::string topLocation;
     int f = 0;
     cv::namedWindow(winp);
@@ -95,7 +95,7 @@ void play_classify_mt(const char* fvid, int reset_location_every_x_frames, bool 
     cv::createTrackbar(track, window_name, &current_frame_nr, getFrameCount(fvid),&trackbar_moved, &data);
 
     ModelRepository modelRepository;
-    LocationRepository locationRepository(true);
+    LocationRepository locationRepository;
     SingleThreadExecutorService<std::vector<CharacteristicValue>> executor;
     BundledCallable<CharacteristicValue> svmtask;
 
