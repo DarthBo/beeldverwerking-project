@@ -616,7 +616,7 @@ bool classify_frame(cv::Mat frame, CharacteristicValue& c, std::vector<std::vect
         const char* nul = ">/dev/null 2>/dev/null";
     #endif
 
-    char buf[100] = {0};
+    char buf[1024] = {0};
     sprintf(buf, "%s .tmp_feat %s .tmp_result %s", svmperf_class, c.definition->getModel().c_str(), nul);
 
     if (system(buf) != 0)
