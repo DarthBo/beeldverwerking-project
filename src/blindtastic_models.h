@@ -21,6 +21,12 @@ protected:
     constexpr static double reddish_wall_rows = 9;
     constexpr static double reddish_wall_cols = 9;
     constexpr static double reddish_wall_ratio = 6/(reddish_wall_rows*reddish_wall_cols);
+    constexpr static double station_tiles_rows = 9;
+    constexpr static double station_tiles_cols = 9;
+    constexpr static double station_tiles_ratio = 13/(reddish_wall_rows*reddish_wall_cols);
+    constexpr static double shrubs_sint_denijs_rows = 9;
+    constexpr static double shrubs_sint_denijs_cols = 9;
+    constexpr static double shrubs_sint_denijs_ratio = 7/(reddish_wall_rows*reddish_wall_cols);
 
     //const CharacteristicDefinition grass_full;
     const FakeCharacteristicDefinition grass_none;
@@ -38,6 +44,8 @@ protected:
     const CharacteristicDefinition square_pavers_crossroads;
     const CharacteristicDefinition bush;
     const CharacteristicDefinition reddish_wall;
+    const CharacteristicDefinition station_tiles;
+    const CharacteristicDefinition shrubs_sint_denijs;
 
 public:
     ModelRepository():
@@ -55,7 +63,9 @@ public:
         square_pavers_sidewalk("Square pavers sidewalk","../model/tegel_Denijs.model",&getRectFeatures,1,1,0),
         square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0),
         bush("Bush","../model/shrubs.model",&getTextnHSVColour,bush_rows,bush_cols,bush_ratio),
-        reddish_wall("Reddish wall","../model/redWall.model",&getTextnHSVColour,reddish_wall_rows,reddish_wall_cols,reddish_wall_ratio)
+        reddish_wall("Reddish wall","../model/redWall.model",&getTextnHSVColour,reddish_wall_rows,reddish_wall_cols,reddish_wall_ratio),
+        station_tiles("Station Tiles","../model/stationTile.model",&getTextnHSVColour,station_tiles_rows,station_tiles_cols,station_tiles_ratio),
+        shrubs_sint_denijs("Shrubs Sint-Denijs","../model/shrubsSintDenijs.model",&getTextnHSVColour,shrubs_sint_denijs_rows,shrubs_sint_denijs_cols,shrubs_sint_denijs_ratio)
     {
         // features <-> characteristics
         CHARINSERT(grass_helper); //don't insert the ACTUAL grass definitions
@@ -68,6 +78,8 @@ public:
         CHARINSERT(square_pavers_crossroads);
         CHARINSERT(bush);
         CHARINSERT(reddish_wall);
+        CHARINSERT(station_tiles);
+        CHARINSERT(shrubs_sint_denijs);
     }
 
     const std::multimap<featureCallback, const CharacteristicDefinition*>& getCharacteristics() const{return mCharacteristics;}
@@ -84,6 +96,8 @@ public:
     const CharacteristicDefinition& getSquarePaversCrossroadsCharDef() const{return square_pavers_crossroads;}
     const CharacteristicDefinition& getBushCharDef() const{return bush;}
     const CharacteristicDefinition& getReddishWallCharDef() const{return reddish_wall;}
+    const CharacteristicDefinition& getStationTilesCharDef() const{return station_tiles;}
+    const CharacteristicDefinition& getShrubsSintDenijsCharDef() const{return shrubs_sint_denijs;}
 
 };
 
@@ -175,22 +189,22 @@ private:
         defaultWeightedLocations.push_back(wSportdenijs_3);
 
         ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversSidewalkCharDef(), models.getBrickPaversHorizontalCharDef(),
-                  models.getBrickPaversVerticalCharDef(),models.getGrassRightCharDef(),models.getReddishWallCharDef()};
-        Location* sintDenijsStraat = new Location("Sint-Denijs tot kruispunt",ch11cs);
+                  models.getBrickPaversVerticalCharDef(),models.getNoGrassCharDef(),models.getReddishWallCharDef(),models.getShrubsSintDenijsCharDef()};
+        Location* sintDenijsStraat = new Location("Sint-Denijs tot station",ch11cs);
         locations.push_back(sintDenijsStraat);
         WeightedLocation* wSintDenijsStraat = new WeightedLocation(7,defaultMinimumWeight,sintDenijsStraat,0.0);
         defaultWeightedLocations.push_back(wSintDenijsStraat);
 
-        ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef(), models.getNoGrassCharDef()};
+        /*ch11cs = {models.getAsphaltCharDef(),models.getSquarePaversCrossroadsCharDef(), models.getNoGrassCharDef()};
         Location* sintDenijsKruispunt = new Location("Kruispunt",ch11cs);
         locations.push_back(sintDenijsKruispunt);
         WeightedLocation* wSintDenijsKruispunt = new WeightedLocation(8,defaultMinimumWeight,sintDenijsKruispunt,0.0);
-        defaultWeightedLocations.push_back(wSintDenijsKruispunt);
+        defaultWeightedLocations.push_back(wSintDenijsKruispunt);*/
 
-        ch11cs = {models.getFenceStationCharDef(), models.getNoGrassCharDef()};
+        ch11cs = { models.getNoGrassCharDef(),models.getStationTilesCharDef()};
         Location* station = new Location("Station",ch11cs);
         locations.push_back(station);
-        WeightedLocation* wStation = new WeightedLocation(9,defaultMinimumWeight,station,0.0);
+        WeightedLocation* wStation = new WeightedLocation(8,defaultMinimumWeight,station,0.0);
         defaultWeightedLocations.push_back(wStation);
 
         resetRefinement(false);

@@ -333,7 +333,7 @@ void testExecutor(){
 
 int main(int argc, char **argv)
 {
-    bool CLI = true;
+    bool CLI = false;
     if (CLI)
     {
         return release(argc, argv);
