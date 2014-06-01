@@ -131,7 +131,7 @@ CharacteristicValue LRHelperCharacteristicDefinition::getValue(const cv::Mat& im
 
     if (w_left > 0)
     {
-        if (def_right > 0)
+        if (w_right > 0)
         {
             val.definition = def_leftright;
             val.weight = (w_left + w_right)/2;
@@ -144,7 +144,7 @@ CharacteristicValue LRHelperCharacteristicDefinition::getValue(const cv::Mat& im
     }
     else
     {
-        if (def_right > 0)
+        if (w_right > 0)
         {
             val.definition = def_right;
             val.weight = w_right;
