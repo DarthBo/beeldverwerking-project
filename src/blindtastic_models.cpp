@@ -59,7 +59,7 @@ void play_classify(const char* fvid, int once_every_x_frames, int reset_location
                 featpair++;
             }
 
-            topLocation = locationRepository.getTopLocation().first->getName();
+            topLocation = locationRepository.getTopLocation().second == 0 ? "Unknown" : locationRepository.getTopLocation().first->getName();
             topLocation += " : ";
             topLocation += std::to_string(locationRepository.getTopLocation().second);
             printText(data.img,topLocation, 400,600);
@@ -163,7 +163,7 @@ void play_classify_mt(const char* fvid, int reset_location_every_x_frames, bool 
 
         if (detectedChars.size() > 1)
         {
-            topLocation = locationRepository.getTopLocation().first->getName();
+            topLocation = locationRepository.getTopLocation().second == 0 ? "Unknown" : locationRepository.getTopLocation().first->getName();
             topLocation += " : ";
             topLocation += std::to_string(locationRepository.getTopLocation().second);
         }
