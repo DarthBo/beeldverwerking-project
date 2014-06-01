@@ -54,7 +54,7 @@ public:
         grass_right("Grass (right)"),
         grass_leftright("Grass (left+right)"),
         grass_helper(&grass_none,&grass_left,&grass_right,&grass_leftright,
-                     "../model/gras.model",&getTextnHSVColour,9,9),
+                     "../model/gras2.model",&getTextnHSVColour,9,9),
         asphalt("Asphalt", "../model/asphalt.model",&getTextnHSVColour, asphalt_rows,asphalt_cols,asphalt_ratio),
         brick_pavers_vertical("Brick pavers (vertical)","../model/tegels1_sporthal.model",&getRectFeatures,1,1,0),
         brick_pavers_horizontal("Brick pavers (horizontal)","../model/tegels2_sporthal.model",&getRectFeatures,1,1,0),
