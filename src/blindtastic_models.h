@@ -41,7 +41,7 @@ protected:
     const CharacteristicDefinition big_square_pebbled_pavers;
     const CharacteristicDefinition fence_station;
     const CharacteristicDefinition square_pavers_sidewalk;
-    const CharacteristicDefinition square_pavers_crossroads;
+    //const CharacteristicDefinition square_pavers_crossroads; UNUSED ATM
     const CharacteristicDefinition bush;
     const CharacteristicDefinition reddish_wall;
     const CharacteristicDefinition station_tiles;
@@ -61,7 +61,7 @@ public:
         big_square_pebbled_pavers("Big square pebbled pavers","../model/tegelsGroot_sporthal.model",&getRectFeatures,1,1,0),
         fence_station("Fence station","../model/hek_station.model",&getRectFeatures,1,1,0),
         square_pavers_sidewalk("Square pavers sidewalk","../model/tegel_Denijs.model",&getRectFeatures,1,1,0),
-        square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0),
+        //square_pavers_crossroads("Square pavers crossroads","../model/tegelx_Denijs.model",&getRectFeatures,1,1,0),
         bush("Bush","../model/shrubs.model",&getTextnHSVColour,bush_rows,bush_cols,bush_ratio),
         reddish_wall("Reddish wall","../model/redWall.model",&getTextnHSVColour,reddish_wall_rows,reddish_wall_cols,reddish_wall_ratio),
         station_tiles("Station Tiles","../model/stationTile.model",&getTextnHSVColour,station_tiles_rows,station_tiles_cols,station_tiles_ratio),
@@ -75,7 +75,7 @@ public:
         CHARINSERT(big_square_pebbled_pavers);
         CHARINSERT(fence_station);
         CHARINSERT(square_pavers_sidewalk);
-        CHARINSERT(square_pavers_crossroads);
+        //CHARINSERT(square_pavers_crossroads);
         CHARINSERT(bush);
         CHARINSERT(reddish_wall);
         CHARINSERT(station_tiles);
@@ -93,7 +93,7 @@ public:
     const CharacteristicDefinition& getBigSquarePebbledPaversCharDef() const{return big_square_pebbled_pavers;}
     const CharacteristicDefinition& getFenceStationCharDef() const{return fence_station;}
     const CharacteristicDefinition& getSquarePaversSidewalkCharDef() const{return square_pavers_sidewalk;}
-    const CharacteristicDefinition& getSquarePaversCrossroadsCharDef() const{return square_pavers_crossroads;}
+    //const CharacteristicDefinition& getSquarePaversCrossroadsCharDef() const{return square_pavers_crossroads;}
     const CharacteristicDefinition& getBushCharDef() const{return bush;}
     const CharacteristicDefinition& getReddishWallCharDef() const{return reddish_wall;}
     const CharacteristicDefinition& getStationTilesCharDef() const{return station_tiles;}
